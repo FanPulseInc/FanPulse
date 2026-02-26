@@ -8,7 +8,7 @@ namespace FanPulseApi.Models
         public Guid Id { get; set; }
 
         [Required]
-        public string RoleName { get; set; }
+        public required string RoleName { get; set; }
 
         
         public DateTimeOffset CreatedAt { get; set; } = TimeProvider.System.GetUtcNow();

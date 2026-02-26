@@ -8,10 +8,10 @@ namespace FanPulseApi.Models
         public Guid Id { get; set; }
 
         [Required]
-        public string Title { get; set; }
+        public required string Title { get; set; }
 
         [Required]
-        public string Description { get; set; }
+        public required string Description { get; set; }
 
 
         public string UserId { get; set; }
@@ -22,6 +22,9 @@ namespace FanPulseApi.Models
 
         public DateTimeOffset CreatedAt { get; set; } = TimeProvider.System.GetUtcNow();
         public DateTimeOffset UpdatedAt { get; set; } = TimeProvider.System.GetUtcNow();
+
+
+        public List<Comment> comments { get; set; } = new List<Comment>();
 
 
         public DateTimeOffset UpdateStamp()

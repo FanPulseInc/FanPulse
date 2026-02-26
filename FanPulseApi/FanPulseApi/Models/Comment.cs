@@ -12,10 +12,13 @@ namespace FanPulseApi.Models
         public Post? Post { get; set; }
 
         [Required]
-        public string CommentText { get; set; }
+        public required string CommentText { get; set; }
 
         public string? ParentId { get; set; }
         public Comment Parent { get; set; }
+
+        public ICollection<Comment> Children { get; set; } = new List<Comment>();
+
 
 
         public string UserID { get; set; }
