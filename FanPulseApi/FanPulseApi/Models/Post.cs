@@ -15,11 +15,11 @@ namespace FanPulseApi.Models
 
 
         public Guid UserId { get; set; }
-        // public User User { get; set; }  nav property
+        public User User { get; set; }
 
-        // public List<string>Likes { get; set; } nav propety to table Likes or well do it with int column 'like'
+        public ICollection<PostLike> Likes {  get; set; }
 
-
+       
         public DateTimeOffset CreatedAt { get; set; } = TimeProvider.System.GetUtcNow();
         public DateTimeOffset UpdatedAt { get; set; } = TimeProvider.System.GetUtcNow();
 
