@@ -5,7 +5,7 @@ namespace FanPulseApi.Models
     public class Role
     {
         [Key]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public string RoleName { get; set; }

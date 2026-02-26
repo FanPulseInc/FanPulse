@@ -6,7 +6,7 @@ namespace FanPulseApi.Models
     public class Comment
     {
         [Key]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public string? PostId { get; set; }
         public Post? Post { get; set; }
