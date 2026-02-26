@@ -14,8 +14,8 @@ namespace FanPulseApi.Models
         public required string Description { get; set; }
 
 
-        public string UserId { get; set; }
-        // public string User { get; set; }  nav property
+        public Guid UserId { get; set; }
+        // public User User { get; set; }  nav property
 
         // public List<string>Likes { get; set; } nav propety to table Likes or well do it with int column 'like'
 
