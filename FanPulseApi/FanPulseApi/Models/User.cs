@@ -35,6 +35,11 @@ public sealed class User
     public required string UpdatedBy { get; set; }
     
     public ICollection<Category> FavCategories { get; set; } = new List<Category>();
+
+    public ICollection<Post> Posts { get; set; } = new List<Post>();
+    public ICollection<PostLike> Likes { get; set; } = new List<PostLike>();
+
+    
     
         
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http.Timeouts;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 
 namespace FanPulseApi.Models
@@ -26,7 +27,7 @@ namespace FanPulseApi.Models
 
 
 
-        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; } = TimeProvider.System.GetUtcNow();
         public DateTimeOffset UpdatedAt { get; set; } = TimeProvider.System.GetUtcNow();
 
 
