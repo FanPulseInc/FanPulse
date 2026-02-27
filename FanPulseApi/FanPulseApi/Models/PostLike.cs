@@ -11,9 +11,13 @@
 
         public Post Post { get; set; }
 
-        public User User { get; set; } 
+        public User User { get; set; }
 
 
+        public DateTimeOffset CreatedAt { get; set; } = TimeProvider.System.GetUtcNow();
+        public DateTimeOffset UpdatedAt { get; set; } = TimeProvider.System.GetUtcNow();
+
+        
 
     }
 }
