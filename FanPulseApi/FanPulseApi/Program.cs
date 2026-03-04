@@ -1,4 +1,7 @@
 
+using FanPulseApi.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace FanPulseApi
 {
     public class Program
@@ -6,11 +9,13 @@ namespace FanPulseApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-
+            
+            var connectionString = builder.Configuration.GetConnectionString("PostgresConnection");
+           
+            builder.Services.AddDbContext<FanPusleDbContext>(options =>
+                options.UseNpgsql(connectionString));
+            
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 

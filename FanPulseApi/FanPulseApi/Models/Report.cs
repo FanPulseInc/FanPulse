@@ -14,7 +14,7 @@
 
     public class Report
     {
-        public Guid Guid { get; set; }
+        public Guid Id { get; set; }
 
        
         public Guid ReportedUserId { get; set; }
