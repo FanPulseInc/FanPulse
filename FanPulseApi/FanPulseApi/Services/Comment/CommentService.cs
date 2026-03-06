@@ -1,5 +1,6 @@
 ﻿using FanPulseApi.DTO;
 using FanPulseApi.Models;
+using System.Runtime.InteropServices;
 
 namespace FanPulseApi.Services.Comment
 {
@@ -13,36 +14,49 @@ namespace FanPulseApi.Services.Comment
             _commentRepository = commentRepository;
         }
 
-        public Task<CommentReponse> AddComment(CommentAddRequest payload)
+        public async Task<CommentReponse> AddComment(CommentAddRequest payload)
         {
-            var comment = _commentRepository.AddComment(payload);
+            var comment = await _commentRepository.AddComment(payload);
 
-            return c
+            return CommentMapper.ToDto(comment);
+
         }
 
-        public Task<CommentReponse> DeleteComment(Guid id)
+        public async Task<CommentReponse> DeleteComment(Guid id)
         {
-            throw new NotImplementedException();
+            var comment = await _commentRepository.DeleteComment(id);
+           
+            return CommentMapper.ToDto(comment);
+
+            
+           
         }
 
-        public Task<List<CommentReponse>> GetChildrens(Guid commentId)
+        public async Task<List<CommentReponse>> GetChildrens(Guid commentId)
         {
-            throw new NotImplementedException();
+            var childrens = await _commentRepository.GetChilderns(commentId);
+            return CommentMapper.ToDtoArray(childrens);
         }
 
-        public Task<CommentReponse> GetCommentById(Guid id)
+        public async Task<CommentReponse> GetCommentById(Guid id)
         {
-            throw new NotImplementedException();
+            var comment = await _commentRepository.GetCommentById(id);
+            return CommentMapper.ToDto(comment);
+            
         }
 
-        public Task<List<CommentReponse>> GetCommentsByPost(Guid postId)
+        public async Task<List<CommentReponse>> GetCommentsByPost(Guid postId)
         {
-            throw new NotImplementedException();
+            var comments = await _commentRepository.GetCommentsByPost(postId);
+            return CommentMapper.ToDtoArray(comments);
+
         }
 
-        public Task<List<CommentReponse>> GetCommentsByUserId(Guid userId)
+        public async Task<List<CommentReponse>> GetCommentsByUserId(Guid userId)
         {
-            throw new NotImplementedException();
+            var comment = await  _commentRepository.GetCommentsByUserId(userId);
+            return CommentMapper.ToDtoArray(comment);
+
         }
     }
 }

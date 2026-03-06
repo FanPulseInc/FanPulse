@@ -11,14 +11,14 @@ namespace FanPulseApi.Services.Comment
                 CommentText = comment.CommentText,
                 User = comment.User,
                 Post = PostMapper.ToDto(comment.Post),
-                Children = ToDtoArray(comment.Children),
+                Children = ToDtoArray(comment.Children.ToList()),
                 
 
             };
 
         }
 
-        public static List<CommentReponse> ToDtoArray(ICollection<Models.Comment> comments)
+        public static List<CommentReponse> ToDtoArray(List<Models.Comment> comments)
         {
             var list = new List<CommentReponse>();
 

@@ -9,7 +9,7 @@ namespace FanPulseApi.Models
 
          public Task<Comment> UpdateComment(Guid commentId,CommentAddRequest comment);
 
-         public Task<Comment> DeleteComment(Comment comment);
+         public Task<Comment> DeleteComment(Guid id);
 
         public Task<List<Comment>> GetCommentsByPost(Guid postId);
 
@@ -17,7 +17,9 @@ namespace FanPulseApi.Models
 
         public Task<Comment> AddComment(CommentAddRequest comment);
 
-        
+        public Task<List<Comment>> GetCommentsByUserId(Guid userId);
+
+        public Task<Comment> GetCommentById(Guid id);
     
     }
 }
