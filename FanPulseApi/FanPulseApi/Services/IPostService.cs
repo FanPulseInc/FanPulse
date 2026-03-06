@@ -4,7 +4,7 @@ namespace FanPulseApi.Services
 {
     public interface IPostService
     {
-        public Task<PostResponce> AddPost(PostAddRequest payload);
+        public Task<PostResponce> AddPost(PostAddRequest payload,Guid userId);
 
         public Task<PostResponce> UpdatePost(Guid id,PostAddRequest payload);
 

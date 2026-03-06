@@ -7,14 +7,14 @@ namespace FanPulseApi.Models
     {
         public Task<List<Post>> GetPosts(int startFrom, int count);
 
-        public Task<Post> AddPost(PostAddRequest payload);
+        public Task<Post> AddPost(PostAddRequest payload,Guid userId);
 
         public Task<Post> GetPostById(Guid id);
 
         public Task<Post> DeletePost(Guid id);
 
-        public Task<Post> UpdatePost(Guid postId,Post post);
-
+        public Task<Post> UpdatePost(Guid postId,PostAddRequest post);
+        
 
       
     }

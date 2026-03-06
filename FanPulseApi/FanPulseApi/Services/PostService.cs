@@ -12,9 +12,9 @@ namespace FanPulseApi.Services
             _repoistory = repoistory;
         }
 
-        public async Task<PostResponce> AddPost(PostAddRequest payload)
+        public async Task<PostResponce> AddPost(PostAddRequest payload,Guid userId)
         {
-            var post = await _repoistory.AddPost(payload);
+            var post = await _repoistory.AddPost(payload,userId);
             return PostMapper.ToDto(post);
           
         }
@@ -38,9 +38,15 @@ namespace FanPulseApi.Services
             return PostMapper.ToArrayDto(posts);
         }
 
+        public Task<List<PostResponce>> GetPosts(int page)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<PostResponce> UpdatePost(Guid id, PostAddRequest payload)
         {
-            var updatedPost = _repoistory.UpdatePost(id,payload);
+            var updatedPost = await _repoistory.UpdatePost(id, payload);
+            return PostMapper.ToDto(updatedPost);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FanPulseApi.DTO;
+using System.ComponentModel.DataAnnotations;
 
 namespace FanPulseApi.Models
 {
@@ -12,7 +13,6 @@ namespace FanPulseApi.Models
 
         [Required]
         public required string Description { get; set; }
-
 
         public Guid UserId { get; set; }
         public User User { get; set; }
@@ -31,6 +31,13 @@ namespace FanPulseApi.Models
         {
             UpdatedAt = TimeProvider.System.GetUtcNow();
             return UpdatedAt;
+        }
+
+        public void UpdatePost(PostAddRequest payload)
+        {
+            Title = payload.Title;
+            Description = payload.Description;
+            
         }
 
         
