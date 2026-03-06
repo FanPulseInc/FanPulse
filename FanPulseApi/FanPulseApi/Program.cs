@@ -1,6 +1,7 @@
 
 using FanPulseApi.Data;
 using FanPulseApi.Models;
+using FanPulseApi.Repositories;
 using FanPulseApi.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -23,7 +24,7 @@ namespace FanPulseApi
             builder.Services.AddSwaggerGen();
 
 
-            builder.Services.AddScoped<IPostRepository, IPostRepository>();
+            builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<IPostService, PostService>();
            
 
