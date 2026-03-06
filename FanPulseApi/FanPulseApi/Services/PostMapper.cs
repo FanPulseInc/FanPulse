@@ -19,6 +19,7 @@ namespace FanPulseApi.Services
                 Id = post.Id,
                 User = post.User, // Should be replaced by UserDto
                 UserId = post.User.Id,
+                
 
             };
         }

@@ -5,7 +5,7 @@ namespace FanPulseApi.Models
 {
     public interface IPostRepository
     {
-        public Task<List<Post>> GetPosts(int startFrom, int count);
+        public Task<IEnumerable<Post>> GetPosts(int startFrom, int count);
 
         public Task<Post> AddPost(PostAddRequest payload,Guid userId);
 

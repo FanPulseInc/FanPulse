@@ -10,7 +10,7 @@ namespace FanPulseApi.Services
 
         public Task<PostResponce> DeletePost(Guid id);
 
-        public Task<List<PostResponce>> GetPosts(int page);
+        public Task<IEnumerable<PostResponce>> GetPosts(int page);
 
         public Task<PostResponce> GetPost(Guid id);
 

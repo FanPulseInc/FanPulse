@@ -1,6 +1,7 @@
 ﻿using FanPulseApi.Data;
 using FanPulseApi.DTO;
 using FanPulseApi.Models;
+using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
 
 namespace FanPulseApi.Repositories
@@ -46,11 +47,10 @@ namespace FanPulseApi.Repositories
 
         }
 
-        public async Task<List<Post>> GetPosts(int startFrom, int count)
+        public async Task<IEnumerable<Post>> GetPosts(int startFrom, int count)
         {
-            var posts =  _context.Posts.Skip(startFrom).Take(count).ToList();
-            return posts ?? null;
-
+            var posts = await _context.Posts.Skip(startFrom).Take(count).AsNoTracking().ToListAsync();
+            return posts;
         }
 
         public async Task<Post> UpdatePost(Guid postId, PostAddRequest payload)
