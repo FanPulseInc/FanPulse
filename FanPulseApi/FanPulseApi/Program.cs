@@ -1,6 +1,10 @@
 
 using FanPulseApi.Data;
+using FanPulseApi.Models;
+using FanPulseApi.Repositories;
+using FanPulseApi.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace FanPulseApi
 {
@@ -18,6 +22,13 @@ namespace FanPulseApi
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+
+            builder.Services.AddScoped<IPostRepository, PostRepository>();
+            builder.Services.AddScoped<IPostService, PostService>();
+           
+
+
 
             var app = builder.Build();
 
