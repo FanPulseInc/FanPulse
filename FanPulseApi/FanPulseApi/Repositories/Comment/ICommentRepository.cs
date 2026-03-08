@@ -5,7 +5,7 @@ namespace FanPulseApi.Models
 {
     public interface ICommentRepository
     {
-         public Task<Comment> NewComment(Comment comment);
+        
 
          public Task<Comment> UpdateComment(Guid commentId,CommentAddRequest comment);
 
@@ -15,7 +15,7 @@ namespace FanPulseApi.Models
 
         public Task<List<Comment>> GetChilderns(Guid commentId);
 
-        public Task<Comment> AddComment(CommentAddRequest comment);
+        public Task<Comment> AddComment(CommentAddRequest comment,Guid userId);
 
         public Task<List<Comment>> GetCommentsByUserId(Guid userId);
 
