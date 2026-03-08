@@ -56,7 +56,8 @@ namespace FanPulseApi.Services.Comment
         {
             var comment = await  _commentRepository.GetCommentsByUserId(userId);
             return CommentMapper.ToDtoArray(comment);
-
+            
         }
+        
     }
 }

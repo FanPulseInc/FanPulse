@@ -44,7 +44,7 @@ namespace FanPulseApi.Controllers
         {
             var post = await _service.AddPost(payload,new Guid());
             return Ok(post) ?? null;
-
+            
         }
 
         // PUT api/<PostController>/5
