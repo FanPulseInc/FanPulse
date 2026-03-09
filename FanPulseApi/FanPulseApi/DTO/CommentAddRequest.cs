@@ -11,6 +11,8 @@ namespace FanPulseApi.DTO
         public Guid PostId { get; set; }
 
         
+
+        
         public Guid? ParrentId { get; set; }
 
     }

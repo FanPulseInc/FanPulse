@@ -1,6 +1,7 @@
 ﻿using FanPulseApi.Data;
 using FanPulseApi.DTO;
 using FanPulseApi.Models;
+using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Internal;
 
 namespace FanPulseApi.Repositories.Comment
@@ -14,40 +15,51 @@ namespace FanPulseApi.Repositories.Comment
             _context = context;
         }
 
-        public Task<Models.Comment> AddComment(CommentAddRequest comment, Guid userId)
+        public async Task<Models.Comment> AddComment(CommentAddRequest payload, Guid userId)
         {
-            _context.Comments.AddAsync(new Models.Comment() { 
-                CommentText = comment.CommentText,
-                ParentId = comment.ParrentId??null,
-                PostId = comment.PostId,
-                UserId = comment
-                })
-           
+            var comment =  await _context.Comments.AddAsync(new Models.Comment()
+            {
+                CommentText = payload.CommentText,
+                ParentId = payload.ParrentId ?? null,
+                PostId = payload.PostId,
+                UserId = userId
+            });
+            return comment.Entity;      
         }
 
-        public Task<Models.Comment> DeleteComment(Guid id)
+        public async Task<Models.Comment> DeleteComment(Guid id)
         {
-            throw new NotImplementedException();
+            var comment = await _context.Comments.FindAsync(id);
+            if (comment == null) return null;
+            var deletedComment = _context.Comments.Remove(comment);
+            return deletedComment.Entity;
+
         }
 
-        public Task<List<Models.Comment>> GetChilderns(Guid commentId)
+        public async Task<List<Models.Comment>> GetChilderns(Guid commentId)
         {
-            throw new NotImplementedException();
+            var comment = await _context.Comments.FindAsync(commentId);
+            return null; // should resolve later
         }
 
-        public Task<Models.Comment> GetCommentById(Guid id)
+        public async Task<Models.Comment> GetCommentById(Guid id)
         {
-            throw new NotImplementedException();
+            return await _context.Comments.FindAsync(id) ?? null;
+
+             
         }
 
-        public Task<List<Models.Comment>> GetCommentsByPost(Guid postId)
+        public async Task<List<Models.Comment>> GetCommentsByPost(Guid postId)
         {
-            throw new NotImplementedException();
+           var comment = await _context.Comments.Where(c => c.PostId == postId).ToListAsync();
+           return comment;
+
         }
 
         public Task<List<Models.Comment>> GetCommentsByUserId(Guid userId)
         {
-            throw new NotImplementedException();
+            return null;
+
         }
 
      
