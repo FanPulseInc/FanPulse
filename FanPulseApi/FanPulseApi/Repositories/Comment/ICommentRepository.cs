@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using FanPulseApi.DTO;
+using System.Runtime.InteropServices;
 
 namespace FanPulseApi.Models
 {
@@ -6,12 +7,19 @@ namespace FanPulseApi.Models
     {
          public Task<Comment> NewComment(Comment comment);
 
-         public Task<Comment> UpdateComment(Guid commentId,Comment comment);
+         public Task<Comment> UpdateComment(Guid commentId,CommentAddRequest comment);
 
-         public Task<bool> DeleteComment(Comment comment);
+         public Task<Comment> DeleteComment(Guid id);
 
+        public Task<List<Comment>> GetCommentsByPost(Guid postId);
 
+        public Task<List<Comment>> GetChilderns(Guid commentId);
 
-      
+        public Task<Comment> AddComment(CommentAddRequest comment);
+
+        public Task<List<Comment>> GetCommentsByUserId(Guid userId);
+
+        public Task<Comment> GetCommentById(Guid id);
+    
     }
 }
