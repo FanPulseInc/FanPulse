@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.Timeouts;
+﻿using FanPulseApi.DTO;
+using Microsoft.AspNetCore.Http.Timeouts;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 
@@ -23,7 +24,7 @@ namespace FanPulseApi.Models
 
 
         public Guid UserId { get; set; }
-        public User User { get; set; }
+        public User User { get; set;}
 
 
 
@@ -40,6 +41,12 @@ namespace FanPulseApi.Models
         {
             UpdatedAt = TimeProvider.System.GetUtcNow();
             return UpdatedAt;
+        }
+
+        public void UpdatedComment(string updatedText)
+        {
+            CommentText = updatedText;
+
         }
 
    
