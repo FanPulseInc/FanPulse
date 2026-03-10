@@ -43,9 +43,10 @@ namespace FanPulseApi.Models
             return UpdatedAt;
         }
 
-        public void UpdatedComment(string updatedText)
+        public void UpdateComment(string updatedText)
         {
             CommentText = updatedText;
+            UpdatedAt = DateTimeOffset.UtcNow;
 
         }
 

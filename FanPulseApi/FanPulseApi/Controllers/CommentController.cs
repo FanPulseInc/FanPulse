@@ -49,9 +49,10 @@ namespace FanPulseApi.Controllers
 
         // PUT api/<CommentController>/5
         [HttpPut("{id}")]
-        public Task<ActionResult<CommentReponse>> Put([FromBody] CommentAddRequest payload,Guid id)
+        public async Task<ActionResult<CommentReponse>> Put([FromBody] CommentAddRequest payload,Guid id)
         {
-           return null;
+            var updatedComment = await _commentService.UpdateComment(id, payload);
+            return Ok(updatedComment);
         }
 
         // DELETE api/<CommentController>/5

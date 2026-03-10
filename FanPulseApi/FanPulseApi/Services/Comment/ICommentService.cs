@@ -16,6 +16,9 @@ namespace FanPulseApi.Services.Comment
 
         public Task<List<CommentReponse>>GetChildrens(Guid commentId);
 
+        public Task<CommentReponse> UpdateComment(Guid id, CommentAddRequest payload);
+
+
         
     }
 }

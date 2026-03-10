@@ -20,6 +20,8 @@ namespace FanPulseApi.Models
         public Task<List<Comment>> GetCommentsByUserId(Guid userId);
 
         public Task<Comment> GetCommentById(Guid id);
-    
+
+        
+        
     }
 }

@@ -58,6 +58,13 @@ namespace FanPulseApi.Services.Comment
             return CommentMapper.ToDtoArray(comment);
             
         }
-        
+
+        public async Task<CommentReponse> UpdateComment(Guid id, CommentAddRequest payload)
+        {
+            var updatedComment = await _commentRepository.UpdateComment(id, payload);
+            return CommentMapper.ToDto(updatedComment);
+
+            
+        }
     }
 }

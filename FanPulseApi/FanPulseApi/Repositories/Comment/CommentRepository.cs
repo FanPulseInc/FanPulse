@@ -72,12 +72,14 @@ namespace FanPulseApi.Repositories.Comment
             var comment = await _context.Comments.FindAsync(commentId);
             if (comment == null) return null;
 
-            comment.UpdatedComment(payload.CommentText);
+            comment.UpdateComment(payload.CommentText);
+            await _context.SaveChangesAsync();
             return comment;
 
 
             
 
         }
+
     }
 }
