@@ -1,6 +1,7 @@
 ﻿using FanPulseApi.DTO;
+using FanPulseApi.DTO.Post;
 
-namespace FanPulseApi.Services
+namespace FanPulseApi.Services.Post
 {
     public interface IPostService
     {

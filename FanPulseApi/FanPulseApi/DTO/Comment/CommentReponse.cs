@@ -1,7 +1,7 @@
-﻿using FanPulseApi.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using FanPulseApi.DTO.Post;
 
-namespace FanPulseApi.DTO
+namespace FanPulseApi.DTO.Comment
 {
     public class CommentReponse
     {
@@ -16,6 +16,6 @@ namespace FanPulseApi.DTO
         public CommentReponse? Parent { get; set; }
 
         public ICollection<CommentReponse> Children { get; set; } = new List<CommentReponse>();
-        public User User { get; set; }
+        public Models.User User { get; set; }
     }
 }

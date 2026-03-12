@@ -2,9 +2,8 @@
 using FanPulseApi.Data;
 using FanPulseApi.Models;
 using FanPulseApi.Repositories;
-using FanPulseApi.Repositories.Comment;
 using FanPulseApi.Services;
-using FanPulseApi.Services.Comment;
+using FanPulseApi.Services.Post;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -28,12 +27,6 @@ namespace FanPulseApi
 
             builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<IPostService, PostService>();
-
-            builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-            builder.Services.AddScoped<ICommentService, CommentService>();
-
-
-
            
 
 

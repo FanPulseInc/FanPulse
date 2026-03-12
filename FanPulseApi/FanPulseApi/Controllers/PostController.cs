@@ -1,5 +1,7 @@
 ﻿using FanPulseApi.DTO;
+using FanPulseApi.DTO.Post;
 using FanPulseApi.Services;
+using FanPulseApi.Services.Post;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql.PostgresTypes;
 

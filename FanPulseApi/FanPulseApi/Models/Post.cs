@@ -1,5 +1,6 @@
 ﻿using FanPulseApi.DTO;
 using System.ComponentModel.DataAnnotations;
+using FanPulseApi.DTO.Post;
 
 namespace FanPulseApi.Models
 {

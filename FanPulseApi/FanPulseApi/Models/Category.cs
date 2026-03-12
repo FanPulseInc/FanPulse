@@ -2,7 +2,7 @@
 
 namespace FanPulseApi.Models;
 
-public sealed class Category
+public class Category
 {
     public Guid Id { get; set; }
     
