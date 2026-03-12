@@ -9,10 +9,10 @@ namespace FanPulseApi.Services.Comment
             return new CommentReponse()
             {
                 CommentText = comment.CommentText,
-                User = comment.User,
-                Post = PostMapper.ToDto(comment.Post),
-                Children = ToDtoArray(comment.Children.ToList()),
-                
+                User = comment.User ?? null,
+                Post = comment.Post != null ? PostMapper.ToDto(comment.Post) : null,
+                Children = ToDtoArray(comment.Children.ToList()) ?? null,
+
 
             };
 
@@ -28,5 +28,6 @@ namespace FanPulseApi.Services.Comment
             }
             return list;
         }
+
     }
 }

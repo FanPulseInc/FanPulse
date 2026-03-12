@@ -49,9 +49,9 @@ namespace FanPulseApi.Controllers
 
         // PUT api/<PostController>/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<PostResponce>> Put([FromBody]PostAddRequest payload)
+        public async Task<ActionResult<PostResponce>> Put(Guid id,[FromBody]PostAddRequest payload)
         {
-            var post = await _service.UpdatePost(new Guid(),payload);
+            var post = await _service.UpdatePost(id,payload);
             if (post == null) return BadRequest();
             return post;
 

@@ -10,11 +10,14 @@ namespace FanPulseApi.Services.Comment
 
         public Task<List<CommentReponse>> GetCommentsByUserId (Guid userId);
 
-        public Task<CommentReponse>AddComment(CommentAddRequest payload);
+        public Task<CommentReponse>AddComment(CommentAddRequest payload,Guid userId);
 
         public Task<CommentReponse>DeleteComment(Guid id);
 
         public Task<List<CommentReponse>>GetChildrens(Guid commentId);
+
+        public Task<CommentReponse> UpdateComment(Guid id, CommentAddRequest payload);
+
 
         
     }

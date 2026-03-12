@@ -14,9 +14,9 @@ namespace FanPulseApi.Services.Comment
             _commentRepository = commentRepository;
         }
 
-        public async Task<CommentReponse> AddComment(CommentAddRequest payload)
+        public async Task<CommentReponse> AddComment(CommentAddRequest payload, Guid userId)
         {
-            var comment = await _commentRepository.AddComment(payload);
+            var comment = await _commentRepository.AddComment(payload,userId);
 
             return CommentMapper.ToDto(comment);
 
@@ -58,6 +58,13 @@ namespace FanPulseApi.Services.Comment
             return CommentMapper.ToDtoArray(comment);
             
         }
-        
+
+        public async Task<CommentReponse> UpdateComment(Guid id, CommentAddRequest payload)
+        {
+            var updatedComment = await _commentRepository.UpdateComment(id, payload);
+            return CommentMapper.ToDto(updatedComment);
+
+            
+        }
     }
 }
