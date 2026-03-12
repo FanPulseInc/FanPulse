@@ -22,7 +22,7 @@ namespace FanPulseApi.Repositories
             {
                 Description = payload.Description,
                 Title = payload.Title,
-                UserId = userId
+                UserId = new Guid()
                 
             });
             await _context.SaveChangesAsync();
@@ -43,7 +43,7 @@ namespace FanPulseApi.Repositories
 
         public async Task<Post> GetPostById(Guid id)
         {
-            var post = await _context.Posts.FindAsync(id);
+            var post = await _context.Posts.Include(c=>c.User).FirstOrDefaultAsync(p=>p.Id == id);
             return post ?? null;
 
         }
@@ -57,7 +57,7 @@ namespace FanPulseApi.Repositories
         public async Task<Post> UpdatePost(Guid postId, PostAddRequest payload)
         {
 
-            var post = await _context.Posts.FindAsync(postId);
+            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
             if (post == null) return null;
             post.UpdatePost(payload);
             await _context.SaveChangesAsync();

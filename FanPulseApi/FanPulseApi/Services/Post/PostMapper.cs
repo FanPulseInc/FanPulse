@@ -10,14 +10,13 @@ namespace FanPulseApi.Services.Post
             {
                 Description = post.Description,
                 Title = post.Title,
-                Comments = post.comments,
+                Comments = post.comments ?? null ,
                 CreatedAt = post.CreatedAt,
                 UpdatedAt = post.UpdatedAt,
-                Likes = post.Likes,
+                Likes = post.Likes ?? null,
                 Id = post.Id,
-                User = post.User, // Should be replaced by UserDto
-                UserId = post.User.Id,
-                
+                User = post.User ?? null, // Should be replaced by UserDto
+                UserId = post.UserId != Guid.Empty ? post.UserId : null,
 
             };
         }

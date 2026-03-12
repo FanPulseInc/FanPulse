@@ -2,10 +2,7 @@
 using FanPulseApi.Data;
 using FanPulseApi.Models;
 using FanPulseApi.Repositories;
-using FanPulseApi.Repositories.User;
 using FanPulseApi.Services;
-using FanPulseApi.Services.Post;
-using FanPulseApi.Services.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -27,13 +24,6 @@ namespace FanPulseApi
             builder.Services.AddSwaggerGen();
 
 
-            builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
-            
-            //User
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<IUserService, UserService>();
-            
-            //Post
             builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<IPostService, PostService>();
            

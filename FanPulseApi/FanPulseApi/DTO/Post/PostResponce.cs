@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using FanPulseApi.Models;
+﻿using FanPulseApi.Models;
+using System.ComponentModel.DataAnnotations;
 
-namespace FanPulseApi.DTO.Post
+namespace FanPulseApi.DTO
 {
     public class PostResponce
     {
@@ -15,7 +15,7 @@ namespace FanPulseApi.DTO.Post
         public required string Description { get; set; }
 
         public Guid UserId { get; set; }
-        public Models.User User { get; set; }
+        public User User { get; set; }
 
         public ICollection<PostLike> Likes { get; set; }
 
@@ -24,7 +24,7 @@ namespace FanPulseApi.DTO.Post
         public DateTimeOffset UpdatedAt { get; set; } = TimeProvider.System.GetUtcNow();
 
 
-        public List<Models.Comment> Comments { get; set; } = new List<Models.Comment>();
+        public List<Comment> Comments { get; set; } = new List<Comment>();
 
 
     
