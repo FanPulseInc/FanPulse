@@ -1,4 +1,5 @@
-﻿using FanPulseApi.DTO.Post;
+﻿using FanPulseApi.DTO;
+using FanPulseApi.DTO.Post;
 
 namespace FanPulseApi.Services.Post
 {

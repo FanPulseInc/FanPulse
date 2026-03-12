@@ -3,6 +3,7 @@ using FanPulseApi.Data;
 using FanPulseApi.Models;
 using FanPulseApi.Repositories;
 using FanPulseApi.Services;
+using FanPulseApi.Services.Post;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 
