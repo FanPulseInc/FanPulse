@@ -1,12 +1,10 @@
-﻿using FanPulseApi.DTO;
-using FanPulseApi.Models;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using FanPulseApi.DTO.Post;
 
-namespace FanPulseApi.Services
+namespace FanPulseApi.Services.Post
 {
     public static class PostMapper
     {
-        public static PostResponce ToDto(Post post)
+        public static PostResponce ToDto(Models.Post post)
         {
             return new PostResponce
             {
@@ -24,7 +22,7 @@ namespace FanPulseApi.Services
             };
         }
 
-        public static List<PostResponce> ToArrayDto(List<Post> posts)
+        public static List<PostResponce> ToArrayDto(List<Models.Post> posts)
         {
             var list = new List<PostResponce>();
             foreach (var post in posts) { 

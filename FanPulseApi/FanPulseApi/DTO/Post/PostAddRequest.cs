@@ -1,7 +1,6 @@
-﻿using FanPulseApi.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace FanPulseApi.DTO
+namespace FanPulseApi.DTO.Post
 {
     public class PostAddRequest
     {

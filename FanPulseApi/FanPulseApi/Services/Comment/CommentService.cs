@@ -1,6 +1,7 @@
 ﻿using FanPulseApi.DTO;
 using FanPulseApi.Models;
 using System.Runtime.InteropServices;
+using FanPulseApi.DTO.Comment;
 
 namespace FanPulseApi.Services.Comment
 {

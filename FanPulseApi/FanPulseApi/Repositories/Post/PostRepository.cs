@@ -1,5 +1,6 @@
 ﻿using FanPulseApi.Data;
 using FanPulseApi.DTO;
+using FanPulseApi.DTO.Post;
 using FanPulseApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
@@ -10,9 +11,9 @@ namespace FanPulseApi.Repositories
     {
         private readonly FanPusleDbContext _context;
 
-        public PostRepository(FanPusleDbContext context) { 
+        public PostRepository(FanPusleDbContext context) 
+        { 
             _context = context;
-
         }
 
         public async Task<Post> AddPost(PostAddRequest payload,Guid userId)
