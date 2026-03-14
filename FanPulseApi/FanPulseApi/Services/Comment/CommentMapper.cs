@@ -1,5 +1,8 @@
 ﻿using FanPulseApi.DTO;
+using FanPulseApi.DTO.Comment;
 using FanPulseApi.Models;
+using FanPulseApi.Services.Post;
+
 namespace FanPulseApi.Services.Comment
 {
     public static class CommentMapper

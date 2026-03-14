@@ -4,14 +4,11 @@ using FanPulseApi.Exceptions;
 using FanPulseApi.Middlewares;
 using FanPulseApi.Models;
 using FanPulseApi.Repositories;
-using FanPulseApi.Repositories.Comment;
 using FanPulseApi.Services;
-using FanPulseApi.Services.Comment;
-using FanPulseApi.Validators;
-using Microsoft.AspNetCore.Diagnostics;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-
+using FanPulseApi.Services.Comment;
 namespace FanPulseApi
 {
     public class Program
@@ -37,12 +34,6 @@ namespace FanPulseApi
 
             builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<IPostService, PostService>();
-
-            builder.Services.AddScoped<ICommentRepository, CommentRepository>();
-            builder.Services.AddScoped<ICommentService, CommentService>();
-
-
-
            
 
 

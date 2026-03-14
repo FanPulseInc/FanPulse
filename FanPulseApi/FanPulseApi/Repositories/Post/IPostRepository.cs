@@ -1,4 +1,5 @@
 ﻿using FanPulseApi.DTO;
+using FanPulseApi.DTO.Post;
 using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 
 namespace FanPulseApi.Models

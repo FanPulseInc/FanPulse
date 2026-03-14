@@ -3,6 +3,7 @@ using FanPulseApi.Exceptions;
 using FanPulseApi.Models;
 using FanPulseApi.Validators;
 using System.Runtime.InteropServices;
+using FanPulseApi.DTO.Comment;
 
 namespace FanPulseApi.Services.Comment
 {

@@ -1,5 +1,6 @@
 ﻿using FanPulseApi.DTO;
 using System.Net;
+using FanPulseApi.DTO.Comment;
 
 namespace FanPulseApi.Services.Comment
 {
