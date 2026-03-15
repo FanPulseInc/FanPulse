@@ -1,5 +1,7 @@
 ﻿using FanPulseApi.DTO;
+using FanPulseApi.Exceptions;
 using FanPulseApi.Models;
+using FanPulseApi.Validators;
 using System.Runtime.InteropServices;
 using FanPulseApi.DTO.Comment;
 
@@ -9,14 +11,20 @@ namespace FanPulseApi.Services.Comment
     {
 
         private readonly ICommentRepository _commentRepository;
+        private readonly ISpecification<string> _specification;
 
-        public CommentService(ICommentRepository commentRepository)
+
+        public CommentService(ICommentRepository commentRepository,ISpecification<string> spec)
         {
             _commentRepository = commentRepository;
+            _specification = spec;
+
         }
 
         public async Task<CommentReponse> AddComment(CommentAddRequest payload, Guid userId)
         {
+            if (!_specification.IsSatisfiedBy(payload.CommentText)) throw new BusinessRuleException("Comment has a frobidden words");
+
             var comment = await _commentRepository.AddComment(payload,userId);
 
             return CommentMapper.ToDto(comment);

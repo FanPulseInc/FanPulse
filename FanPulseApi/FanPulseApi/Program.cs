@@ -1,12 +1,14 @@
 
 using FanPulseApi.Data;
+using FanPulseApi.Exceptions;
+using FanPulseApi.Middlewares;
 using FanPulseApi.Models;
 using FanPulseApi.Repositories;
 using FanPulseApi.Services;
-using FanPulseApi.Services.Post;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
-
+using FanPulseApi.Services.Comment;
 namespace FanPulseApi
 {
     public class Program
@@ -19,6 +21,11 @@ namespace FanPulseApi
            
             builder.Services.AddDbContext<FanPusleDbContext>(options =>
                 options.UseNpgsql(connectionString));
+
+
+            builder.Services.AddSingleton<IBadWordsProvider, BadWordsProvider>();
+            builder.Services.AddSingleton<ISpecification<string>,ProfanityFilterSpec>();
+
             
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -32,6 +39,7 @@ namespace FanPulseApi
 
 
             var app = builder.Build();
+            app.UseMiddleware<BusinessExceptionMiddleware>();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -39,6 +47,8 @@ namespace FanPulseApi
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+           
 
             app.UseAuthorization();
 
