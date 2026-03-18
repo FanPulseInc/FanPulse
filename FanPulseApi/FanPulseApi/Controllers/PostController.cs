@@ -44,8 +44,8 @@ namespace FanPulseApi.Controllers
         [HttpPost]
         public async Task<ActionResult<PostResponce>> Post([FromBody] PostAddRequest payload)
         {
-            var post = await _service.AddPost(payload,new Guid());
-            return Ok(post) ?? null;
+            var post = await _service.AddPost(payload,new Guid()); // Should remove mock guid
+            return Ok(post);
             
         }
 
@@ -63,7 +63,7 @@ namespace FanPulseApi.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<PostResponce>> Delete(Guid id)
         {
-            var deletedPost = _service.DeletePost(id);
+            var deletedPost = await _service.DeletePost(id);
             if (deletedPost == null) return NotFound();
             return Ok(deletedPost);
 

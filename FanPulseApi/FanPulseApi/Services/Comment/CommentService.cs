@@ -4,6 +4,7 @@ using FanPulseApi.Models;
 using FanPulseApi.Validators;
 using System.Runtime.InteropServices;
 using FanPulseApi.DTO.Comment;
+using Microsoft.EntityFrameworkCore;
 
 namespace FanPulseApi.Services.Comment
 {
@@ -11,19 +12,20 @@ namespace FanPulseApi.Services.Comment
     {
 
         private readonly ICommentRepository _commentRepository;
-        private readonly ISpecification<string> _specification;
+        private readonly ISpecification<string> _wordSpec;
+        private readonly ISpecification<OwnerCheckRequest> _ownerCheckRequest;
 
 
-        public CommentService(ICommentRepository commentRepository,ISpecification<string> spec)
+        public CommentService(ICommentRepository commentRepository,ISpecification<string> spec, ISpecification<OwnerCheckRequest> ownerCheckRequest)
         {
             _commentRepository = commentRepository;
-            _specification = spec;
-
+            _wordSpec = spec;
+            _ownerCheckRequest = ownerCheckRequest;
         }
 
         public async Task<CommentReponse> AddComment(CommentAddRequest payload, Guid userId)
         {
-            if (!_specification.IsSatisfiedBy(payload.CommentText)) throw new BusinessRuleException("Comment has a frobidden words");
+            if (!_wordSpec.IsSatisfiedBy(payload.CommentText)) throw new BusinessRuleException("Comment has a frobidden words");
 
             var comment = await _commentRepository.AddComment(payload,userId);
 
@@ -38,7 +40,7 @@ namespace FanPulseApi.Services.Comment
             return CommentMapper.ToDto(comment);
 
             
-           
+          
         }
 
         public async Task<List<CommentReponse>> GetChildrens(Guid commentId)
@@ -63,8 +65,8 @@ namespace FanPulseApi.Services.Comment
 
         public async Task<List<CommentReponse>> GetCommentsByUserId(Guid userId)
         {
-            var comment = await  _commentRepository.GetCommentsByUserId(userId);
-            return CommentMapper.ToDtoArray(comment);
+            var comment = _commentRepository.GetCommentsByUserId(userId);
+            return CommentMapper.ToDtoArray(await comment.ToListAsync());
             
         }
 

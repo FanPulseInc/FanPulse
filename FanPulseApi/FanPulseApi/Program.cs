@@ -9,6 +9,10 @@ using FanPulseApi.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using FanPulseApi.Services.Comment;
+using FanPulseApi.Validators;
+using FanPulseApi.Services.Post;
+using FanPulseApi.DTO;
+using FanPulseApi.Validators.Specification;
 namespace FanPulseApi
 {
     public class Program
@@ -25,6 +29,7 @@ namespace FanPulseApi
 
             builder.Services.AddSingleton<IBadWordsProvider, BadWordsProvider>();
             builder.Services.AddSingleton<ISpecification<string>,ProfanityFilterSpec>();
+            builder.Services.AddSingleton<ISpecification<OwnerCheckRequest>, IsOwnerSpec>();
 
             
             builder.Services.AddControllers();

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.Json;
+﻿using FanPulseApi.Validators.Specification;
+using Microsoft.EntityFrameworkCore.Storage.Json;
 using Microsoft.OpenApi.Validations;
 
 namespace FanPulseApi.Validators

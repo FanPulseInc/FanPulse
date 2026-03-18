@@ -2,6 +2,7 @@
 using FanPulseApi.DTO.Comment;
 using FanPulseApi.Models;
 using FanPulseApi.Services.Post;
+using FanPulseApi.Services.User;
 
 namespace FanPulseApi.Services.Comment
 {
@@ -12,7 +13,7 @@ namespace FanPulseApi.Services.Comment
             return new CommentReponse()
             {
                 CommentText = comment.CommentText,
-                User = comment.User ?? null,
+                User = UserMapper.ToDto(comment.User),
                 Post = comment.Post != null ? PostMapper.ToDto(comment.Post) : null,
                 Children = ToDtoArray(comment.Children.ToList()) ?? null,
 

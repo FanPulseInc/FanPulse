@@ -1,5 +1,6 @@
 ﻿using FanPulseApi.DTO;
 using FanPulseApi.DTO.Post;
+using FanPulseApi.Services.User;
 
 namespace FanPulseApi.Services.Post
 {
@@ -11,15 +12,15 @@ namespace FanPulseApi.Services.Post
             {
                 Description = post.Description,
                 Title = post.Title,
-                Comments = post.comments ?? null ,
+                Comments = post.comments ?? null,
                 CreatedAt = post.CreatedAt,
                 UpdatedAt = post.UpdatedAt,
                 Likes = post.Likes ?? null,
                 Id = post.Id,
-                User = post.User ?? null, // Should be replaced by UserDto
-                UserId = post.UserId != Guid.Empty ? post.UserId : null,
+                User = UserMapper.ToDto(post.User), // Should be replaced by UserDto  
+                UserId = post.UserId != Guid.Empty ? post.UserId : Guid.Empty
 
-            };
+            };   
         }
 
         public static List<PostResponce> ToArrayDto(List<Models.Post> posts)
