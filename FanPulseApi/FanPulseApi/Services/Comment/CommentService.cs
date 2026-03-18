@@ -1,10 +1,10 @@
 ﻿using FanPulseApi.DTO;
 using FanPulseApi.Exceptions;
 using FanPulseApi.Models;
-using FanPulseApi.Validators;
 using System.Runtime.InteropServices;
 using FanPulseApi.DTO.Comment;
 using Microsoft.EntityFrameworkCore;
+using FanPulseApi.Validators.Specification;
 
 namespace FanPulseApi.Services.Comment
 {
@@ -45,8 +45,8 @@ namespace FanPulseApi.Services.Comment
 
         public async Task<List<CommentReponse>> GetChildrens(Guid commentId)
         {
-            var childrens = await _commentRepository.GetChilderns(commentId);
-            return CommentMapper.ToDtoArray(childrens);
+            var childrens = _commentRepository.GetChilderns(commentId);
+            return CommentMapper.ToDtoArray(childrens.ToList());
         }
 
         public async Task<CommentReponse> GetCommentById(Guid id)
@@ -58,8 +58,8 @@ namespace FanPulseApi.Services.Comment
 
         public async Task<List<CommentReponse>> GetCommentsByPost(Guid postId)
         {
-            var comments = await _commentRepository.GetCommentsByPost(postId);
-            return CommentMapper.ToDtoArray(comments);
+            var comments =  _commentRepository.GetCommentsByPost(postId);
+            return CommentMapper.ToDtoArray(await comments.ToListAsync());
 
         }
 

@@ -1,8 +1,7 @@
-﻿using FanPulseApi.Validators.Specification;
-using Microsoft.EntityFrameworkCore.Storage.Json;
+﻿using Microsoft.EntityFrameworkCore.Storage.Json;
 using Microsoft.OpenApi.Validations;
 
-namespace FanPulseApi.Validators
+namespace FanPulseApi.Validators.Specification
 {
     public class ProfanityFilterSpec : ISpecification<string>
     {

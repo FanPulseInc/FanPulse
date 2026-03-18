@@ -1,4 +1,4 @@
-﻿namespace FanPulseApi.Validators
+﻿namespace FanPulseApi.Validators.Specification
 {
     public interface ISpecification<T>
     {

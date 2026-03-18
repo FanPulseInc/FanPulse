@@ -11,9 +11,9 @@ namespace FanPulseApi.Models
 
         public Task<Comment> DeleteComment(Guid id);
 
-        public Task<IQueryable<Comment>> GetCommentsByPost(Guid postId);
+        public IQueryable<Comment> GetCommentsByPost(Guid postId);
 
-        public Task<ICollection<Comment>> GetChilderns(Guid commentId);
+        public ICollection<Comment> GetChilderns(Guid commentId);
 
         public Task<Comment> AddComment(CommentAddRequest comment,Guid userId);
 

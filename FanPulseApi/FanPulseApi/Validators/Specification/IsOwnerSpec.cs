@@ -1,6 +1,6 @@
 ﻿using FanPulseApi.DTO;
 
-namespace FanPulseApi.Validators
+namespace FanPulseApi.Validators.Specification
 {
     public class IsOwnerSpec : ISpecification<OwnerCheckRequest>
     {

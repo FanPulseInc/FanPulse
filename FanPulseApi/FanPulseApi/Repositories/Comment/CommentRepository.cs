@@ -42,7 +42,7 @@ namespace FanPulseApi.Repositories.Comment
 
         }
 
-        public async Task<ICollection<Models.Comment>> GetChilderns(Guid commentId)
+        public  ICollection<Models.Comment> GetChilderns(Guid commentId)
         {
             var comment = _context.Comments
                 .Include(c => c.Children)
@@ -58,7 +58,7 @@ namespace FanPulseApi.Repositories.Comment
              
         }
 
-        public async Task<IQueryable<Models.Comment>> GetCommentsByPost(Guid postId)
+        public IQueryable<Models.Comment> GetCommentsByPost(Guid postId)
         {
            var comment = _context.Comments.Where(c => c.PostId == postId);
            return comment;
