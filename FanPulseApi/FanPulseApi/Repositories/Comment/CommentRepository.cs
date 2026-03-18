@@ -18,12 +18,15 @@ namespace FanPulseApi.Repositories.Comment
 
         public async Task<Models.Comment> AddComment(CommentAddRequest payload, Guid userId)
         {
+
+            
+
             var comment = await _context.Comments.AddAsync(new Models.Comment()
             {
                 CommentText = payload.CommentText,
                 ParentId = payload.ParrentId ?? null,
                 PostId = payload.PostId,
-                UserId = new Guid("8116e90f-422d-4c4c-9c8e-e759ad1ae497")
+                UserId = new Guid("8116e90f-422d-4c4c-9c8e-e759ad1ae497") // Should remove this mock.
             });
             await _context.SaveChangesAsync();
             return comment.Entity;      
@@ -39,10 +42,13 @@ namespace FanPulseApi.Repositories.Comment
 
         }
 
-        public async Task<List<Models.Comment>> GetChilderns(Guid commentId)
+        public  ICollection<Models.Comment> GetChilderns(Guid commentId)
         {
-            var comment = await _context.Comments.FindAsync(commentId);
-            return null; // should resolve later
+            var comment = _context.Comments
+                .Include(c => c.Children)
+                .FirstOrDefault(i => i.Id == commentId);
+                
+            return comment.Children ?? null;
         }
 
         public async Task<Models.Comment> GetCommentById(Guid id)
@@ -52,17 +58,16 @@ namespace FanPulseApi.Repositories.Comment
              
         }
 
-        public async Task<List<Models.Comment>> GetCommentsByPost(Guid postId)
+        public IQueryable<Models.Comment> GetCommentsByPost(Guid postId)
         {
-           var comment = await _context.Comments.Where(c => c.PostId == postId).ToListAsync();
+           var comment = _context.Comments.Where(c => c.PostId == postId);
            return comment;
 
         }
 
-        public Task<List<Models.Comment>> GetCommentsByUserId(Guid userId)
+        public IQueryable<Models.Comment> GetCommentsByUserId(Guid userId)
         {
-            return null;
-
+            return _context.Comments.Where(i => i.UserId == userId);
         }
 
      

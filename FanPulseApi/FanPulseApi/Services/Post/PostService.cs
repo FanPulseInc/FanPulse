@@ -1,6 +1,7 @@
 ﻿using FanPulseApi.DTO;
 using FanPulseApi.DTO.Post;
 using FanPulseApi.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace FanPulseApi.Services.Post
 {
@@ -39,7 +40,7 @@ namespace FanPulseApi.Services.Post
         public async Task<IEnumerable<PostResponce>> GetPosts(int page,int count = 20)
         {
             var posts = await _repoistory.GetPosts(page,count);
-            return PostMapper.ToArrayDto(posts.ToList());
+            return PostMapper.ToArrayDto(await posts.ToListAsync());
             
             
         }

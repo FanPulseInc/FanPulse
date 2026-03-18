@@ -48,9 +48,9 @@ namespace FanPulseApi.Repositories
 
         }
 
-        public async Task<IEnumerable<Post>> GetPosts(int startFrom, int count)
+        public async Task<IQueryable<Post>> GetPosts(int startFrom, int count)
         {
-            var posts = await _context.Posts.Skip(startFrom).Take(count).AsNoTracking().ToListAsync();
+            var posts = _context.Posts.Skip(startFrom).Take(count).AsNoTracking();
             return posts;
         }
 

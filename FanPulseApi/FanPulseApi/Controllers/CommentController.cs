@@ -40,6 +40,13 @@ namespace FanPulseApi.Controllers
            
         }
 
+        [HttpGet("comments")]
+        public async Task<ActionResult<IEnumerable<CommentReponse>>>GetAllByUserId([FromQuery]Guid userId)
+        {
+            var comments = await _commentService.GetCommentsByUserId(userId);
+            return Ok(comments);
+        }
+
         // POST api/<CommentController>
         [HttpPost]
         public async Task<ActionResult<CommentReponse>> Post([FromBody] CommentAddRequest payload)
@@ -61,7 +68,7 @@ namespace FanPulseApi.Controllers
         public async Task<ActionResult<CommentReponse>> Delete(Guid id)
         {
            var deletedComment  = await _commentService.DeleteComment(id);
-           if (deletedComment == null) return null ;
+           if (deletedComment == null) return null;
            return Ok(deletedComment);
         }
     }
