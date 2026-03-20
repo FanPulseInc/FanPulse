@@ -4,12 +4,12 @@ using FanPulseApi.Repositories.Likes;
 
 namespace FanPulseApi.Services.Like
 {
-    public class LikeServicecs:ILikeService
+    public class LikeService:ILikeService
     {
 
         private readonly ILikeRepository _repository;
 
-        public LikeServicecs(ILikeRepository repository)
+        public LikeService(ILikeRepository repository)
         {
             _repository = repository;
 
