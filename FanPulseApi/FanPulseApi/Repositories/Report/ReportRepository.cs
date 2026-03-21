@@ -33,10 +33,10 @@ namespace FanPulseApi.Repositories.Report
             return report;
         }
 
-        public int GetCountReportsForUserById(Guid userId)
+        public Task<int> GetCountReportsForUserById(Guid userId)
         {
-            return _context.Reports.Count(i => i.ReportedUserId == userId);
-         
+            return _context.Reports.CountAsync(i => i.ReportedUserId == userId);
+             
         }
 
         public async Task<Models.Report> GetReportById(Guid guid)
@@ -85,13 +85,6 @@ namespace FanPulseApi.Repositories.Report
 
         }
 
-        public async Task<int> GetCountReportsForUserById(Guid userId)
-        {
-            var count = await  _context.Reports.CountAsync(i => i.ReportedUserId == userId);
-            return count;
-        }
-        
-
-
+       
     }
 }

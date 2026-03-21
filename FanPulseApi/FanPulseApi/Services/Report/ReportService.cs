@@ -22,12 +22,9 @@ namespace FanPulseApi.Services.Report
             {
                 throw new BusinessRuleException("You already reported that person. Please wait for the consideration");
             }
-
-
-
             
-
-            
+           var report =  await _repository.AddReport(payload);
+            return ReportMapper.ToDto(report);    
         }
 
         private async Task<bool> HasNoDublicate(ReportAddRequest request,Guid reporterId) 
@@ -50,15 +47,18 @@ namespace FanPulseApi.Services.Report
             throw new NotImplementedException();
         }
 
-        public Task<ReportResponse> GetReportById(Guid guid)
+        public async Task<ReportResponse> GetReportById(Guid guid)
         {
-            throw new NotImplementedException();
+            var report = await _repository.GetReportById(guid);
+            if (report == null) return null;
+            return ReportMapper.ToDto(report);
         }
 
         public async Task<IEnumerable<ReportResponse>> GetReportsForUserById(Guid userId)
         {
             var reports = _repository.GetReportsForUserById(userId);
             return ReportMapper.ToArrayDto(await reports.ToListAsync());
+
         }
 
         public async Task<ReportResponse> RemoveReport(Guid reportId)
