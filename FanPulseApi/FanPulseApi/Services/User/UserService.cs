@@ -1,6 +1,7 @@
 ﻿using FanPulseApi.DTO;
 using FanPulseApi.DTO.User;
 using FanPulseApi.Models;
+using FanPulseApi.Repositories.Category;
 using FanPulseApi.Repositories.User;
 
 namespace FanPulseApi.Services.User;
@@ -9,11 +10,15 @@ public class UserService: IUserService
 {
     private readonly IUserRepository _repository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ICategoryRepository _categoryRepository;
 
-    public UserService(IUserRepository repository, IPasswordHasher passwordHasher)
+    public UserService(IUserRepository repository, 
+        IPasswordHasher passwordHasher, 
+        ICategoryRepository categoryRepository)
     {
         _repository = repository;
         _passwordHasher = passwordHasher;
+        _categoryRepository =  categoryRepository;
     }
 
     //Get
@@ -51,6 +56,17 @@ public class UserService: IUserService
             return null;
         }
         
+        var categories = new List<Models.Category>();
+        foreach (var categoryId in addRequest.FavCategoryIds)
+        {
+            var category = await _categoryRepository.GetCategoryByIdAsync(categoryId);
+            if (category == null)
+            {
+                throw new Exception($"Category with ID {categoryId} not found.");
+            }
+            categories.Add(category);
+        }
+        
         var passwordResult = _passwordHasher.HashPassword(addRequest.Password);
         
         var user = new Models.User
@@ -58,15 +74,17 @@ public class UserService: IUserService
             Id = Guid.NewGuid(),
             Email = addRequest.Email,
             Name = addRequest.Name,
+            
             PasswordHash = passwordResult.Hash,
             PasswordSalt = passwordResult.Salt,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow,
             CreatedBy = "system",
-            UpdatedBy = "system" 
+            UpdatedBy = "system",
+            
+            FavCategories = categories
         };
         
-        //There will be categories soon...
         
         var createdUser = await _repository.CreateUserAsync(user);
         return createdUser.ToDto();

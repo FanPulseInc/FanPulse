@@ -12,6 +12,10 @@ using FanPulseApi.Services.Comment;
 using FanPulseApi.Validators;
 using FanPulseApi.Services.Post;
 using FanPulseApi.DTO;
+using FanPulseApi.Repositories.Category;
+using FanPulseApi.Repositories.User;
+using FanPulseApi.Services.Category;
+using FanPulseApi.Services.User;
 using FanPulseApi.Validators.Specification;
 namespace FanPulseApi
 {
@@ -36,7 +40,12 @@ namespace FanPulseApi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            
+            builder.Services.AddScoped<IUserRepository, IUserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            
             builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<IPostService, PostService>();
            
