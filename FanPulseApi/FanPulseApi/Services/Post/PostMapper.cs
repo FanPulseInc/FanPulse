@@ -17,7 +17,7 @@ namespace FanPulseApi.Services.Post
                 UpdatedAt = post.UpdatedAt,
                 Likes = post.Likes ?? null,
                 Id = post.Id,
-                User = UserMapper.ToDto(post.User), // Should be replaced by UserDto  
+                User = UserMapper.ToDto(post.User),  
                 UserId = post.UserId != Guid.Empty ? post.UserId : Guid.Empty
 
             };   
