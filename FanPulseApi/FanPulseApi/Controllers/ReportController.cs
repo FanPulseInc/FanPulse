@@ -23,8 +23,8 @@ namespace FanPulseApi.Controllers
         [HttpGet("{id}")]
         public async Task<ReportResponse> Get(Guid id)
         {
-            var report = await _service.GetReportById(id);
-            if (report == null) return null;
+            var report = await _service.GetReportByIdAsync(id);
+            if (report == null) { return null; }
             return report;
 
         }
@@ -33,7 +33,7 @@ namespace FanPulseApi.Controllers
         [HttpPost]
         public async Task<ReportResponse> Post([FromBody] ReportAddRequest payload)
         {
-            var report = await _service.AddReport(payload, new Guid());
+            var report = await _service.AddReportAsync(payload, new Guid());
             return report;
 
         }
@@ -42,8 +42,8 @@ namespace FanPulseApi.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ReportResponse>> Put(Guid id, [FromBody] ReportAddRequest payload)
         {
-            var report = await _service.UpdateReport(id, payload);
-            if (report == null) return BadRequest("Error when update report");
+            var report = await _service.UpdateReportAsync(id, payload);
+            if (report == null)  { return BadRequest("Error when update report"); };
             return Ok(report);
         }
 
@@ -57,8 +57,8 @@ namespace FanPulseApi.Controllers
         [HttpGet("user-reports")]
         public async Task<ActionResult<IEnumerable<ReportResponse>>> GetReportsForUser([FromQuery]Guid id)
         {
-            var reports = await _service.GetReportsForUserById(id);
-            if (reports == null) return NotFound();
+            var reports = await _service.GetReportsForUserByIdAsync(id);
+            if (reports == null) { return NotFound(); };
             return Ok(reports);
         }
 
@@ -67,8 +67,8 @@ namespace FanPulseApi.Controllers
         [HttpPatch("{id}/close")]
         public async Task<ActionResult<ReportResponse>>CloseReport(Guid id)
         {
-            var report = await _service.GetReportById(id);
-            if (report == null) return BadRequest("Error when closing report");
+            var report = await _service.GetReportByIdAsync(id);
+            if (report == null) { return BadRequest("Error when closing report"); }
             return report;
 
         }

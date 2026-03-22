@@ -1,9 +1,8 @@
 ﻿using FanPulseApi.DTO.Report;
 using FanPulseApi.Exceptions;
 using FanPulseApi.Models;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using FanPulseApi.Repositories.Report;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
 
 namespace FanPulseApi.Services.Report
 {
@@ -16,60 +15,58 @@ namespace FanPulseApi.Services.Report
             _repository = repository;
         }
 
-        public async Task<ReportResponse> AddReport(ReportAddRequest payload,Guid reporterId)
+        public async Task<ReportResponse> AddReportAsync(ReportAddRequest payload, Guid reporterId)
         {
-            if(!await HasNoDublicate(payload,reporterId))
+            if (!await HasNoDuplicateAsync(payload, reporterId))
             {
                 throw new BusinessRuleException("You already reported that person. Please wait for the consideration");
             }
-            
-           var report =  await _repository.AddReport(payload);
-            return ReportMapper.ToDto(report);    
+
+            var report = await _repository.AddReportAsync(payload);
+            return ReportMapper.ToDto(report);
         }
 
-        private async Task<bool> HasNoDublicate(ReportAddRequest request,Guid reporterId) 
+        private async Task<bool> HasNoDuplicateAsync(ReportAddRequest request, Guid reporterId)
         {
-            var reports = await _repository.GetUserReportsById(reporterId);
-            if ((await reports.ToListAsync()).Find(i => i.ReportedUserId == request.ReportedId) != null) return false;
-            return true;
+            var reportsQuery = await _repository.GetUserReportsByIdAsync(reporterId);
+            var exists = await reportsQuery.AnyAsync(i => i.ReportedUserId == request.ReportedId);
+            return !exists;
         }
 
-        public async Task<ReportResponse> CloseReport(Guid reportId)
+        public async Task<ReportResponse> CloseReportAsync(Guid reportId)
         {
-            var updatedReport = await _repository.CloseReport(reportId);
-
+            var updatedReport = await _repository.CloseReportAsync(reportId);
             return ReportMapper.ToDto(updatedReport);
-
         }
 
-        public int GetCountReportsForUserById(Guid userId)
+        public async Task<int> GetCountReportsForUserByIdAsync(Guid userId)
         {
-            throw new NotImplementedException();
+            return await _repository.GetCountReportsForUserByIdAsync(userId);
         }
 
-        public async Task<ReportResponse> GetReportById(Guid guid)
+        public async Task<ReportResponse> GetReportByIdAsync(Guid guid)
         {
-            var report = await _repository.GetReportById(guid);
+            var report = await _repository.GetReportByIdAsync(guid);
             if (report == null) return null;
             return ReportMapper.ToDto(report);
         }
 
-        public async Task<IEnumerable<ReportResponse>> GetReportsForUserById(Guid userId)
+        public async Task<IEnumerable<ReportResponse>> GetReportsForUserByIdAsync(Guid userId)
         {
-            var reports = _repository.GetReportsForUserById(userId);
-            return ReportMapper.ToArrayDto(await reports.ToListAsync());
-
+            var reportsQuery = _repository.GetReportsForUserById(userId);
+            var list = await reportsQuery.ToListAsync();
+            return ReportMapper.ToArrayDto(list);
         }
 
-        public async Task<ReportResponse> RemoveReport(Guid reportId)
+        public async Task<ReportResponse> RemoveReportAsync(Guid reportId)
         {
-            var removedReport = await _repository.RemoveReport(reportId);
+            var removedReport = await _repository.RemoveReportAsync(reportId);
             return ReportMapper.ToDto(removedReport);
         }
 
-        public async Task<ReportResponse> UpdateReport(Guid reportId, ReportAddRequest report)
+        public async Task<ReportResponse> UpdateReportAsync(Guid reportId, ReportAddRequest report)
         {
-            var updatedReport = await _repository.UpdateReport(reportId,report);
+            var updatedReport = await _repository.UpdateReportAsync(reportId, report);
             return ReportMapper.ToDto(updatedReport);
         }
     }

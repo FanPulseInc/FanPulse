@@ -9,23 +9,29 @@ namespace FanPulseApi.Repositories.Report
     {
         private readonly FanPusleDbContext _context;
 
-        public async Task<Models.Report> AddReport(ReportAddRequest payload)
+        public ReportRepository(FanPusleDbContext context)
         {
-           var report = await  _context.Reports.AddAsync(new Models.Report()
+            _context = context;
+        }
+
+        public async Task<Models.Report> AddReportAsync(ReportAddRequest payload)
+        {
+            var report = new Models.Report()
             {
                 description = payload.description,
                 ReportedUserId = payload.ReportedId,
                 Reason = payload.reason,
                 ReporterId = payload.ReportedId,
+            };
 
-
-            });
-            return report.Entity;
+            await _context.Reports.AddAsync(report);
+            await _context.SaveChangesAsync();
+            return report;
         }
 
-        public async Task<Models.Report> CloseReport(Guid reportId)
+        public async Task<Models.Report> CloseReportAsync(Guid reportId)
         {
-            var report =  await _context.Reports.FindAsync(reportId);
+            var report = await _context.Reports.FindAsync(reportId);
             if (report == null) return null;
 
             report.Status = ReportStatus.Closed;
@@ -33,47 +39,40 @@ namespace FanPulseApi.Repositories.Report
             return report;
         }
 
-        public Task<int> GetCountReportsForUserById(Guid userId)
+        public async Task<int> GetCountReportsForUserByIdAsync(Guid userId)
         {
-            return _context.Reports.CountAsync(i => i.ReportedUserId == userId);
-             
+            var count = await _context.Reports.CountAsync(i => i.ReportedUserId == userId);
+            return count;
         }
 
-        public async Task<Models.Report> GetReportById(Guid guid)
+        public async Task<Models.Report> GetReportByIdAsync(Guid guid)
         {
-            var report = await _context.Reports.FindAsync(guid);
-            if (report == null) return null;
-
-            
-            
-            return report;
+            return await _context.Reports.FindAsync(guid);
         }
 
         public IQueryable<Models.Report> GetReportsForUserById(Guid userId)
         {
-            var reports = _context.Reports.Where(i => i.ReportedUserId == userId);
-            return reports;
-            
+   
+            return _context.Reports.Where(i => i.ReportedUserId == userId);
         }
 
-        public async Task<IQueryable<Models.Report>> GetUserReportsById(Guid userId)
+        public async Task<IQueryable<Models.Report>> GetUserReportsByIdAsync(Guid userId)
         {
-            var reports = _context.Reports.Where(i => i.ReporterId == userId);
-            return reports;
+          
+            return _context.Reports.Where(i => i.ReporterId == userId);
         }
 
-        public async Task<Models.Report> RemoveReport(Guid reportId)
+        public async Task<Models.Report> RemoveReportAsync(Guid reportId)
         {
             var report = await _context.Reports.FindAsync(reportId);
-
-            if(report == null) return null;
+            if (report == null) return null;
 
             _context.Reports.Remove(report);
             await _context.SaveChangesAsync();
             return report;
         }
 
-        public async Task<Models.Report> UpdateReport(Guid reportId, ReportAddRequest payload)
+        public async Task<Models.Report> UpdateReportAsync(Guid reportId, ReportAddRequest payload)
         {
             var report = await _context.Reports.FindAsync(reportId);
             if (report == null) return null;
@@ -82,9 +81,6 @@ namespace FanPulseApi.Repositories.Report
 
             await _context.SaveChangesAsync();
             return report;
-
         }
-
-       
     }
 }

@@ -4,19 +4,17 @@ namespace FanPulseApi.Services.Report
 {
     public interface IReportService
     {
-        public Task<ReportResponse> AddReport(DTO.Report.ReportAddRequest payload,Guid reporterId);
+        public Task<ReportResponse> AddReportAsync(DTO.Report.ReportAddRequest payload, Guid reporterId);
 
-        public Task<ReportResponse> UpdateReport(Guid reportId, ReportAddRequest report);
+        public Task<ReportResponse> UpdateReportAsync(Guid reportId, ReportAddRequest report);
 
-        public Task<ReportResponse> RemoveReport(Guid reportId);
+        public Task<ReportResponse> RemoveReportAsync(Guid reportId);
 
-        public Task<IEnumerable<ReportResponse>> GetReportsForUserById(Guid userId);
+        public Task<IEnumerable<ReportResponse>> GetReportsForUserByIdAsync(Guid userId);
+        public Task<int> GetCountReportsForUserByIdAsync(Guid userId);
 
-        public int GetCountReportsForUserById(Guid userId);
+        public Task<ReportResponse> CloseReportAsync(Guid reportId);
 
-        public Task<ReportResponse> CloseReport(Guid reportId);
-
-        public Task<ReportResponse> GetReportById(Guid guid);
-
+        public Task<ReportResponse> GetReportByIdAsync(Guid guid);
     }
 }
