@@ -17,6 +17,8 @@ using FanPulseApi.Repositories.User;
 using FanPulseApi.Services.Category;
 using FanPulseApi.Services.User;
 using FanPulseApi.Validators.Specification;
+using FanPulseApi.Repositories.Report;
+using FanPulseApi.Services.Report;
 namespace FanPulseApi
 {
     public class Program
@@ -48,6 +50,9 @@ namespace FanPulseApi
             
             builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<IPostService, PostService>();
+
+            builder.Services.AddScoped<IReportRepository, ReportRepository>();
+            builder.Services.AddScoped<IReportService, ReportService>();
            
 
 
