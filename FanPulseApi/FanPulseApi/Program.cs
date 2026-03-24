@@ -12,6 +12,7 @@ using FanPulseApi.Services.Comment;
 using FanPulseApi.Validators;
 using FanPulseApi.Services.Post;
 using FanPulseApi.DTO;
+using FanPulseApi.DTO.User.Validator;
 using FanPulseApi.Repositories.Category;
 using FanPulseApi.Repositories.User;
 using FanPulseApi.Services.Category;
@@ -19,6 +20,8 @@ using FanPulseApi.Services.User;
 using FanPulseApi.Validators.Specification;
 using FanPulseApi.Repositories.Report;
 using FanPulseApi.Services.Report;
+using FluentValidation;
+
 namespace FanPulseApi
 {
     public class Program
@@ -54,6 +57,8 @@ namespace FanPulseApi
             builder.Services.AddScoped<IReportRepository, ReportRepository>();
             builder.Services.AddScoped<IReportService, ReportService>();
            
+            //This code will automatically register any validators, no need for more registration
+            builder.Services.AddValidatorsFromAssemblyContaining<UserAddRequestValidator>();
 
 
 
