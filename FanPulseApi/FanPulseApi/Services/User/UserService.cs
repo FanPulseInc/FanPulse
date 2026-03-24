@@ -3,6 +3,7 @@ using FanPulseApi.DTO.User;
 using FanPulseApi.Models;
 using FanPulseApi.Repositories.Category;
 using FanPulseApi.Repositories.User;
+using FluentValidation;
 
 namespace FanPulseApi.Services.User;
 
@@ -11,14 +12,20 @@ public class UserService: IUserService
     private readonly IUserRepository _repository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IValidator<UserAddRequest> _validator;
+    private readonly IValidator<UserUpdateRequest> _updateValidator;
 
     public UserService(IUserRepository repository, 
         IPasswordHasher passwordHasher, 
-        ICategoryRepository categoryRepository)
+        ICategoryRepository categoryRepository,
+        IValidator<UserAddRequest> validator,
+        IValidator<UserUpdateRequest> updateValidator)
     {
         _repository = repository;
         _passwordHasher = passwordHasher;
         _categoryRepository =  categoryRepository;
+        _validator = validator;
+        _updateValidator = updateValidator;
     }
 
     //Get
@@ -45,6 +52,15 @@ public class UserService: IUserService
     
     public async Task<UserResponse?> AddUserAsync(UserAddRequest addRequest)
     {
+        var validationResult = await _validator.ValidateAsync(addRequest);
+        
+        if (!validationResult.IsValid)
+        {
+            //Exception can be changed
+            var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+            throw new ValidationException(errors); 
+        }
+        
         if (addRequest.FavCategoryIds.Count != 2)
         {
             throw new Exception("You must select exactly 2 favorite categories.");
@@ -74,7 +90,7 @@ public class UserService: IUserService
             Id = Guid.NewGuid(),
             Email = addRequest.Email,
             Name = addRequest.Name,
-            
+            AvatarUrl = addRequest.AvatarUrl,
             PasswordHash = passwordResult.Hash,
             PasswordSalt = passwordResult.Salt,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -94,6 +110,13 @@ public class UserService: IUserService
     
     public async Task<UserResponse> UpdateUserAsync(Guid userId, UserUpdateRequest request)
     {
+        var validationResult = await _updateValidator.ValidateAsync(request);
+        
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+        
         var user = await _repository.GetUserByIdAsync(userId);
         if (user == null)
         {
