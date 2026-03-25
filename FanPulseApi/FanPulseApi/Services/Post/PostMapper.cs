@@ -18,7 +18,8 @@ namespace FanPulseApi.Services.Post
                 Likes = post.Likes ?? null,
                 Id = post.Id,
                 User = UserMapper.ToDto(post.User),  
-                UserId = post.UserId != Guid.Empty ? post.UserId : Guid.Empty
+                UserId = post.UserId != Guid.Empty ? post.UserId : Guid.Empty,
+                Category = Category.CategoryMapper.ToDto(post.Category),
 
             };   
         }

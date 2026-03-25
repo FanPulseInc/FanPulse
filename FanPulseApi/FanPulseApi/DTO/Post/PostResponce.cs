@@ -1,4 +1,5 @@
-﻿using FanPulseApi.DTO.User;
+﻿using FanPulseApi.DTO.Category;
+using FanPulseApi.DTO.User;
 using FanPulseApi.Models;
 using System.ComponentModel.DataAnnotations;
 
@@ -17,6 +18,8 @@ namespace FanPulseApi.DTO
 
         public Guid UserId { get; set; }
         public UserResponse User { get; set; }
+
+        public CategoryResponse Category { get; set; }
 
         public ICollection<PostLike> Likes { get; set; }
 

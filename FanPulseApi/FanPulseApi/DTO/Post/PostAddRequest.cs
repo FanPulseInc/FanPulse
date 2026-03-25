@@ -9,6 +9,9 @@ namespace FanPulseApi.DTO.Post
         [Required]
         public required string Description { get; set; }
 
+        [Required]
+        public required Guid CategoryId { get; set; }
+
    
     }
 }

@@ -18,6 +18,10 @@ namespace FanPulseApi.Models
         public Guid UserId { get; set; }
         public User User { get; set; }
 
+        public Guid? CategoryId { get; set; }
+        public Category? Category { get; set; }
+
+
         public ICollection<PostLike> Likes {  get; set; }
 
        
