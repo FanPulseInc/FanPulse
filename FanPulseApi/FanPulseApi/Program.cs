@@ -19,6 +19,7 @@ using FanPulseApi.Services.Category;
 using FanPulseApi.Services.User;
 using FanPulseApi.Validators.Specification;
 using FanPulseApi.Repositories.Report;
+using FanPulseApi.Services.Auth;
 using FanPulseApi.Services.Report;
 using FluentValidation;
 
@@ -45,6 +46,8 @@ namespace FanPulseApi
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             
@@ -63,6 +66,19 @@ namespace FanPulseApi
             builder.Services.AddValidatorsFromAssemblyContaining<UserAddRequestValidator>();
 
 
+            var jwtKey = builder.Configuration["Jwt:Key"] ?? "Temporary_Local_Dev_Key_32_Chars_Long!!!";
+            builder.Services.AddAuthentication("Bearer")
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtKey)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                    };
+                });
 
             var app = builder.Build();
             app.UseMiddleware<BusinessExceptionMiddleware>();
@@ -75,10 +91,9 @@ namespace FanPulseApi
             }
 
            
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
-
+            
             app.MapControllers();
 
             app.Run();
