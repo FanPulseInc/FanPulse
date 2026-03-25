@@ -1,6 +1,7 @@
 ﻿using FanPulseApi.Data;
 using FanPulseApi.Models;
 using FanPulseApi.Repositories.Likes;
+using System.Threading.Tasks;
 
 namespace FanPulseApi.Services.Like
 {
@@ -32,19 +33,23 @@ namespace FanPulseApi.Services.Like
 
         }
 
-        public Task<int> GetCountLikesByCommentId(Guid commentId)
-        {
-            throw new NotImplementedException();
+        public  async Task<int> GetCountLikesByCommentId(Guid commentId)
+        { 
+           var likes = await _repository.GetCountLikesByCommentId(commentId);
+           return likes;
         }
 
-        public Task<int> GetCountLikesByPostId(Guid postId)
+        public async Task<int> GetCountLikesByPostId(Guid postId)
         {
-            throw new NotImplementedException();
+            var likes = await _repository.GetCountLikesByPostId(postId);
+            return likes;
         }
 
-        public IQueryable<PostLike> GetLikesByUserId(Guid id)
+        public async Task<IQueryable<PostLike>> GetLikesByUserId(Guid id)
         {
-            throw new NotImplementedException();
+            var likes = await GetLikesByUserId(id);
+            return likes;
         }
+
     }
 }
