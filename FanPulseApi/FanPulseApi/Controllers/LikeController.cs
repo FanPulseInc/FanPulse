@@ -1,4 +1,5 @@
-﻿using FanPulseApi.Services.Like;
+﻿using FanPulseApi.DTO.Like;
+using FanPulseApi.Services.Like;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -28,9 +29,11 @@ namespace FanPulseApi.Controllers
 
   
         // POST api/<LikeController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("{postId}")]
+        public void Post([FromRoute]Guid postId)
         {
+
+            _likeService.AddLike()
             
         }
 
