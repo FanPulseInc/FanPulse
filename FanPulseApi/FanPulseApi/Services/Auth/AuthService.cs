@@ -35,7 +35,7 @@ public class AuthService : IAuthService
         
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "Temporary_Local_Dev_Key_32_Chars_Long!!!");
-            
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
@@ -43,7 +43,7 @@ public class AuthService : IAuthService
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email)
             }),
-            Expires = DateTime.UtcNow.AddDays(7),
+            Expires = DateTime.UtcNow.AddSeconds(double.Parse(_config["Jwt:lifeTime"])),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
