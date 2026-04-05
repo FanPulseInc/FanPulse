@@ -15,36 +15,36 @@ namespace FanPulseApi.Services.Like
 
         }
 
-        public async Task<PostLike> AddLike(PostLike postLike)
-        {
-          var like = await _repository.AddLike(postLike);
+        public async Task<PostLike> AddLikeAsync(PostLike postLike)
+        { 
+            var like = await _repository.AddLikeAsync(postLike);
            return like;
 
           
         }
 
-        public async Task<bool> DeleteLike(Guid id)
+        public async Task<bool> DeleteLikeAsync(Guid id)
         {
-            var completed = await _repository.DeleteLike(id);
+            var completed = await _repository.DeleteLikeAsync(id);
 
             return completed ? true : false;
 
 
         }
 
-        public Task<int> GetCountLikesByCommentId(Guid commentId)
+        public async Task<int> GetLikeCountAsync(Guid targetId)
         {
-            throw new NotImplementedException();
+            return await _repository.GetLikeCountAsync(targetId);
         }
 
-        public Task<int> GetCountLikesByPostId(Guid postId)
+        public async Task<bool> IsLikedByUserAsync(Guid targetId, Guid userId)
         {
-            throw new NotImplementedException();
+            return await _repository.IsLikedByUserAsync(targetId, userId);
         }
 
-        public IQueryable<PostLike> GetLikesByUserId(Guid id)
+        public async Task<IEnumerable<PostLike>> GetLikesByTargetIdAsync(Guid targetId)
         {
-            throw new NotImplementedException();
+            return await _repository.GetLikesByTargetIdAsync(targetId);
         }
     }
 }

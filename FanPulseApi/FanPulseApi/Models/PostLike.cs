@@ -3,11 +3,11 @@
     public class PostLike
     {
         
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
-        public Guid UserId { get; set; }
-
-        public Guid PostId { get; set; }
+        public Guid? UserId { get; set; }
+        public Guid? PostId { get; set; }
+        public Guid? CommentId { get; set; }
 
         public Post Post { get; set; }
 

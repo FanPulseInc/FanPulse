@@ -3,15 +3,19 @@ using System.Diagnostics.Contracts;
 
 namespace FanPulseApi.Repositories.Likes
 {
+    public enum LikeTarget
+    {
+        Post,
+        Comment
+    }
+    
     public interface ILikeRepository
     {
-        public Task<PostLike> AddLike(PostLike postLike);
-        public Task<bool> DeleteLike(Guid id);
-        public IQueryable<PostLike> GetLikesByUserId(Guid id);
-
-        public Task<int> GetCountLikesByPostId(Guid postId);
-        // Dont like this approach, should to think about how to handle in 1 method for Posts and Comments
-        public Task<int> GetCountLikesByCommentId(Guid commentId); 
+        public Task<PostLike> AddLikeAsync(PostLike postLike);
+        public Task<bool> DeleteLikeAsync(Guid id);
+        public Task<int> GetLikeCountAsync(Guid targetId); 
+        public Task<bool> IsLikedByUserAsync(Guid targetId, Guid userId);
+        public Task<IEnumerable<PostLike>> GetLikesByTargetIdAsync(Guid targetId);
 
        
     }
