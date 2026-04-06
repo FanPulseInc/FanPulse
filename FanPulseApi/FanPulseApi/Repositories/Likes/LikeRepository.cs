@@ -1,6 +1,7 @@
 ﻿using FanPulseApi.Data;
 using FanPulseApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FanPulseApi.Repositories.Likes
 {
@@ -13,14 +14,14 @@ namespace FanPulseApi.Repositories.Likes
             _context = context;
         }
 
-        public async Task<PostLike> AddLike(PostLike postLike)
+        public async Task<PostLike> AddLikeAsync(PostLike postLike)
         {
             var like = await  _context.PostLikes.AddAsync(postLike);
             await _context.SaveChangesAsync();
             return like.Entity;
         }
 
-        public async  Task<bool> DeleteLike(Guid id)
+        public async  Task<bool> DeleteLikeAsync(Guid id)
         {
 
             var like = await _context.PostLikes.FindAsync(id);
@@ -31,20 +32,26 @@ namespace FanPulseApi.Repositories.Likes
 
         }
 
-        public Task<int> GetCountLikesByCommentId(Guid commentId)
+
+        public async Task<int> GetLikeCountAsync(Guid targetId)
         {
-            throw new NotImplementedException();
+            var likes = await _context.PostLikes
+                .CountAsync(l => l.PostId == targetId || l.CommentId == targetId);
+            return likes;
         }
 
-        public Task<int> GetCountLikesByPostId(Guid postId)
+        public async Task<bool> IsLikedByUserAsync(Guid targetId, Guid userId)
         {
-            throw new NotImplementedException();
+            var isLiked = await _context.PostLikes
+                .AnyAsync(l => l.UserId == userId && (l.PostId == targetId || l.CommentId == targetId));
+            return isLiked;
         }
 
-        public  IQueryable<PostLike> GetLikesByUserId(Guid id)
+        public async Task<IEnumerable<PostLike>> GetLikesByTargetIdAsync(Guid targetId)
         {
-            return _context.PostLikes.Where(i => i.UserId == id);
-           
+            return await _context.PostLikes
+                .Where(l => l.PostId == targetId || l.CommentId == targetId)
+                .ToListAsync();
         }
     }
 }

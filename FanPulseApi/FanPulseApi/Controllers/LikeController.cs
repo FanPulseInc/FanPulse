@@ -1,4 +1,4 @@
-﻿using FanPulseApi.DTO.Like;
+﻿using FanPulseApi.Models;
 using FanPulseApi.Services.Like;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,41 +12,51 @@ namespace FanPulseApi.Controllers
     {
         private readonly ILikeService _likeService;
 
-        public LikeController(ILikeService likeService)
+        // GET: api/Like/count/{targetId}
+        [HttpGet("count/{targetId}")]
+        public async Task<ActionResult<int>> GetLikeCount(Guid targetId)
         {
-            _likeService = likeService;
+            var count = await _likeService.GetLikeCountAsync(targetId);
+            return Ok(count);
         }
+        
 
-
-
-
-        // GET: api/<LikeController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        // GET: api/Like/check?targetId=...&userId=...
+        [HttpGet("check")]
+        public async Task<ActionResult<bool>> CheckIfLiked([FromQuery] Guid targetId, [FromQuery] Guid userId)
         {
-            return new string[] { "value1", "value2" };
+            var isLiked = await _likeService.IsLikedByUserAsync(targetId, userId);
+            return Ok(isLiked);
         }
 
   
-        // POST api/<LikeController>
-        [HttpPost("{postId}")]
-        public void Post([FromRoute]Guid postId)
+        // POST: api/Like
+        [HttpPost]
+        public async Task<ActionResult<PostLike>> Post([FromBody] PostLike postLike)
         {
-
-            _likeService.AddLike()
-            
+            try
+            {
+                var result = await _likeService.AddLikeAsync(postLike);
+                return CreatedAtAction(nameof(GetLikeCount), new { targetId = result.PostId ?? result.CommentId }, result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // PUT api/<LikeController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<LikeController>/5
+        // DELETE: api/Like/{id}
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
+            var deleted = await _likeService.DeleteLikeAsync(id);
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return NoContent(); 
         }
+
     }
 }
