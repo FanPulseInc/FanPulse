@@ -22,7 +22,8 @@ namespace FanPulseApi.Repositories
             {
                 Description = payload.Description,
                 Title = payload.Title,
-                UserId = new Guid()
+                UserId = new Guid(),
+                CategoryId = payload.CategoryId,
                 
             });
             await _context.SaveChangesAsync();

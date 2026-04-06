@@ -1,6 +1,7 @@
 ﻿using FanPulseApi.Data;
 using FanPulseApi.Models;
 using FanPulseApi.Repositories.Likes;
+using System.Threading.Tasks;
 
 namespace FanPulseApi.Services.Like
 {
@@ -46,5 +47,6 @@ namespace FanPulseApi.Services.Like
         {
             return await _repository.GetLikesByTargetIdAsync(targetId);
         }
+
     }
 }
