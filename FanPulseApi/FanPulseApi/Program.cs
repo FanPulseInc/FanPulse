@@ -31,7 +31,19 @@ namespace FanPulseApi
         {
             var builder = WebApplication.CreateBuilder(args);
             
+            var nextJsAppUrl = builder.Configuration["AllowedOrigins:NextJsApp"] ?? "http://localhost:3000";
             var connectionString = builder.Configuration.GetConnectionString("PostgresConnection");
+            
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("NextJsPolicy", policy =>
+                {
+                    policy.WithOrigins(nextJsAppUrl)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials(); 
+                });
+            });
            
             builder.Services.AddDbContext<FanPusleDbContext>(options =>
                 options.UseNpgsql(connectionString));
@@ -81,6 +93,9 @@ namespace FanPulseApi
                 });
 
             var app = builder.Build();
+            
+            app.UseCors("NextJsPolicy");
+            
             app.UseMiddleware<BusinessExceptionMiddleware>();
 
             // Configure the HTTP request pipeline.
