@@ -4,6 +4,8 @@ import "./globals.css";
 import Header from "./_components/Header";
 import Footer from "./_components/Footer";
 import Auth from "./_components/Auth";
+import QueryProvider from "@/providers/QueryProvider";
+import { Suspense } from "react";
 
 
 const geistSans = Geist({
@@ -34,14 +36,16 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background">
-        <Header />
-        
-        <Auth/>
-        
-        {children}
-         <Footer />
-        </body>
-       
+         <Suspense fallback={<div>Loading...</div>}>
+        <QueryProvider>
+          <Header />
+          <Auth />
+          {children}
+          <Footer />
+        </QueryProvider>
+       </Suspense>
+      </body>
+
     </html>
   );
 }
