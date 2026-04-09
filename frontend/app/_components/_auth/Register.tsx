@@ -5,6 +5,8 @@ import { useGetApiCategory } from "@/services/api/generated"
 import { h1, i } from "framer-motion/client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 const Register = () => {
     const [email, setEmail] = useState("")
