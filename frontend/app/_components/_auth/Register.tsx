@@ -1,6 +1,10 @@
 'use client'
 
 import { ICONS } from "@/app/svg"
+import { useGetApiCategory } from "@/services/api/generated"
+import { h1, i } from "framer-motion/client"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
@@ -12,11 +16,33 @@ const Register = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
     const router = useRouter()
-    
+
     const onLogin = () => router.push("?auth=login")
     const onRegister = () => router.push("?auth=confirm")
 
+    const { isLoading, isError, data } = useGetApiCategory()
+
+    // useEffect(() => {
+    //     const res = fetch("http://localhost:5195/api/Category",
+    //         {
+    //             method: "GET",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+
+    //         }
+    //     ).then((res) => console.log(res))
+
+
+    // }, [])
+
+    if (isLoading) {
+        return null
+    }
+
+
     return (
+
         <div
             onClick={(e) => e.stopPropagation()}
             className="w-[370px] h-auto bg-white rounded-[20px] py-10 p-8 flex flex-col gap-4 shadow-sm"
@@ -46,9 +72,9 @@ const Register = () => {
                         placeholder="Введіть пароль"
                         className="flex-1 outline-none text-body-m bg-transparent"
                     />
-                    <button 
+                    <button
                         type="button"
-                        className="cursor-pointer p-1 hover:opacity-70 transition-opacity" 
+                        className="cursor-pointer p-1 hover:opacity-70 transition-opacity"
                         onClick={() => setShowPassword(!showPassword)}
                     >
                         {ICONS.EYE}
@@ -67,9 +93,9 @@ const Register = () => {
                         placeholder="Повторіть пароль"
                         className="flex-1 outline-none text-body-m bg-transparent"
                     />
-                    <button 
+                    <button
                         type="button"
-                        className="cursor-pointer p-1 hover:opacity-70 transition-opacity" 
+                        className="cursor-pointer p-1 hover:opacity-70 transition-opacity"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                         {ICONS.EYE}
@@ -77,8 +103,18 @@ const Register = () => {
                 </div>
             </div>
 
-            <button 
-                onClick={onRegister} 
+            <div>
+                <label htmlFor="cetegory-select">Оберiть категорiю</label>
+                <select id="category-select">
+                    {data && data?.map((item, index) => {
+                        return (<option id={index.toString()} label={item.name?.toString()} value={item.id} />)
+
+                    })}
+                </select>
+            </div>
+
+            <button
+                onClick={onRegister}
                 className="h-[50px] bg-brand-red text-white rounded-[12px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer mt-2"
             >
                 Зареєструватися
