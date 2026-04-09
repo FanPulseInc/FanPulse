@@ -3,7 +3,9 @@ import Footer from "./_components/Footer";
 
 export default function Page() {
   return (
+    
     <main className="min-h-screen">
+      
 
       <div className="max-w-7xl mx-auto p-4 space-y-6">
 

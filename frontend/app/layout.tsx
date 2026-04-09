@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "./_components/Header";
 import Footer from "./_components/Footer";
+import Auth from "./_components/Auth";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,6 +26,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+
   return (
     <html
       lang="en"
@@ -31,6 +35,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background">
         <Header />
+        
+        <Auth/>
+        
         {children}
          <Footer />
         </body>
