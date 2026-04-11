@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/shelf/Uncommitted_changes_before_Update_at_09_04_2026_23_59_[Changes]/shelved.patch
+/.idea/shelf/Uncommitted_changes_before_Update_at_09_04_2026_23_59__Changes_.xml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/.idea/shelf/Uncommitted_changes_before_Update_at_09_04_2026_23_59_[Changes]/shelved.patch

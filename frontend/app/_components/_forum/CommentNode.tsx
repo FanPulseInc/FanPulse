@@ -12,11 +12,7 @@ interface Comment {
 export default function CommentNode({ comment, depth }: { comment: Comment, depth: number }) {
     return (
         <div className="relative">
-            {depth > 0 && (
-                <div className="absolute -left-6 top-8 w-6 h-[2px] bg-[#af292a]" />
-            )}
-
-            <div className="flex flex-col bg-white rounded-[20px] shadow-sm border border-gray-100 mb-2 overflow-visible">
+            <div className="flex flex-col bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-visible">
                 <div className="bg-[#212121] h-[37px] px-4 flex justify-between items-center rounded-[20px] relative">
                     <span className="text-white text-[11px] font-bold">
                         #{comment.id}
@@ -40,10 +36,20 @@ export default function CommentNode({ comment, depth }: { comment: Comment, dept
                 </div>
             </div>
             {comment.replies.length > 0 && (
-                <div className="ml-10 relative border-l-4 border-[#af292a] pl-6 py-2">
-                    {comment.replies.map((reply: Comment) => (
-                        <CommentNode key={reply.id} comment={reply} depth={depth + 1} />
-                    ))}
+                <div className="ml-10 relative">
+                    {comment.replies.map((reply: Comment, index: number) => {
+                        const isLast = index === comment.replies.length - 1;
+                        return (
+                            <div key={reply.id} className="relative pl-6 pt-2">
+                                <div
+                                    className="absolute left-0 top-0 w-1 bg-[#af292a]"
+                                    style={{ height: isLast ? '27px' : '100%' }}
+                                />
+                                <div className="absolute left-0 top-[27px] w-6 h-1 bg-[#af292a]" />
+                                <CommentNode comment={reply} depth={depth + 1} />
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </div>
