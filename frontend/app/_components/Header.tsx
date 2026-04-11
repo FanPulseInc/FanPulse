@@ -10,7 +10,7 @@ const navItems = [
 
 const Header = () => {
     return (
-        <div className="w-full max-w-[1440px] bg-[#ffffff] px-10 py-4 flex flex-col gap-4">
+        <div className="w-full  bg-[#ffffff] px-10 py-4 flex flex-col gap-4">
 
 
           <div className="flex h-[70px] items-center justify-between w-full">

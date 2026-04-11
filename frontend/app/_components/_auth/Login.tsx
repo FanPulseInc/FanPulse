@@ -1,5 +1,6 @@
 'use client'
 import { ICONS } from "@/app/svg";
+import { usePostApiAuthLogin } from "@/services/api/generated";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -13,13 +14,39 @@ const Login = () => {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
 
+  
+
+  const {mutateAsync:login,isPending,isSuccess,isError} = usePostApiAuthLogin()
+  
+
+
+
+  const onLogin = async () => {
+    console.log("login started")
+    const res = await login({data:{email:email,password:password}})
+
+     if(res.token != undefined && isSuccess){
+       localStorage.setItem("token",res.token) 
+       router.push("/profile")
+     }
+     
+  
+
+  }
+
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      
+
       className="w-[370px] min-h-[650px] bg-card-bg rounded-[20px] py-10 p-8 flex flex-col gap-4 shadow-sm"
     >
       <h1 className="text-h1 text-brand-black text-left">Увійти</h1>
+       
+       {isError ? (
+        <div className="bg-red-500  rounded-full flex items-center justify-center p-2">
+          <span className="text-center">Неправильний email або пароль</span>
+        </div>
+       ):null}
 
       {/* Email */}
       <div className="flex flex-col gap-1.5">
@@ -44,9 +71,9 @@ const Login = () => {
             placeholder="Введіть пароль"
             className="flex-1 outline-none text-body-m bg-transparent"
           />
-          <button 
-            type="button" 
-            className="cursor-pointer p-1 hover:opacity-70 transition-opacity" 
+          <button
+            type="button"
+            className="cursor-pointer p-1 hover:opacity-70 transition-opacity"
             onClick={() => setShowPassword(!showPassword)}
           >
             {ICONS.EYE}
@@ -55,7 +82,7 @@ const Login = () => {
       </div>
 
       {/* Login button */}
-      <button className="h-[50px] bg-brand-red text-white rounded-[12px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer mt-2">
+      <button onClick={onLogin} className="h-[50px] bg-brand-red text-white rounded-[12px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer mt-2">
         Увійти
       </button>
 
@@ -86,7 +113,7 @@ const Login = () => {
       </div>
 
       {/* Google button */}
-      <button 
+      <button
         type="button"
         className="h-[50px] border-2 border-brand-red rounded-[20px] flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer"
       >
