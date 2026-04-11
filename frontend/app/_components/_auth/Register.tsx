@@ -54,7 +54,9 @@ const Register = () => {
        const res =  await registerUser({data:payload})  
          
        if(isSuccess){
-          console.log("Success register")
+          console.log("register completed")
+          router.push("?auth=login")
+          
        }
        console.log("Created mail: " + res.email)
         
