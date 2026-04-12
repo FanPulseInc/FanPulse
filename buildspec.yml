@@ -7,9 +7,13 @@ phases:
       - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 137568342949.dkr.ecr.us-east-1.amazonaws.com
   build:
     commands:
-      - echo "Збираємо Docker образ бекенду..."
-      - docker build -f FanPulseApi/FanPulseApi/Dockerfile -t fanpulse-app .
+      - echo "Переходимо в папку з API..."
+      - cd FanPulseApi/FanPulseApi
+      - echo "Збираємо Docker образ..."
+      - docker build -t fanpulse-app .
       - docker tag fanpulse-app:latest 137568342949.dkr.ecr.us-east-1.amazonaws.com/fanpulse-app:latest
+      - echo "Повертаємось в корінь для артефактів..."
+      - cd ../..
   post_build:
     commands:
       - echo "Відправляємо образ в ECR..."
