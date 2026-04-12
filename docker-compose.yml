@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: 137568342949.dkr.ecr.us-east-1.amazonaws.com/fanpulse-app:latest
+    container_name: fanpulse_api
+    ports:
+      - "80:8080" 
+    restart: always
