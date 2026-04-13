@@ -26,10 +26,14 @@ namespace FanPulseApi.Repositories.Comment
                 CommentText = payload.CommentText,
                 ParentId = payload.ParrentId ?? null,
                 PostId = payload.PostId,
-                UserId = new Guid("8116e90f-422d-4c4c-9c8e-e759ad1ae497") // Should remove this mock.
+                UserId = userId
             });
             await _context.SaveChangesAsync();
-            return comment.Entity;      
+
+            return await _context.Comments
+                .Include(c => c.User)
+                .Include(c => c.Children)
+                .FirstAsync(c => c.Id == comment.Entity.Id);
         }
 
         public async Task<Models.Comment> DeleteComment(Guid id)
@@ -53,28 +57,28 @@ namespace FanPulseApi.Repositories.Comment
 
         public async Task<Models.Comment> GetCommentById(Guid id)
         {
-            return await _context.Comments.FindAsync(id) ?? null;
+            return await _context.Comments.Include(c => c.User).Include(c => c.Children).FirstOrDefaultAsync(c => c.Id == id);
 
              
         }
 
         public IQueryable<Models.Comment> GetCommentsByPost(Guid postId)
         {
-           var comment = _context.Comments.Where(c => c.PostId == postId);
+           var comment = _context.Comments.Include(c => c.User).Include(c => c.Children).Where(c => c.PostId == postId);
            return comment;
 
         }
 
         public IQueryable<Models.Comment> GetCommentsByUserId(Guid userId)
         {
-            return _context.Comments.Where(i => i.UserId == userId);
+            return _context.Comments.Include(c => c.User).Include(c => c.Children).Where(i => i.UserId == userId);
         }
 
      
 
         public async Task<Models.Comment> UpdateComment(Guid commentId, CommentAddRequest payload)
         {
-            var comment = await _context.Comments.FindAsync(commentId);
+            var comment = await _context.Comments.Include(c => c.User).Include(c => c.Children).FirstOrDefaultAsync(c => c.Id == commentId);
             if (comment == null) return null;
 
             comment.UpdateComment(payload.CommentText);

@@ -22,7 +22,7 @@ namespace FanPulseApi.Services.Report
                 throw new BusinessRuleException("You already reported that person. Please wait for the consideration");
             }
 
-            var report = await _repository.AddReportAsync(payload);
+            var report = await _repository.AddReportAsync(payload, reporterId);
             return ReportMapper.ToDto(report);
         }
 

@@ -1,4 +1,5 @@
-﻿using FanPulseApi.DTO.Report;
+﻿using System.Security.Claims;
+using FanPulseApi.DTO.Report;
 using FanPulseApi.Repositories.Report;
 using FanPulseApi.Services.Report;
 using Microsoft.AspNetCore.Mvc;
@@ -31,10 +32,13 @@ namespace FanPulseApi.Controllers
 
         // POST api/<ReportController>
         [HttpPost]
-        public async Task<ReportResponse> Post([FromBody] ReportAddRequest payload)
+        public async Task<ActionResult<ReportResponse>> Post([FromBody] ReportAddRequest payload)
         {
-            var report = await _service.AddReportAsync(payload, new Guid());
-            return report;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+            var report = await _service.AddReportAsync(payload, userId);
+            return Ok(report);
 
         }
 
