@@ -24,10 +24,14 @@ namespace FanPulseApi.Repositories
                 Title = payload.Title,
                 UserId = userId,
                 CategoryId = payload.CategoryId,
-                
+
             });
             await _context.SaveChangesAsync();
-            return post.Entity;
+
+            return await _context.Posts
+                .Include(p => p.User)
+                .Include(p => p.Category)
+                .FirstAsync(p => p.Id == post.Entity.Id);
 
         }
 
@@ -44,21 +48,21 @@ namespace FanPulseApi.Repositories
 
         public async Task<Post> GetPostById(Guid id)
         {
-            var post = await _context.Posts.Include(c=>c.User).FirstOrDefaultAsync(p=>p.Id == id);
-            return post ?? null;
+            var post = await _context.Posts.Include(p => p.User).Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+            return post;
 
         }
 
         public async Task<IQueryable<Post>> GetPosts(int startFrom, int count)
         {
-            var posts = _context.Posts.Skip(startFrom).Take(count).AsNoTracking();
+            var posts = _context.Posts.Include(p => p.User).Include(p => p.Category).Skip(startFrom).Take(count).AsNoTracking();
             return posts;
         }
 
         public async Task<Post> UpdatePost(Guid postId, PostAddRequest payload)
         {
 
-            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+            var post = await _context.Posts.Include(p => p.User).Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == postId);
             if (post == null) return null;
             post.UpdatePost(payload);
             await _context.SaveChangesAsync();
