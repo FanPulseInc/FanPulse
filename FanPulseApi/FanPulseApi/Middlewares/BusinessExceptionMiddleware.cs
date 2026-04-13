@@ -29,11 +29,11 @@ namespace FanPulseApi.Middlewares
             }
             catch (Exception ex)
             {
-               
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 context.Response.ContentType = "application/json";
 
-               
+                var response = new { error = "Internal server error", detail = ex.Message };
+                await context.Response.WriteAsJsonAsync(response);
             }
         }
     }

@@ -22,43 +22,53 @@ namespace FanPulseApi.Repositories
             {
                 Description = payload.Description,
                 Title = payload.Title,
-                UserId = new Guid(),
+                UserId = userId,
                 CategoryId = payload.CategoryId,
-                
+
             });
             await _context.SaveChangesAsync();
-            return post.Entity;
+
+            return await _context.Posts
+                .Include(p => p.User)
+                .Include(p => p.Category)
+                .FirstAsync(p => p.Id == post.Entity.Id);
 
         }
 
         public async Task<Post> DeletePost(Guid id)
         {
-            var post = await _context.Posts.FindAsync(id);
+            var post = await _context.Posts
+                .Include(p => p.User)
+                .Include(p => p.Category)
+                .Include(p => p.comments)
+                .Include(p => p.Likes)
+                .FirstOrDefaultAsync(p => p.Id == id);
             if (post == null) return null;
 
-            var deletedPost = _context.Posts.Remove(post);
+            _context.Comments.RemoveRange(post.comments);
+            _context.PostLikes.RemoveRange(post.Likes);
+            _context.Posts.Remove(post);
             await _context.SaveChangesAsync();
-            return deletedPost.Entity;
-           
+            return post;
         }
 
         public async Task<Post> GetPostById(Guid id)
         {
-            var post = await _context.Posts.Include(c=>c.User).FirstOrDefaultAsync(p=>p.Id == id);
-            return post ?? null;
+            var post = await _context.Posts.Include(p => p.User).Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+            return post;
 
         }
 
         public async Task<IQueryable<Post>> GetPosts(int startFrom, int count)
         {
-            var posts = _context.Posts.Skip(startFrom).Take(count).AsNoTracking();
+            var posts = _context.Posts.Include(p => p.User).Include(p => p.Category).Skip(startFrom).Take(count).AsNoTracking();
             return posts;
         }
 
         public async Task<Post> UpdatePost(Guid postId, PostAddRequest payload)
         {
 
-            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+            var post = await _context.Posts.Include(p => p.User).Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == postId);
             if (post == null) return null;
             post.UpdatePost(payload);
             await _context.SaveChangesAsync();

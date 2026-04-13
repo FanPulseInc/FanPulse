@@ -6,7 +6,7 @@ namespace FanPulseApi.Models
 {
     public interface IReportRepository
     {
-        public Task<Report> AddReportAsync(DTO.Report.ReportAddRequest payload);
+        public Task<Report> AddReportAsync(DTO.Report.ReportAddRequest payload, Guid reporterId);
 
         public Task<Report> UpdateReportAsync(Guid reportId, ReportAddRequest report);
 

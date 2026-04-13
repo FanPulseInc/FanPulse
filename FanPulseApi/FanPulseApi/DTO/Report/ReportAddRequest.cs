@@ -4,9 +4,9 @@ namespace FanPulseApi.DTO.Report
 {
     public class ReportAddRequest
     {
-        public Guid ReportedId;
-        public string? description;
-        public ReportReasons reason;
+        public Guid ReportedId { get; set; }
+        public string? Description { get; set; }
+        public ReportReasons Reason { get; set; }
         
     }
 }

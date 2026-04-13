@@ -1,4 +1,5 @@
-﻿using FanPulseApi.DTO;
+﻿using System.Security.Claims;
+using FanPulseApi.DTO;
 using FanPulseApi.DTO.Post;
 using FanPulseApi.Services;
 using FanPulseApi.Services.Post;
@@ -44,7 +45,10 @@ namespace FanPulseApi.Controllers
         [HttpPost]
         public async Task<ActionResult<PostResponce>> Post([FromBody] PostAddRequest payload)
         {
-            var post = await _service.AddPost(payload,new Guid()); // Should remove mock guid
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+            var post = await _service.AddPost(payload, userId);
             return Ok(post);
             
         }

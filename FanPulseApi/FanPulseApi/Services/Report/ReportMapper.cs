@@ -17,9 +17,8 @@ namespace FanPulseApi.Services.Report
                 CreatedAt = report.CreatedAt,
                 UpdatedAt = report.UpdatedAt,
                 Id = report.Id,
-
-
-
+                Status = report.Status,
+                Reason = report.Reason,
             };
         }
 
