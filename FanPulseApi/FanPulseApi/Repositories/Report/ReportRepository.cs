@@ -22,6 +22,7 @@ namespace FanPulseApi.Repositories.Report
                 ReportedUserId = payload.ReportedId,
                 Reason = payload.Reason,
                 ReporterId = reporterId,
+                Status = ReportStatus.Pending,
             };
 
             await _context.Reports.AddAsync(report);

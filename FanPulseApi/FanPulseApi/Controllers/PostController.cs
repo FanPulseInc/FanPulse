@@ -65,11 +65,11 @@ namespace FanPulseApi.Controllers
 
         // DELETE api/<PostController>/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<PostResponce>> Delete(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
             var deletedPost = await _service.DeletePost(id);
             if (deletedPost == null) return NotFound();
-            return Ok(deletedPost);
+            return NoContent();
 
         }
     }
