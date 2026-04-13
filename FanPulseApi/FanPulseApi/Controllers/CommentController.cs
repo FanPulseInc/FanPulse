@@ -43,9 +43,9 @@ namespace FanPulseApi.Controllers
         }
 
         [HttpGet("{id}/childrens")]
-        public async Task<ActionResult<IEnumerable<CommentReponse>>>GetChildrens(Guid commentId)
+        public async Task<ActionResult<IEnumerable<CommentReponse>>>GetChildrens(Guid id)
         {
-            var comments = await _commentService.GetChildrens(commentId);
+            var comments = await _commentService.GetChildrens(id);
             return Ok(comments);
 
 

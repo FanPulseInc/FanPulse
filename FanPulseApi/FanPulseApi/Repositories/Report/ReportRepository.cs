@@ -71,7 +71,7 @@ namespace FanPulseApi.Repositories.Report
 
         public async Task<Models.Report> RemoveReportAsync(Guid reportId)
         {
-            var report = await _context.Reports.FindAsync(reportId);
+            var report = await _context.Reports.Include(r => r.ReportedUser).Include(r => r.Reporter).FirstOrDefaultAsync(r => r.Id == reportId);
             if (report == null) return null;
 
             _context.Reports.Remove(report);

@@ -40,21 +40,21 @@ namespace FanPulseApi.Repositories.Comment
 
         public async Task<Models.Comment> DeleteComment(Guid id)
         {
-            var comment = await _context.Comments.FindAsync(id);
+            var comment = await _context.Comments.Include(c => c.User).Include(c => c.Children).FirstOrDefaultAsync(c => c.Id == id);
             if (comment == null) return null;
-            var deletedComment = _context.Comments.Remove(comment);
+            _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
-            return deletedComment.Entity;
+            return comment;
 
         }
 
         public  ICollection<Models.Comment> GetChilderns(Guid commentId)
         {
             var comment = _context.Comments
-                .Include(c => c.Children)
+                .Include(c => c.Children).ThenInclude(c => c.User)
                 .FirstOrDefault(i => i.Id == commentId);
-                
-            return comment.Children ?? null;
+            if (comment == null) return new List<Models.Comment>();
+            return comment.Children ?? new List<Models.Comment>();
         }
 
         public async Task<Models.Comment> GetCommentById(Guid id)
