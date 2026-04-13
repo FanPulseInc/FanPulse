@@ -12,12 +12,11 @@ namespace FanPulseApi.Services.Comment
         {
             return new CommentReponse()
             {
+                Id = comment.Id,
                 CommentText = comment.CommentText,
                 User = UserMapper.ToDto(comment.User),
                 Post = comment.Post != null ? PostMapper.ToDto(comment.Post) : null,
                 Children = ToDtoArray(comment.Children.ToList()) ?? null,
-
-
             };
 
         }
