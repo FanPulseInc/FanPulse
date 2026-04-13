@@ -12,6 +12,11 @@ namespace FanPulseApi.Controllers
     {
         private readonly ILikeService _likeService;
 
+        public LikeController(ILikeService likeService)
+        {
+            _likeService = likeService;
+        }
+
         // GET: api/Like/count/{targetId}
         [HttpGet("count/{targetId}")]
         public async Task<ActionResult<int>> GetLikeCount(Guid targetId)

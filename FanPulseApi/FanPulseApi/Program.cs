@@ -14,12 +14,15 @@ using FanPulseApi.Services.Post;
 using FanPulseApi.DTO;
 using FanPulseApi.DTO.User.Validator;
 using FanPulseApi.Repositories.Category;
+using FanPulseApi.Repositories.Comment;
+using FanPulseApi.Repositories.Likes;
 using FanPulseApi.Repositories.User;
 using FanPulseApi.Services.Category;
 using FanPulseApi.Services.User;
 using FanPulseApi.Validators.Specification;
 using FanPulseApi.Repositories.Report;
 using FanPulseApi.Services.Auth;
+using FanPulseApi.Services.Like;
 using FanPulseApi.Services.Report;
 using FluentValidation;
 
@@ -65,7 +68,13 @@ namespace FanPulseApi
             
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
-
+            
+            builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+            builder.Services.AddScoped<ICommentService, CommentService>();
+            
+            builder.Services.AddScoped<ILikeRepository, LikeRepository>();
+            builder.Services.AddScoped<ILikeService, LikeService>();
+            
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
             
             builder.Services.AddScoped<IPostRepository, PostRepository>();

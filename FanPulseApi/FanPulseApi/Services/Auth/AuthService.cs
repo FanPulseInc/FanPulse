@@ -43,7 +43,7 @@ public class AuthService : IAuthService
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email)
             }),
-            Expires = DateTime.UtcNow.AddSeconds(double.Parse(_config["Jwt:lifeTime"])),
+            Expires = DateTime.UtcNow.AddSeconds(double.Parse(_config["Jwt:lifeTime"] ?? "3600")),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
