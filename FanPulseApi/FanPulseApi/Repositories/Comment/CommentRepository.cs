@@ -21,19 +21,21 @@ namespace FanPulseApi.Repositories.Comment
 
             
 
-            var comment = await _context.Comments.AddAsync(new Models.Comment()
+            var newComment = new Models.Comment()
             {
+                Id = Guid.NewGuid(),
                 CommentText = payload.CommentText,
                 ParentId = payload.ParrentId ?? null,
                 PostId = payload.PostId,
                 UserId = userId
-            });
+            };
+            await _context.Comments.AddAsync(newComment);
             await _context.SaveChangesAsync();
 
             return await _context.Comments
                 .Include(c => c.User)
                 .Include(c => c.Children)
-                .FirstAsync(c => c.Id == comment.Entity.Id);
+                .FirstAsync(c => c.Id == newComment.Id);
         }
 
         public async Task<Models.Comment> DeleteComment(Guid id)
