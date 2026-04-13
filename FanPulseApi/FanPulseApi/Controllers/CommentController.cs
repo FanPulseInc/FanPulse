@@ -23,11 +23,12 @@ namespace FanPulseApi.Controllers
         }
 
 
-        // GET: api/<CommentController>
+        // GET: api/<CommentController>?postId=...
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<IEnumerable<CommentReponse>>> GetByPost([FromQuery] Guid postId)
         {
-            return new string[] { "value1", "value2" };
+            var comments = await _commentService.GetCommentsByPost(postId);
+            return Ok(comments);
         }
 
         // GET api/<CommentController>/5

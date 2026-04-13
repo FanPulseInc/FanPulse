@@ -37,13 +37,19 @@ namespace FanPulseApi.Repositories
 
         public async Task<Post> DeletePost(Guid id)
         {
-            var post = await _context.Posts.FindAsync(id);
+            var post = await _context.Posts
+                .Include(p => p.User)
+                .Include(p => p.Category)
+                .Include(p => p.comments)
+                .Include(p => p.Likes)
+                .FirstOrDefaultAsync(p => p.Id == id);
             if (post == null) return null;
 
-            var deletedPost = _context.Posts.Remove(post);
+            _context.Comments.RemoveRange(post.comments);
+            _context.PostLikes.RemoveRange(post.Likes);
+            _context.Posts.Remove(post);
             await _context.SaveChangesAsync();
-            return deletedPost.Entity;
-           
+            return post;
         }
 
         public async Task<Post> GetPostById(Guid id)

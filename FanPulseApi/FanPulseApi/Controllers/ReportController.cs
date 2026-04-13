@@ -53,9 +53,11 @@ namespace FanPulseApi.Controllers
 
         // DELETE api/<ReportController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+            public async Task<ActionResult> Delete(Guid id)
         {
-
+            var report = await _service.RemoveReportAsync(id);
+            if (report == null) return NotFound();
+            return NoContent();
         }
 
         [HttpGet("user-reports")]
@@ -71,9 +73,9 @@ namespace FanPulseApi.Controllers
         [HttpPatch("{id}/close")]
         public async Task<ActionResult<ReportResponse>>CloseReport(Guid id)
         {
-            var report = await _service.GetReportByIdAsync(id);
-            if (report == null) { return BadRequest("Error when closing report"); }
-            return report;
+            var report = await _service.CloseReportAsync(id);
+            if (report == null) { return NotFound(); }
+            return Ok(report);
 
         }
 
