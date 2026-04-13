@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "Логінимось в Amazon ECR..."
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 137568342949.dkr.ecr.us-east-1.amazonaws.com
+  build:
+    commands:
+      - echo "Переходимо в папку з API..."
+      - cd FanPulseApi/FanPulseApi
+      - echo "Збираємо Docker образ..."
+      - docker build -t fanpulse-app .
+      - docker tag fanpulse-app:latest 137568342949.dkr.ecr.us-east-1.amazonaws.com/fanpulse-app:latest
+      - echo "Повертаємось в корінь для артефактів..."
+      - cd ../..
+  post_build:
+    commands:
+      - echo "Відправляємо образ в ECR..."
+      - docker push 137568342949.dkr.ecr.us-east-1.amazonaws.com/fanpulse-app:latest
+
+artifacts:
+  files:
+    - appspec.yml
+    - docker-compose.yml
+    - scripts/**/*

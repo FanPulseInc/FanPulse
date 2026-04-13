@@ -5,14 +5,10 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface UserResponse {
-  id?: string;
+export interface AuthResponse {
   /** @nullable */
-  name?: string | null;
+  token?: string | null;
   /** @nullable */
   email?: string | null;
-  /** @nullable */
-  avatarUrl?: string | null;
-  isVerifiedUser?: boolean;
-  createdAt?: string;
+  userId?: string;
 }

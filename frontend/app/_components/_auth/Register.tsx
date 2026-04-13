@@ -1,12 +1,11 @@
 'use client'
 
 import { ICONS } from "@/app/svg"
-import { useGetApiCategory } from "@/services/api/generated"
+import { useGetApiCategory, usePostApiUser } from "@/services/api/generated"
 import { h1, i } from "framer-motion/client"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import CustomSelect from "../CustomSelect"
 
 const Register = () => {
     const [email, setEmail] = useState("")
@@ -14,38 +13,62 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
+    const [selectedCategory,setCategory] = useState<string[]>()
     const router = useRouter()
 
     const onLogin = () => router.push("?auth=login")
-    const onRegister = () => router.push("?auth=confirm")
+ 
+
+    const {mutateAsync:registerUser,isPending,isSuccess,error} = usePostApiUser()
 
     const { isLoading, isError, data } = useGetApiCategory()
 
-    // useEffect(() => {
-    //     const res = fetch("http://localhost:5195/api/Category",
-    //         {
-    //             method: "GET",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-
-    //         }
-    //     ).then((res) => console.log(res))
 
 
-    // }, [])
 
     if (isLoading) {
         return null
     }
+    
+
+    const categories = data?.map(item => ({
+        value: item.id ?? "",
+        label: item.name ?? ""
+    })) || [];
+
+    const handleSelectChange = (selectedIds: string[]) => {
+        console.log("Выбранные ID:", selectedIds);
+        setCategory(selectedIds)
+    };
+    
+    const onRegister = async () => {
+        const payload = {
+            email:email,
+            name: "someName",
+            favCategoryIds: selectedCategory,
+            password:password
+
+            
+
+        }
+       const res =  await registerUser({data:payload})  
+         
+       if(isSuccess){
+          console.log("register completed")
+          router.push("?auth=login")
+          
+       }
+       console.log("Created mail: " + res.email)
+        
+    }
+
 
 
     return (
 
         <div
             onClick={(e) => e.stopPropagation()}
-            className="w-[370px] h-auto bg-white rounded-[20px] py-10 p-8 flex flex-col gap-4 shadow-sm"
+            className="w-[370px] h-auto bg-white rounded-[20px] py-10 p-8  flex flex-col gap-4 shadow-sm"
         >
             <h1 className="text-h1 text-brand-black text-left">Реєстрація</h1>
 
@@ -104,13 +127,8 @@ const Register = () => {
             </div>
 
             <div>
-                <label htmlFor="cetegory-select">Оберiть категорiю</label>
-                <select id="category-select">
-                    {data && data?.map((item, index) => {
-                        return (<option id={index.toString()} label={item.name?.toString()} value={item.id} />)
-
-                    })}
-                </select>
+                
+               <CustomSelect options={categories} onChange={handleSelectChange}/>
             </div>
 
             <button
