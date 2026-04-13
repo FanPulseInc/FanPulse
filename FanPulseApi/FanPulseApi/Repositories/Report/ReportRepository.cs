@@ -18,9 +18,9 @@ namespace FanPulseApi.Repositories.Report
         {
             var report = new Models.Report()
             {
-                description = payload.description,
+                description = payload.Description,
                 ReportedUserId = payload.ReportedId,
-                Reason = payload.reason,
+                Reason = payload.Reason,
                 ReporterId = payload.ReportedId,
             };
 
@@ -77,7 +77,7 @@ namespace FanPulseApi.Repositories.Report
             var report = await _context.Reports.FindAsync(reportId);
             if (report == null) return null;
 
-            report.description = payload.description;
+            report.description = payload.Description;
 
             await _context.SaveChangesAsync();
             return report;

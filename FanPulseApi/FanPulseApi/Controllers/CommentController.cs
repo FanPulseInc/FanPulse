@@ -1,4 +1,5 @@
-﻿using FanPulseApi.DTO;
+﻿using System.Security.Claims;
+using FanPulseApi.DTO;
 using FanPulseApi.Services.Comment;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -61,7 +62,10 @@ namespace FanPulseApi.Controllers
         [HttpPost]
         public async Task<ActionResult<CommentReponse>> Post([FromBody] CommentAddRequest payload)
         {
-            var comment = await _commentService.AddComment(payload,new Guid());
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
+            var comment = await _commentService.AddComment(payload, userId);
             return Ok(comment);
         }
 

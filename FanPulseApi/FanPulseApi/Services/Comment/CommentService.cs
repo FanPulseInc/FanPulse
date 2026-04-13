@@ -25,7 +25,7 @@ namespace FanPulseApi.Services.Comment
 
         public async Task<CommentReponse> AddComment(CommentAddRequest payload, Guid userId)
         {
-            if (!_wordSpec.IsSatisfiedBy(payload.CommentText)) throw new BusinessRuleException("Comment has a frobidden words");
+            if (_wordSpec.IsSatisfiedBy(payload.CommentText)) throw new BusinessRuleException("Comment has forbidden words");
 
             var comment = await _commentRepository.AddComment(payload,userId);
 
