@@ -22,7 +22,7 @@ namespace FanPulseApi.Repositories
             {
                 Description = payload.Description,
                 Title = payload.Title,
-                UserId = new Guid(),
+                UserId = userId,
                 CategoryId = payload.CategoryId,
                 
             });
