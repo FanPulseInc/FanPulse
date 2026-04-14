@@ -27,7 +27,7 @@ const Login = () => {
 
      if(res.token != undefined && isSuccess){
        localStorage.setItem("token",res.token) 
-       router.push("/profile")
+       window.location.href = "/profile";
      }
      
   
