@@ -1,11 +1,27 @@
 'use client'
 
 import { useUserStore } from "@/store/useUserStore"
+import { ICONS } from "../svg"
+import { useScroll } from "framer-motion"
+import { useState } from "react"
+import { usePutApiUserId } from "@/services/api/generated"
 
 const Profile = () => {
-    const { user, isLoading } = useUserStore()
+    const { user, isLoading, setUser } = useUserStore()
+
+    const [nameEditing, setNameEditing] = useState(false)
 
     if (isLoading) return <div className="p-10 text-brand-red">Завантаження...</div>
+    
+    const {mutateAsync } = usePutApiUserId()
+
+
+    const handleLogout = () => {
+        setUser(null)
+        location.href = "/"
+    }
+
+
 
     const competitions = [
         { name: "Ліга Європи УЄФА", icon: "/Vector.svg" },
@@ -55,13 +71,61 @@ const Profile = () => {
                     <div className="flex flex-col items-center gap-3">
                         <div className="w-24 h-24 rounded-full border-2 border-brand-red flex items-center justify-center bg-gray-50 overflow-hidden">
                             <span className="text-brand-red text-left text-3xl font-bold">
-                                {user?.name?.[0] || "?"}
+                                {user?.email?.[0] || "?"}
                             </span>
                         </div>
-                        <h2 className="text-xl font-bold text-brand-red uppercase tracking-wide">
-                            {user?.name || "Гість"}
-                        </h2>
+                        <div className="flex flex-col gap-1">
+                            <div className="flex flex-row items-center gap-4">
+                                {nameEditing ? (
+                                    <input
+                                        autoFocus
+                                        className="text-xl font-bold text-brand-red uppercase tracking-wide bg-gray-50 border-b-2 border-brand-red outline-none px-1"
+                                        value={user?.name || ""}
+                                        onChange={(e) => {
+                                           
+                                            if (user) setUser({ ...user, name: e.target.value });
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') setNameEditing(false); 
+                                        }}
+                                    />
+                                ) : (
+                                    <h2 className="text-xl text-left font-bold text-brand-red uppercase tracking-wide">
+                                        {user?.name || user?.email}
+                                    </h2>
+                                )}
+
+                                <div className="flex flex-row gap-4 items-center">
+                                    {nameEditing ? (
+                                        <span
+                                            className="cursor-pointer hover:scale-110 transition-transform"
+                                            onClick={() => {
+                                                setNameEditing(false);
+
+                                                
+                                            }}
+                                        >
+                                            {ICONS.STAR}
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className="cursor-pointer hover:opacity-70 transition-opacity"
+                                            onClick={() => setNameEditing(true)}
+                                        >
+                                            {ICONS.Edit}
+                                        </span>
+                                    )}
+                                    <span className="cursor-pointer hover:opacity-70 transition-opacity">
+                                        {ICONS.Share}
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+
+
                     </div>
+
 
                     <section className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
@@ -89,7 +153,7 @@ const Profile = () => {
                         </div>
 
                         <div className="flex flex-col gap-2 mt-4">
-                            <button className="w-full h-[50px] rounded-[20px] bg-brand-red text-white font-bold hover:opacity-90 transition-opacity cursor-pointer">
+                            <button onClick={handleLogout} className="w-full h-[50px] rounded-[20px] bg-brand-red text-white font-bold hover:opacity-90 transition-opacity cursor-pointer">
                                 Вийти
                             </button>
                             <button className="text-sm text-brand-red/50 font-medium hover:text-brand-red transition-colors cursor-pointer mt-2">
