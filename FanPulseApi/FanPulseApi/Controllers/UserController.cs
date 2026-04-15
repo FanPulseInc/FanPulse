@@ -3,6 +3,7 @@ using FanPulseApi.DTO.User;
 using FanPulseApi.Services.User;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace FanPulseApi.Controllers
 {
@@ -22,6 +23,25 @@ namespace FanPulseApi.Controllers
         {
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);
+        }
+
+
+        [HttpGet("/me")]
+        public async Task<ActionResult<UserResponse>> GetMe()
+        {
+            var uid = HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (uid == null)
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userService.GetUserByIdAsync(Guid.Parse(uid));
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
         }
 
         [HttpGet("{id:guid}")]
