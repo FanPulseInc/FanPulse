@@ -4,6 +4,8 @@ import Link from "next/link";
 import {ForumContainer} from "../_forum/ForumContainer";
 import ThreadRow from "../_forum/ThreadRow";
 import { ICONS } from "../../svg";
+import { useGetApiPost, useGetApiCategoryRoots } from "@/services/api/generated";
+import type { PostResponce } from "@/services/api/model";
 
 const navFilters = [
     { id: "latest", label: "Найновіші" },
@@ -11,27 +13,18 @@ const navFilters = [
     { id: "recommended", label: "Рекомендовані" },
 ];
 
-const CATEGORIES = [
-    "Футбол",
-    "Американський футбол",
-    "Баскетбол",
-    "Моторспорт",
-    "Теніс",
-    "Dota2",
-    "League of Legends",
-];
-
-const MOCK_THREADS = [
-    { id: 1, title: "A quick note regarding Off-Topic content in the CS forum", author: "admin" },
-    { id: 2, title: "Senzu is NAVI agent", author: "Maksym" },
-    { id: 3, title: "FROZEN STAYS IN FAZE", author: "karrigan" },
-    { id: 4, title: "Vitality domination", author: "zywoo" },
-];
-
 export default function ForumPage() {
     const [activeFilter, setActiveFilter] = useState("latest");
     const [selectedCategory, setSelectedCategory] = useState("Counter-Strike");
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+
+    const { data: postsData, isLoading: postsLoading } = useGetApiPost({ page: 0, count: 20 });
+    const posts: PostResponce[] = Array.isArray(postsData)
+        ? postsData
+        : (postsData as unknown as Record<string, PostResponce[]>)?.data
+            ?? (postsData as unknown as Record<string, PostResponce[]>)?.items
+            ?? [];
+    const { data: categories } = useGetApiCategoryRoots();
 
     return (
         <ForumContainer>
@@ -43,7 +36,7 @@ export default function ForumPage() {
 
                     <button
                         onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 cursor-pointer"
                     >
                         <h1 className="text-white font-bold text-xl uppercase tracking-wider">
                             {selectedCategory}
@@ -64,16 +57,16 @@ export default function ForumPage() {
                                 : "opacity-0 scale-y-0 pointer-events-none"
                         }`}
                     >
-                        {CATEGORIES.map((cat) => (
+                        {categories?.map((cat) => (
                             <button
-                                key={cat}
+                                key={cat.id}
                                 onClick={() => {
-                                    setSelectedCategory(cat);
+                                    setSelectedCategory(cat.name ?? "");
                                     setIsCategoryOpen(false);
                                 }}
                                 className="w-full text-center font-bold text-lg hover:text-[#af292a] transition-colors cursor-pointer"
                             >
-                                {cat}
+                                {cat.name}
                             </button>
                         ))}
                     </div>
@@ -100,9 +93,22 @@ export default function ForumPage() {
                         })}
                         </div>
                     </div>
-                        {MOCK_THREADS.map((thread) => (
-                            <ThreadRow key={thread.id} id={thread.id} title={thread.title} author={thread.author} />
+                        {postsLoading && (
+                            <div className="text-center text-gray-500 py-4">Завантаження...</div>
+                        )}
+                        {posts?.map((post) => (
+                            <ThreadRow
+                                key={post.id}
+                                id={post.id!}
+                                title={post.title}
+                                author={post.user?.name ?? "Анонім"}
+                                date={post.createdAt}
+                                likesCount={post.likes?.length ?? 0}
+                            />
                         ))}
+                        {!postsLoading && (!posts || posts.length === 0) && (
+                            <div className="text-center text-gray-500 py-4">Немає постів</div>
+                        )}
                 </div>
             </div>
         </ForumContainer>
