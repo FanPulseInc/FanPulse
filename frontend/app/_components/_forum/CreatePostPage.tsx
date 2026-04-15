@@ -3,34 +3,33 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ForumContainer } from "../_forum/ForumContainer";
 import { ICONS } from "../../svg";
-
-const CATEGORIES = [
-    "Counter-Strike",
-    "Футбол",
-    "Американський футбол",
-    "Баскетбол",
-    "Мотоспорт",
-    "Теніс",
-    "Dota2",
-    "League of Legends",
-];
+import { usePostApiPost, useGetApiCategoryRoots } from "@/services/api/generated";
+import type { CategoryResponse } from "@/services/api/model";
+import Toast from "../Toast";
 
 export default function CreatePostPage() {
     const router = useRouter();
-    const [category, setCategory] = useState("Counter-Strike");
+    const [selectedCategory, setSelectedCategory] = useState<CategoryResponse | null>(null);
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
     const [title, setTitle] = useState("");
     const [text, setText] = useState("");
-    const [errors, setErrors] = useState<{ title?: string; text?: string }>({});
+    const [errors, setErrors] = useState<{ title?: string; text?: string; category?: string }>({});
+    const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-    const handleSubmit = () => {
-        const newErrors: { title?: string; text?: string } = {};
+    const { data: categories } = useGetApiCategoryRoots();
+    const { mutateAsync: createPost, isPending } = usePostApiPost();
+
+    const handleSubmit = async () => {
+        const newErrors: { title?: string; text?: string; category?: string } = {};
 
         if (!title.trim()) {
             newErrors.title = "Введіть назву посту";
         }
         if (!text.trim()) {
             newErrors.text = "Введіть текст посту";
+        }
+        if (!selectedCategory?.id) {
+            newErrors.category = "Оберіть категорію";
         }
 
         if (Object.keys(newErrors).length > 0) {
@@ -39,10 +38,37 @@ export default function CreatePostPage() {
         }
 
         setErrors({});
-        router.push("/forum");
+
+        try {
+            const result = await createPost({
+                data: {
+                    title: title.trim(),
+                    description: text.trim(),
+                    categoryId: selectedCategory!.id!,
+                },
+            });
+            setToast({ message: "Пост успішно створено!", type: "success" });
+            setTimeout(() => router.push(`/forum/${result.id}`), 1500);
+        } catch (e: unknown) {
+            const err = e as { response?: { status?: number } };
+            if (err?.response?.status === 401) {
+                setToast({ message: "Увійдіть в акаунт щоб створити пост", type: "error" });
+                setTimeout(() => router.push("/?auth=login"), 2000);
+            } else {
+                setToast({ message: "Помилка при створенні посту", type: "error" });
+            }
+        }
     };
 
     return (
+        <>
+        {toast && (
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                onClose={() => setToast(null)}
+            />
+        )}
         <ForumContainer>
             <div className="w-[1039px] flex flex-col gap-4">
                 {/* Header - single red bar */}
@@ -73,7 +99,9 @@ export default function CreatePostPage() {
                             className="w-[90%] ml-auto h-full px-6 bg-[#212121] rounded-full flex items-center justify-between cursor-pointer hover:bg-black transition-colors"
                         >
                             <div className="w-6" />
-                            <span className="text-white font-bold text-[20px]">{category}</span>
+                            <span className="text-white font-bold text-[20px]">
+                                {selectedCategory?.name ?? "Оберіть категорію"}
+                            </span>
                             <div className={`${isCategoryOpen ? "rotate-180" : ""} transition-transform duration-200`}>
                                 {ICONS.ArrowDownWhite}
                             </div>
@@ -87,21 +115,24 @@ export default function CreatePostPage() {
                                     : "opacity-0 scale-y-0 pointer-events-none"
                             }`}
                         >
-                            {CATEGORIES.map((cat) => (
+                            {categories?.map((cat) => (
                                 <button
-                                    key={cat}
+                                    key={cat.id}
                                     onClick={() => {
-                                        setCategory(cat);
+                                        setSelectedCategory(cat);
                                         setIsCategoryOpen(false);
                                     }}
                                     className="w-full text-center font-bold text-lg hover:text-[#af292a] transition-colors cursor-pointer"
                                 >
-                                    {cat}
+                                    {cat.name}
                                 </button>
                             ))}
                         </div>
                     </div>
                 </div>
+                {errors.category && (
+                    <span className="text-red-500 text-xs font-medium px-5 -mt-2">{errors.category}</span>
+                )}
 
                 {/* Post title block */}
                 <div className="w-full flex flex-col">
@@ -151,11 +182,13 @@ export default function CreatePostPage() {
                 {/* Submit button */}
                 <button
                     onClick={handleSubmit}
-                    className="w-full h-[50px] bg-[#af292a] rounded-[20px] flex justify-center items-center text-white font-bold text-base hover:bg-[#8f2223] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+                    disabled={isPending}
+                    className="w-full h-[50px] bg-[#af292a] rounded-[20px] flex justify-center items-center text-white font-bold text-base hover:bg-[#8f2223] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.15)] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Створити пост
+                    {isPending ? "Створення..." : "Створити пост"}
                 </button>
             </div>
         </ForumContainer>
+        </>
     );
 }

@@ -1,34 +1,44 @@
+"use client";
+import { useParams } from "next/navigation";
 import { ForumContainer } from "../../_components/_forum/ForumContainer";
 import CommentNode from "../../_components/_forum/CommentNode";
 import { ICONS } from "../../svg";
+import { useGetApiPostId } from "@/services/api/generated";
 
-const MOCK_THREAD_DATA = {
-    title: "Vitality domination",
-    content: "They dominate so much that they define the tier of a tournament by themselves...",
-    author: "Autor",
-    date: "2026-03-31 14:20",
-    comments: [
-        {
-            id: 1,
-            author: "Name",
-            text: "Shameless bump",
-            replies: [
-                { id: 3, author: "Name", text: "Shameless bump", replies: [] },
-                {
-                    id: 5,
-                    author: "Name",
-                    text: "Shameless bump",
-                    replies: [
-                        { id: 16, author: "Name", text: "Shameless bump", replies: [] }
-                    ]
-                },
-            ]
-        },
-        { id: 2, author: "Name", text: "Shameless bump", replies: [] }
-    ]
-};
+function formatDate(dateStr?: string) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("uk-UA", {
+        day: "2-digit", month: "2-digit", year: "numeric",
+    }) + " " + d.toLocaleTimeString("uk-UA", {
+        hour: "2-digit", minute: "2-digit",
+    });
+}
 
 export default function ThreadDetailPage() {
+    const params = useParams();
+    const postId = params.id as string;
+
+    const { data: post, isLoading } = useGetApiPostId(postId);
+
+    if (isLoading) {
+        return (
+            <ForumContainer>
+                <div className="text-center text-gray-500 py-10">Завантаження...</div>
+            </ForumContainer>
+        );
+    }
+
+    if (!post) {
+        return (
+            <ForumContainer>
+                <div className="text-center text-gray-500 py-10">Пост не знайдено</div>
+            </ForumContainer>
+        );
+    }
+
+    const topLevelComments = (post.comments ?? []).filter(c => !c.parentId);
+
     return (
         <ForumContainer>
             <div className="flex flex-col gap-6">
@@ -41,29 +51,29 @@ export default function ThreadDetailPage() {
                                 </div>
                             </div>
                             <h1 className="text-white font-bold text-lg tracking-tight">
-                                {MOCK_THREAD_DATA.title}
+                                {post.title}
                             </h1>
                         </div>
                         <div className="absolute right-[10px] top-[12px] w-[202px] h-[37px] bg-[#212121] rounded-full flex items-center justify-center shadow-md">
                             <span className="text-white text-sm font-bold tracking-wide">
-                                {MOCK_THREAD_DATA.date}
+                                {formatDate(post.createdAt)}
                             </span>
                         </div>
                     </div>
                     <div className="p-8 pt-10 relative">
                         <div className="text-[#212121] text-sm leading-relaxed whitespace-pre-wrap">
-                            {MOCK_THREAD_DATA.content}
+                            {post.description}
                         </div>
                         <div className="flex justify-end mt-6">
                             <div className="bg-[#212121] text-white px-8 py-2 rounded-full text-xs font-bold uppercase tracking-wider">
-                                {MOCK_THREAD_DATA.author}
+                                {post.user?.name ?? "Анонім"}
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="flex flex-col gap-4">
-                    {MOCK_THREAD_DATA.comments.map(comment => (
+                    {topLevelComments.map(comment => (
                         <CommentNode key={comment.id} comment={comment} depth={0} />
                     ))}
                 </div>

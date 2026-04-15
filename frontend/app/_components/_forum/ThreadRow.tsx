@@ -1,13 +1,24 @@
 import Link from "next/link";
 
 interface ThreadRowProps {
-    id: number;
+    id: string;
     title: string;
     author: string;
+    date?: string;
+    likesCount?: number;
 }
 
+function formatDate(dateStr?: string) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("uk-UA", {
+        day: "2-digit", month: "2-digit", year: "numeric",
+    }) + " " + d.toLocaleTimeString("uk-UA", {
+        hour: "2-digit", minute: "2-digit",
+    });
+}
 
-export default function ThreadRow({ id, title, author }: ThreadRowProps) {
+export default function ThreadRow({ id, title, author, date, likesCount }: ThreadRowProps) {
     return (
         <Link href={`/forum/${id}`} className="block">
             <div className="w-full h-[52px] px-2 bg-[#e6e6e6] rounded-[16px] flex items-center justify-between mb-2
@@ -20,9 +31,9 @@ export default function ThreadRow({ id, title, author }: ThreadRowProps) {
           </span>
 
                 <div className="flex items-center gap-[10px] bg-[#af292a] text-white h-[32px] px-4 rounded-full text-[10px] font-bold">
-                    <span>31.03.2026 19:20</span>
+                    <span>{formatDate(date)}</span>
                     <span className="opacity-40">|</span>
-                    <span>357</span>
+                    <span>{likesCount ?? 0}</span>
                     <span className="uppercase tracking-wider">{author}</span>
                 </div>
             </div>
