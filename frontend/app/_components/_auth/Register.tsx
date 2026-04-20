@@ -47,9 +47,6 @@ const Register = () => {
             name: "someName",
             favCategoryIds: selectedCategory,
             password:password
-
-            
-
         }
        const res =  await registerUser({data:payload})  
          
