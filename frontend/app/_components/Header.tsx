@@ -1,8 +1,10 @@
 'use client'
 import Link from "next/link";
+import { useState } from "react";
 import { ICONS } from "../svg";
 import { useUserStore } from "@/store/useUserStore";
 import { useRouter } from "next/navigation";
+import { useGetApiCategoryRoots } from "@/services/api/generated";
 
 const navItems = [
     { icon: ICONS.HOME, label: "ГОЛОВНА", href: "/" },
@@ -15,8 +17,13 @@ const navItems = [
 
 
 const Header = () => {
+
     const { user } = useUserStore()
     const router = useRouter()
+    const [isSportOpen, setIsSportOpen] = useState(false);
+    const { data: categories } = useGetApiCategoryRoots();
+
+
     return (
         <div className="w-full  bg-[#ffffff] px-10 py-4 flex flex-col gap-4">
 
@@ -69,23 +76,76 @@ const Header = () => {
             <div className="flex items-center justify-between w-full h-20">
                 <nav className="flex items-center gap-12">
                     <div className="flex items-center gap-[30px]">
-                        {navItems.map((item, index) => (
-                            <Link
-                                key={index}
-                                href={item.href}
-                                className="flex items-center justify-center gap-2 p-2.5 rounded-[10px] hover:bg-brand-red/5 transition-colors group"
-                            >
-                                <div className="w-[18px] h-[18px] flex items-center justify-center">
-                                    {item.icon}
-                                </div>
-                                <span className="text-body-l font-medium text-brand-red uppercase">
-                                    {item.label}
-                                </span>
-                            </Link>
-                        ))}
+                        {navItems.map((item, index) => {
+                            if (item.label === "СПОРТ") {
+                                return (
+                                    <div key={index} className="relative">
+                                        <button
+                                            onClick={() => setIsSportOpen(!isSportOpen)}
+                                            className="flex items-center justify-center gap-2 p-2.5 rounded-[10px] hover:bg-brand-red/5 transition-colors group cursor-pointer"
+                                        >
+                                            <div className="w-[18px] h-[18px] flex items-center justify-center">
+                                                {item.icon}
+                                            </div>
+                                            <span className="text-body-l font-medium text-brand-red uppercase">
+                                                {item.label}
+                                            </span>
+                                            <div className={`${isSportOpen ? "rotate-180" : ""} transition-transform duration-200`}>
+                                                {ICONS.ArrowDown}
+                                            </div>
+                                        </button>
+
+                                        <div
+                                            className={`absolute top-[75px] left-0 z-50 w-[760px] h-auto 
+                                                        pt-8 pl-12 pr-8 pb-10 
+                                                        bg-[#ffffff] border-[2px] border-[#af292a] rounded-[20px] 
+                                                        shadow-2xl transition-all duration-300 ease-in-out origin-top ${
+                                                isSportOpen
+                                                    ? "opacity-100 scale-y-100 pointer-events-auto"
+                                                    : "opacity-0 scale-y-0 pointer-events-none"
+                                            }`}
+                                        >
+                                            <div className="flex flex-col gap-6">
+                                                {categories?.map((cat) => (
+                                                    <button
+                                                        key={cat.id}
+                                                        onClick={() => {
+                                                            router.push(`/sport/${cat.id}`);
+                                                            setIsSportOpen(false);
+                                                        }}
+                                                        className="flex items-center gap-1 group cursor-pointer w-full"
+                                                    >
+                                                        <div className="w-8 h-8 flex items-center justify-center">
+                                                            {/* Тут можна додати мапінг іконок, наприклад: {getIcon(cat.name)} */}
+                                                            {ICONS.SPORT}
+                                                        </div>
+                                                        <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
+                                                            {cat.name}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            }
+                            return (
+                                <Link
+                                    key={index}
+                                    href={item.href}
+                                    className="flex items-center justify-center gap-2 p-2.5 rounded-[10px] hover:bg-brand-red/5 transition-colors group"
+                                >
+                                    <div className="w-[18px] h-[18px] flex items-center justify-center">
+                                        {item.icon}
+                                    </div>
+                                    <span className="text-body-l font-medium text-brand-red uppercase">
+                                        {item.label}
+                                    </span>
+                                </Link>
+                            );
+                        })}
                     </div>
                 </nav>
-
 
                 <div className="flex items-center gap-8 px-4">
                     <button className="cursor-pointer hover:opacity-70 transition-opacity">{ICONS.NOTIFY}</button>
