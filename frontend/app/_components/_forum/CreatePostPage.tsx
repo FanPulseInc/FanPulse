@@ -7,6 +7,7 @@ import { usePostApiPost, useGetApiCategoryRoots } from "@/services/api/generated
 import type { CategoryResponse } from "@/services/api/model";
 import Toast from "../Toast";
 
+
 export default function CreatePostPage() {
     const router = useRouter();
     const [selectedCategory, setSelectedCategory] = useState<CategoryResponse | null>(null);
@@ -71,7 +72,6 @@ export default function CreatePostPage() {
         )}
         <ForumContainer>
             <div className="w-[1039px] flex flex-col gap-4">
-                {/* Header - single red bar */}
                 <div className="w-full h-[60px] bg-[#af292a] rounded-[20px] flex items-center justify-between px-6">
                     <h1 className="text-white font-bold text-xl italic">Create post</h1>
                     <button className="w-[327px] h-[45px] bg-[#212121] rounded-[18px] flex justify-center items-center text-white font-bold text-sm hover:bg-black transition-all cursor-pointer">
@@ -79,14 +79,12 @@ export default function CreatePostPage() {
                     </button>
                 </div>
 
-                {/* Warning */}
                 <div className="w-full py-3 bg-[#f8f8f8] rounded-[20px] flex justify-center items-center shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
                     <span className="font-bold text-base leading-[30px] text-center text-[#212121]">
                         Перед створення посту рекомендується ознайомитись зі правилами форуму !!!
                     </span>
                 </div>
 
-                {/* Category selector */}
                 <div className="w-full h-[47px] bg-[#f8f8f8] rounded-full flex items-center overflow-visible relative shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
                     <div className="px-10 flex items-center justify-center">
                         <span className="font-bold text-[20px] text-[#212121] whitespace-nowrap pl-5">
