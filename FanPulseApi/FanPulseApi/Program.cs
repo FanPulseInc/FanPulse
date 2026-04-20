@@ -34,17 +34,19 @@ namespace FanPulseApi
         {
             var builder = WebApplication.CreateBuilder(args);
             
-            var nextJsAppUrl = builder.Configuration["AllowedOrigins:NextJsApp"] ?? "http://localhost:3000";
             var connectionString = builder.Configuration.GetConnectionString("PostgresConnection");
-            
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("NextJsPolicy", policy =>
                 {
-                    policy.WithOrigins(nextJsAppUrl)
+                    policy.WithOrigins(
+                            "http://localhost:3000",
+                            "https://main.d2pc57axofhk5v.amplifyapp.com"
+                        )
                         .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .AllowCredentials(); 
+                        .AllowCredentials();
                 });
             });
            
