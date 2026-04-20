@@ -4,7 +4,13 @@ import Link from "next/link";
 import {ForumContainer} from "../_forum/ForumContainer";
 import ThreadRow from "../_forum/ThreadRow";
 import { ICONS } from "../../svg";
-import { useGetApiPost, useGetApiCategoryRoots } from "@/services/api/generated";
+import { useQueries } from "@tanstack/react-query";
+import {
+    useGetApiPost,
+    useGetApiCategoryRoots,
+    getApiLikeCountTargetId,
+    getGetApiLikeCountTargetIdQueryKey,
+} from "@/services/api/generated";
 import type { PostResponce } from "@/services/api/model";
 
 const navFilters = [
@@ -13,18 +19,62 @@ const navFilters = [
     { id: "recommended", label: "Рекомендовані" },
 ];
 
+const ALL_CATEGORIES = "Всі категорії";
+
 export default function ForumPage() {
     const [activeFilter, setActiveFilter] = useState("latest");
-    const [selectedCategory, setSelectedCategory] = useState("Counter-Strike");
+    const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES);
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
     const { data: postsData, isLoading: postsLoading } = useGetApiPost({ page: 0, count: 20 });
-    const posts: PostResponce[] = Array.isArray(postsData)
+    const rawPosts: PostResponce[] = Array.isArray(postsData)
         ? postsData
         : (postsData as unknown as Record<string, PostResponce[]>)?.data
             ?? (postsData as unknown as Record<string, PostResponce[]>)?.items
             ?? [];
     const { data: categories } = useGetApiCategoryRoots();
+
+    // Filter by category first
+    const filteredPosts = selectedCategory === ALL_CATEGORIES
+        ? rawPosts
+        : rawPosts.filter(p => p.category?.name === selectedCategory);
+
+    // Live like counts per post. /api/Post doesn't include likes, so we fetch
+    // /api/Like/count/{id} in parallel and use that to sort by popularity.
+    // Results are cached under the same query key ThreadRow uses, so no extra
+    // network calls happen when rows mount.
+    const likeCountQueries = useQueries({
+        queries: filteredPosts.map(p => ({
+            queryKey: getGetApiLikeCountTargetIdQueryKey(p.id!),
+            queryFn: ({ signal }: { signal?: AbortSignal }) =>
+                getApiLikeCountTargetId(p.id!, signal),
+            enabled: !!p.id,
+            staleTime: 30_000,
+        })),
+    });
+
+    const likeCountById = new Map<string, number>();
+    filteredPosts.forEach((p, i) => {
+        if (p.id) likeCountById.set(p.id, likeCountQueries[i]?.data ?? 0);
+    });
+
+    const posts = [...filteredPosts].sort((a, b) => {
+        if (activeFilter === "latest") {
+            const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return bTime - aTime; // newest first
+        }
+        if (activeFilter === "popular") {
+            const aLikes = (a.id && likeCountById.get(a.id)) || 0;
+            const bLikes = (b.id && likeCountById.get(b.id)) || 0;
+            if (bLikes !== aLikes) return bLikes - aLikes;
+            // Tie-breaker: newer first
+            const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return bTime - aTime;
+        }
+        return 0;
+    });
 
     return (
         <ForumContainer>
@@ -57,6 +107,18 @@ export default function ForumPage() {
                                 : "opacity-0 scale-y-0 pointer-events-none"
                         }`}
                     >
+                        <button
+                            key="all"
+                            onClick={() => {
+                                setSelectedCategory(ALL_CATEGORIES);
+                                setIsCategoryOpen(false);
+                            }}
+                            className={`w-full text-center font-bold text-lg transition-colors cursor-pointer ${
+                                selectedCategory === ALL_CATEGORIES ? "text-[#af292a]" : "hover:text-[#af292a]"
+                            }`}
+                        >
+                            {ALL_CATEGORIES}
+                        </button>
                         {categories?.map((cat) => (
                             <button
                                 key={cat.id}
@@ -64,7 +126,9 @@ export default function ForumPage() {
                                     setSelectedCategory(cat.name ?? "");
                                     setIsCategoryOpen(false);
                                 }}
-                                className="w-full text-center font-bold text-lg hover:text-[#af292a] transition-colors cursor-pointer"
+                                className={`w-full text-center font-bold text-lg transition-colors cursor-pointer ${
+                                    selectedCategory === cat.name ? "text-[#af292a]" : "hover:text-[#af292a]"
+                                }`}
                             >
                                 {cat.name}
                             </button>
