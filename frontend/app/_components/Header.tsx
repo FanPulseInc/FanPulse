@@ -106,24 +106,41 @@ const Header = () => {
                                             }`}
                                         >
                                             <div className="flex flex-col gap-6">
-                                                {categories?.map((cat) => (
-                                                    <button
-                                                        key={cat.id}
-                                                        onClick={() => {
-                                                            router.push(`/sport/${cat.id}`);
-                                                            setIsSportOpen(false);
-                                                        }}
-                                                        className="flex items-center gap-1 group cursor-pointer w-full"
-                                                    >
-                                                        <div className="w-8 h-8 flex items-center justify-center">
-                                                            {/* Тут можна додати мапінг іконок, наприклад: {getIcon(cat.name)} */}
-                                                            {ICONS.SPORT}
-                                                        </div>
-                                                        <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
-                                                            {cat.name}
-                                                        </span>
-                                                    </button>
-                                                ))}
+                                                <button
+                                                    key="football"
+                                                    onClick={() => {
+                                                        router.push("/football");
+                                                        setIsSportOpen(false);
+                                                    }}
+                                                    className="flex items-center gap-1 group cursor-pointer w-full"
+                                                >
+                                                    <div className="w-8 h-8 flex items-center justify-center">
+                                                        {ICONS.SPORT}
+                                                    </div>
+                                                    <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
+                                                        Футбол
+                                                    </span>
+                                                </button>
+                                                {categories
+                                                    ?.filter((cat) => cat.name?.toLowerCase() !== "футбол" && cat.name?.toLowerCase() !== "football")
+                                                    .map((cat) => (
+                                                        <button
+                                                            key={cat.id}
+                                                            onClick={() => {
+                                                                router.push(`/sport/${cat.id}`);
+                                                                setIsSportOpen(false);
+                                                            }}
+                                                            className="flex items-center gap-1 group cursor-pointer w-full"
+                                                        >
+                                                            <div className="w-8 h-8 flex items-center justify-center">
+                                                                {/* Тут можна додати мапінг іконок, наприклад: {getIcon(cat.name)} */}
+                                                                {ICONS.SPORT}
+                                                            </div>
+                                                            <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
+                                                                {cat.name}
+                                                            </span>
+                                                        </button>
+                                                    ))}
                                             </div>
                                         </div>
                                     </div>
