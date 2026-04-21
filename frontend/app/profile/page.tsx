@@ -10,14 +10,16 @@ const Profile = () => {
     const { user, isLoading, setUser } = useUserStore()
 
     const [nameEditing, setNameEditing] = useState(false)
+    const {mutateAsync:rename} = usePutApiUserId()
 
     if (isLoading) return <div className="p-10 text-brand-red">Завантаження...</div>
     
-    const {mutateAsync } = usePutApiUserId()
+    
 
 
     const handleLogout = () => {
         setUser(null)
+        localStorage.removeItem("token")
         location.href = "/"
     }
 
@@ -71,7 +73,7 @@ const Profile = () => {
                     <div className="flex flex-col items-center gap-3">
                         <div className="w-24 h-24 rounded-full border-2 border-brand-red flex items-center justify-center bg-gray-50 overflow-hidden">
                             <span className="text-brand-red text-left text-3xl font-bold">
-                                {user?.email?.[0] || "?"}
+                                {user?.name?.[0] || "?"}
                             </span>
                         </div>
                         <div className="flex flex-col gap-1">
@@ -101,6 +103,8 @@ const Profile = () => {
                                             className="cursor-pointer hover:scale-110 transition-transform"
                                             onClick={() => {
                                                 setNameEditing(false);
+                                                const payload = {name:user?.name}
+                                                rename({id:user?.id ?? "",data:payload})
 
                                                 
                                             }}
