@@ -32,7 +32,7 @@ import type {
   CommentAddRequest,
   CommentReponse,
   GetApiCommentCommentsParams,
-  GetApiCommentIdChildrensParams,
+  GetApiCommentParams,
   GetApiLikeCheckParams,
   GetApiPostParams,
   GetApiReportUserReportsParams,
@@ -632,13 +632,14 @@ export function useGetApiCategoryIdSubcategories<TData = Awaited<ReturnType<type
 
 
 export const getApiComment = (
-
+    params?: GetApiCommentParams,
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<string[]>(
-      {url: `/api/Comment`, method: 'GET', signal
+      return customInstance<CommentReponse[]>(
+      {url: `/api/Comment`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -646,23 +647,23 @@ export const getApiComment = (
 
 
 
-export const getGetApiCommentQueryKey = () => {
+export const getGetApiCommentQueryKey = (params?: GetApiCommentParams,) => {
     return [
-    `/api/Comment`
+    `/api/Comment`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetApiCommentQueryOptions = <TData = Awaited<ReturnType<typeof getApiComment>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiComment>>, TError, TData>>, }
+export const getGetApiCommentQueryOptions = <TData = Awaited<ReturnType<typeof getApiComment>>, TError = unknown>(params?: GetApiCommentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiComment>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetApiCommentQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetApiCommentQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiComment>>> = ({ signal }) => getApiComment(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiComment>>> = ({ signal }) => getApiComment(params, signal);
 
 
 
@@ -676,7 +677,7 @@ export type GetApiCommentQueryError = unknown
 
 
 export function useGetApiComment<TData = Awaited<ReturnType<typeof getApiComment>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiComment>>, TError, TData>> & Pick<
+ params: undefined |  GetApiCommentParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiComment>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiComment>>,
           TError,
@@ -686,7 +687,7 @@ export function useGetApiComment<TData = Awaited<ReturnType<typeof getApiComment
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetApiComment<TData = Awaited<ReturnType<typeof getApiComment>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiComment>>, TError, TData>> & Pick<
+ params?: GetApiCommentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiComment>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiComment>>,
           TError,
@@ -696,16 +697,16 @@ export function useGetApiComment<TData = Awaited<ReturnType<typeof getApiComment
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetApiComment<TData = Awaited<ReturnType<typeof getApiComment>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiComment>>, TError, TData>>, }
+ params?: GetApiCommentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiComment>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGetApiComment<TData = Awaited<ReturnType<typeof getApiComment>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiComment>>, TError, TData>>, }
+ params?: GetApiCommentParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiComment>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetApiCommentQueryOptions(options)
+  const queryOptions = getGetApiCommentQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -980,14 +981,12 @@ const {mutation: mutationOptions} = options ?
 
 export const getApiCommentIdChildrens = (
     id: string,
-    params?: GetApiCommentIdChildrensParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<CommentReponse[]>(
-      {url: `/api/Comment/${id}/childrens`, method: 'GET',
-        params, signal
+      {url: `/api/Comment/${id}/childrens`, method: 'GET', signal
     },
       );
     }
@@ -995,25 +994,23 @@ export const getApiCommentIdChildrens = (
 
 
 
-export const getGetApiCommentIdChildrensQueryKey = (id: string,
-    params?: GetApiCommentIdChildrensParams,) => {
+export const getGetApiCommentIdChildrensQueryKey = (id: string,) => {
     return [
-    `/api/Comment/${id}/childrens`, ...(params ? [params] : [])
+    `/api/Comment/${id}/childrens`
     ] as const;
     }
 
 
-export const getGetApiCommentIdChildrensQueryOptions = <TData = Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError = unknown>(id: string,
-    params?: GetApiCommentIdChildrensParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError, TData>>, }
+export const getGetApiCommentIdChildrensQueryOptions = <TData = Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetApiCommentIdChildrensQueryKey(id,params);
+  const queryKey =  queryOptions?.queryKey ?? getGetApiCommentIdChildrensQueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiCommentIdChildrens>>> = ({ signal }) => getApiCommentIdChildrens(id,params, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiCommentIdChildrens>>> = ({ signal }) => getApiCommentIdChildrens(id, signal);
 
 
 
@@ -1027,8 +1024,7 @@ export type GetApiCommentIdChildrensQueryError = unknown
 
 
 export function useGetApiCommentIdChildrens<TData = Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError = unknown>(
- id: string,
-    params: undefined |  GetApiCommentIdChildrensParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError, TData>> & Pick<
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiCommentIdChildrens>>,
           TError,
@@ -1038,8 +1034,7 @@ export function useGetApiCommentIdChildrens<TData = Awaited<ReturnType<typeof ge
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetApiCommentIdChildrens<TData = Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError = unknown>(
- id: string,
-    params?: GetApiCommentIdChildrensParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError, TData>> & Pick<
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getApiCommentIdChildrens>>,
           TError,
@@ -1049,18 +1044,16 @@ export function useGetApiCommentIdChildrens<TData = Awaited<ReturnType<typeof ge
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetApiCommentIdChildrens<TData = Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError = unknown>(
- id: string,
-    params?: GetApiCommentIdChildrensParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError, TData>>, }
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGetApiCommentIdChildrens<TData = Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError = unknown>(
- id: string,
-    params?: GetApiCommentIdChildrensParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError, TData>>, }
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCommentIdChildrens>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetApiCommentIdChildrensQueryOptions(id,params,options)
+  const queryOptions = getGetApiCommentIdChildrensQueryOptions(id,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -1748,7 +1741,7 @@ export const deleteApiPostId = (
 ) => {
 
 
-      return customInstance<PostResponce>(
+      return customInstance<void>(
       {url: `/api/Post/${id}`, method: 'DELETE', signal
     },
       );
@@ -1945,7 +1938,7 @@ const {mutation: mutationOptions} = options ?
     }
 
 export const deleteApiReportId = (
-    id: number,
+    id: string,
  signal?: AbortSignal
 ) => {
 
@@ -1959,8 +1952,8 @@ export const deleteApiReportId = (
 
 
 export const getDeleteApiReportIdMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiReportId>>, TError,{id: number}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof deleteApiReportId>>, TError,{id: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiReportId>>, TError,{id: string}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deleteApiReportId>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['deleteApiReportId'];
 const {mutation: mutationOptions} = options ?
@@ -1972,7 +1965,7 @@ const {mutation: mutationOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApiReportId>>, {id: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApiReportId>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
           return  deleteApiReportId(id,)
@@ -1990,11 +1983,11 @@ const {mutation: mutationOptions} = options ?
     export type DeleteApiReportIdMutationError = unknown
 
     export const useDeleteApiReportId = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiReportId>>, TError,{id: number}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiReportId>>, TError,{id: string}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteApiReportId>>,
         TError,
-        {id: number},
+        {id: string},
         TContext
       > => {
       return useMutation(getDeleteApiReportIdMutationOptions(options), queryClient);

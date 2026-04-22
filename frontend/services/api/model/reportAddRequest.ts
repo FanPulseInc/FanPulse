@@ -4,5 +4,11 @@
  * FanPulseApi
  * OpenAPI spec version: 1.0
  */
+import type { ReportReasons } from './reportReasons';
 
-export interface ReportAddRequest { [key: string]: unknown }
+export interface ReportAddRequest {
+  reportedId?: string;
+  /** @nullable */
+  description?: string | null;
+  reason?: ReportReasons;
+}
