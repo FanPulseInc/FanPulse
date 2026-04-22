@@ -8,6 +8,7 @@ import type {
     SDBLineupResponse,
     SDBStatsResponse,
     SDBLeagueResponse,
+    SDBTimelineResponse,
 } from "./types";
 const PROXY = "/api/sports";
 
@@ -66,23 +67,30 @@ export function useLeagueSeason(leagueId: string | undefined, season: string | u
     });
 }
 
-// Lookup a single event (match) by id
+// Lookup a single event (match) by id. Polled so scores / status flip from
+// "scheduled" → "live" → "finished" without a hard refresh, and so the
+// strVideo (highlights) URL appears as soon as the API publishes it.
 export function useEventLookup(eventId: string | undefined) {
     return useQuery({
         queryKey: ["sdb", "event", eventId],
         queryFn: () => sdbGet<SDBEventsResponse>(`lookup/event/${eventId}`),
         enabled: !!eventId,
-        staleTime: 60_000,
+        refetchInterval: 30_000,
+        refetchOnWindowFocus: true,
+        staleTime: 15_000,
     });
 }
 
-// Lineups for an event
+// Lineups for an event. Subs come in during the second half — refresh roughly
+// once a minute so a substitution shows up without reload.
 export function useEventLineup(eventId: string | undefined) {
     return useQuery({
         queryKey: ["sdb", "event-lineup", eventId],
         queryFn: () => sdbGet<SDBLineupResponse>(`lookup/event_lineup/${eventId}`),
         enabled: !!eventId,
-        staleTime: 60_000,
+        refetchInterval: 60_000,
+        refetchOnWindowFocus: true,
+        staleTime: 30_000,
     });
 }
 
@@ -93,6 +101,17 @@ export function useEventStats(eventId: string | undefined) {
         queryFn: () => sdbGet<SDBStatsResponse>(`lookup/event_stats/${eventId}`),
         enabled: !!eventId,
         refetchInterval: 60_000,
+        staleTime: 30_000,
+    });
+}
+
+// Timeline (goals, cards, subs) for an event — drives the scorers panel.
+export function useEventTimeline(eventId: string | undefined) {
+    return useQuery({
+        queryKey: ["sdb", "event-timeline", eventId],
+        queryFn: () => sdbGet<SDBTimelineResponse>(`lookup/event_timeline/${eventId}`),
+        enabled: !!eventId,
+        refetchInterval: 60_000, // goals can come in while we watch
         staleTime: 30_000,
     });
 }
@@ -119,7 +138,10 @@ export function useLeagueLookups(leagueIds: string[]) {
     });
 }
 
-// Parallel season-schedule fetches
+// Parallel season-schedule fetches. We don't poll the full season every minute
+// — that would be wasteful — but we do drop the stale window short and refetch
+// on focus, so coming back to the tab pulls fresh statuses/scores. The
+// `useLiveScores` 30 s tick covers the in-progress match cells via merge.
 export function useLeagueSeasons(leagueIds: string[], season: string | undefined) {
     return useQueries({
         queries: leagueIds.map(id => ({
@@ -129,7 +151,9 @@ export function useLeagueSeasons(leagueIds: string[], season: string | undefined
                     `schedule/league/${id}/${season}`
                 ),
             enabled: !!id && !!season,
-            staleTime: 10 * 60_000,
+            refetchInterval: 5 * 60_000, // 5 min — scores roll in via livescore
+            refetchOnWindowFocus: true,
+            staleTime: 60_000,
         })),
     });
 }

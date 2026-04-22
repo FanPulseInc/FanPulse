@@ -8,6 +8,7 @@ import ScheduleColumn, {
 import FeaturedMatch from "../../_components/_football/FeaturedMatch";
 import FormationPitch from "../../_components/_football/FormationPitch";
 import StatsTable from "../../_components/_football/StatsTable";
+import MatchHighlights from "../../_components/_football/MatchHighlights";
 import {
     useLiveScores,
     useLeagueSeasons,
@@ -15,6 +16,7 @@ import {
     useEventLookup,
     useEventLineup,
     useEventStats,
+    useEventTimeline,
     useTeamPreviousEvents,
 } from "@/services/sportsdb/hooks";
 import {
@@ -24,7 +26,9 @@ import {
     lineupsToFormation,
     predictedFormationFromPrevLineups,
     statsToRows,
+    timelineToScorers,
     localDateIsoOf,
+    formatElapsed,
 } from "@/services/sportsdb/adapters";
 import type { SDBEvent } from "@/services/sportsdb/types";
 
@@ -85,6 +89,7 @@ export default function FootballMatchPage() {
     const { data: eventData, isLoading: eventLoading } = useEventLookup(matchId);
     const { data: lineupData } = useEventLineup(matchId);
     const { data: statsData } = useEventStats(matchId);
+    const { data: timelineData } = useEventTimeline(matchId);
 
     // Build the same grouped list as the index page so the sidebar is
     // consistent and the active match is highlighted regardless of league.
@@ -127,14 +132,21 @@ export default function FootballMatchPage() {
     }, [seasonQueries, leagueQueries, liveData, dateIso]);
 
     const event = (eventData?.events ?? eventData?.lookup)?.[0];
+    // Prefer live progress from /livescore (has the actual minute — "67") over
+    // the event's strStatus (often just the phase — "1H").
+    const liveForMatch = (liveData?.livescore ?? []).find(l => l.idEvent === matchId);
+    const liveElapsed = formatElapsed(liveForMatch?.strProgress, liveForMatch?.strStatus);
     const featured = event ? eventToFeatured(event) : null;
+    if (featured && liveElapsed) featured.elapsed = liveElapsed;
 
     // Real lineup (match has started / completed).
     const actualLineup = lineupData?.lineup ?? lineupData?.lookup ?? null;
     const formation = lineupsToFormation(
         actualLineup,
         event?.strHomeTeam ?? "Команда 1",
-        event?.strAwayTeam ?? "Команда 2"
+        event?.strAwayTeam ?? "Команда 2",
+        event?.strHomeTeamBadge ?? undefined,
+        event?.strAwayTeamBadge ?? undefined
     );
 
     // If no actual lineup yet AND the match is upcoming/scheduled,
@@ -162,11 +174,14 @@ export default function FootballMatchPage() {
               event?.idHomeTeam,
               event?.idAwayTeam,
               event?.strHomeTeam ?? "Команда 1",
-              event?.strAwayTeam ?? "Команда 2"
+              event?.strAwayTeam ?? "Команда 2",
+              event?.strHomeTeamBadge ?? undefined,
+              event?.strAwayTeamBadge ?? undefined
           )
         : null;
 
     const stats = statsToRows(statsData?.statistics ?? statsData?.lookup);
+    const scorers = timelineToScorers(timelineData?.timeline ?? timelineData?.lookup);
 
     return (
         <FootballContainer>
@@ -196,18 +211,55 @@ export default function FootballMatchPage() {
                         </div>
                     )}
 
-                    {featured && <FeaturedMatch match={featured} />}
+                    {featured && (
+                        <FeaturedMatch
+                            match={featured}
+                            homeScorers={scorers.home}
+                            awayScorers={scorers.away}
+                        />
+                    )}
 
-                    {/* Live timer bar */}
-                    {featured?.status === "live" && (
-                        <div className="w-full bg-[#212121] rounded-[14px] h-[34px] flex items-center justify-between px-4">
-                            <span className="bg-[#af292a] text-white text-[10px] font-bold uppercase px-2 py-[2px] rounded-full">
-                                Live
+                    {event?.strVideo && (
+                        <MatchHighlights
+                            videoUrl={event.strVideo}
+                            homeName={event.strHomeTeam ?? undefined}
+                            awayName={event.strAwayTeam ?? undefined}
+                        />
+                    )}
+
+                    {/* Live / finished timer bar — Figma: h-[78px] bg-[#212121] rounded-[20px]
+                        with white pill (red text), clock + elapsed in the middle,
+                        star on the right. Finished matches show "FT" in place of "Live"
+                        and in place of the minute count. */}
+                    {(featured?.status === "live" || featured?.status === "finished") && (
+                        <div className="w-full h-[78px] p-[16px] bg-[#212121] rounded-[20px] flex items-center justify-between">
+                            <span className="w-[65px] h-[35px] pt-[2px] pr-[7px] pb-[2px] pl-[8px] bg-[#f8f8f8] rounded-[8px] flex flex-row justify-center items-center gap-[10px]">
+                                <span
+                                    className="text-[16px] font-bold leading-[30px] tracking-normal text-center text-[#af292a]"
+                                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                                >
+                                    {featured.status === "live" ? "Live" : "FT"}
+                                </span>
                             </span>
-                            <span className="text-white font-data font-bold text-sm">
-                                {event?.strStatus ?? ""}
+                            <span className="flex items-center gap-2 text-white font-data font-bold text-base pr-8">
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <circle cx="12" cy="12" r="9" />
+                                    <polyline points="12 7 12 12 15 14" />
+                                </svg>
+                                {featured.status === "finished"
+                                    ? "FT"
+                                    : liveElapsed ?? formatElapsed(undefined, event?.strStatus ?? undefined) ?? ""}
                             </span>
-                            <span className="text-gray-400 text-lg">★</span>
+                            <span className="text-[#af292a] text-xl">★</span>
                         </div>
                     )}
 

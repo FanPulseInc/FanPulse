@@ -36,6 +36,7 @@ export interface SDBEvent {
     strHomeTeamBadge?: string | null;
     strAwayTeamBadge?: string | null;
     strThumb?: string | null;
+    strVideo?: string | null; // YouTube highlights URL — present after the match ends
     strVenue?: string | null;
     strStatus?: string | null;
     strTimestamp?: string;
@@ -80,6 +81,20 @@ export interface SDBEventStat {
     intAway?: string;
 }
 
+export interface SDBTimelineEvent {
+    idTimeline?: string;
+    idEvent?: string;
+    idTeam?: string;
+    idPlayer?: string;
+    idAssist?: string;
+    intTime?: string; // minute as a numeric string — "56", "90+2"
+    strTimeline?: string; // event type: "Goal", "Yellow Card", "Substitute"
+    strTimelineDetail?: string; // sub-type: "Penalty", "Own Goal", "Disallowed Goal"
+    strPlayer?: string;
+    strAssist?: string;
+    strHome?: string; // "1"/"0" (v1) or "Yes"/"No" (v2)
+}
+
 export interface SDBLeague {
     idLeague?: string;
     strLeague?: string;
@@ -100,3 +115,4 @@ export interface SDBScheduleResponse { schedule?: SDBEvent[] | null }
 export interface SDBTeamsResponse { teams?: SDBTeam[] | null; lookup?: SDBTeam[] | null }
 export interface SDBLineupResponse { lineup?: SDBLineupPlayer[] | null; lookup?: SDBLineupPlayer[] | null }
 export interface SDBStatsResponse { statistics?: SDBEventStat[] | null; lookup?: SDBEventStat[] | null }
+export interface SDBTimelineResponse { timeline?: SDBTimelineEvent[] | null; lookup?: SDBTimelineEvent[] | null }

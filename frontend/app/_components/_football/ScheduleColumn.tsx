@@ -14,6 +14,9 @@ export interface ScheduleMatch {
     awayLogo?: string;
     homeScore?: number;
     awayScore?: number;
+    /** Short time-state label — "67'" / "HT" during a live match, "FT" after it ends.
+     *  Shown under the time/date cell whenever the match is live or past. */
+    elapsed?: string;
     favorite?: boolean;
     status?: "live" | "past" | "upcoming";
 }
@@ -83,7 +86,20 @@ function MatchRow({
     now: number;
 }) {
     const isUpcoming = m.status === "upcoming";
+    const isPast = m.status === "past";
     const countdown = isUpcoming ? relativeKickoff(m.startIso, now) : null;
+    // Finished matches: swap the kickoff time for the play date (DD.MM) so the
+    // user sees when the game was played, not when it would've started today.
+    const timeLabel = isPast && m.startIso
+        ? (() => {
+              const iso = /[zZ]|[+-]\d{2}:?\d{2}$/.test(m.startIso!) ? m.startIso! : `${m.startIso!}Z`;
+              const d = new Date(iso);
+              if (Number.isNaN(d.getTime())) return m.time;
+              const dd = String(d.getDate()).padStart(2, "0");
+              const mm = String(d.getMonth() + 1).padStart(2, "0");
+              return `${dd}.${mm}`;
+          })()
+        : m.time;
     return (
         <div
             onClick={onClick}
@@ -91,17 +107,24 @@ function MatchRow({
                 selected ? "bg-[#af292a]/10" : "hover:bg-white"
             }`}
         >
-            <span className="text-[#af292a] text-[14px] font-bold font-data">{m.time}</span>
+            <div className="flex flex-col items-start leading-tight">
+                <span className="text-[#af292a] text-[14px] font-bold font-data">{timeLabel}</span>
+                {(m.status === "live" || isPast) && m.elapsed && (
+                    <span className="text-[10px] font-bold text-[#af292a] font-data pl-3">
+                        {m.elapsed}
+                    </span>
+                )}
+            </div>
             <div className="flex flex-col gap-[2px] min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
                     {m.homeLogo ? (
                         <Image
                             src={m.homeLogo}
                             alt=""
-                            width={24}
-                            height={24}
+                            width={18}
+                            height={18}
                             unoptimized
-                            className="w-6 h-6 object-contain shrink-0"
+                            className="w-[18px] h-[18px] object-contain shrink-0"
                         />
                     ) : (
                         <span className="w-5 h-5 rounded-full bg-gray-300 shrink-0" />
@@ -113,10 +136,10 @@ function MatchRow({
                         <Image
                             src={m.awayLogo}
                             alt=""
-                            width={24}
-                            height={24}
+                            width={18}
+                            height={18}
                             unoptimized
-                            className="w-6 h-6 object-contain shrink-0"
+                            className="w-[18px] h-[18px] object-contain shrink-0"
                         />
                     ) : (
                         <span className="w-5 h-5 rounded-full bg-gray-300 shrink-0" />

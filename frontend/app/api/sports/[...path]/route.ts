@@ -3,8 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 const BASE = process.env.SPORTSDB_BASE_URL ?? "https://www.thesportsdb.com/api/v2/json";
 const KEY = process.env.SPORTSDB_API_KEY;
 
-// Catch-all proxy to TheSportsDB so the X-API-KEY header never reaches the browser.
-// Client calls /api/sports/livescore/soccer → we forward to {BASE}/livescore/soccer.
 export async function GET(
     req: NextRequest,
     context: { params: Promise<{ path: string[] }> }
