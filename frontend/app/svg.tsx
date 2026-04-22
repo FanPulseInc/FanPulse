@@ -93,6 +93,10 @@ export const ICONS = {
         <path d="M4 6L8 10L12 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
     ),
+    ArrowUpWhite: (<svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1L7 7L13 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    ),
     Edit: (<svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M2 13.1716L1 17.1716L5 16.1716L16.586 4.58557C16.9609 4.21052 17.1716 3.7019 17.1716 3.17157C17.1716 2.64124 16.9609 2.13263 16.586 1.75757L16.414 1.58557C16.0389 1.21063 15.5303 1 15 1C14.4697 1 13.9611 1.21063 13.586 1.58557L2 13.1716Z" stroke="#AF292A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         <path d="M2 13.1714L1 17.1714L5 16.1714L15 6.17139L12 3.17139L2 13.1714Z" fill="#AF292A" />
@@ -138,6 +142,7 @@ export const ICONS = {
         </defs>
     </svg>
     )
+
 
 
 
