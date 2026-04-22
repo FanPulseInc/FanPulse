@@ -77,7 +77,11 @@ const Profile = () => {
                     <div className="flex flex-col items-center gap-3">
                         <div className="w-24 h-24 rounded-full border-2 border-brand-red flex items-center justify-center bg-gray-50 overflow-hidden">
                             <span className="text-brand-red text-left text-3xl font-bold">
-                                {user?.name?.[0] || "?"}
+                                {user?.name && user.name !== "someName"
+                                    ? user.name[0].toUpperCase()
+                                    : user?.email
+                                        ? user.email[0].toUpperCase()
+                                        : "?"}
                             </span>
                         </div>
                         <div className="flex flex-col gap-1">
