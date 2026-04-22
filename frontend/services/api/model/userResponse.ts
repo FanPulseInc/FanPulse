@@ -4,6 +4,7 @@
  * FanPulseApi
  * OpenAPI spec version: 1.0
  */
+import type { UserActivityDto } from './userActivityDto';
 
 export interface UserResponse {
   id?: string;
@@ -15,4 +16,12 @@ export interface UserResponse {
   avatarUrl?: string | null;
   isVerifiedUser?: boolean;
   createdAt?: string;
+  /** @nullable */
+  countOfPosts?: number | null;
+  /** @nullable */
+  countOfComments?: number | null;
+  /** @nullable */
+  countOfLkes?: number | null;
+  /** @nullable */
+  recentActivities?: UserActivityDto[] | null;
 }

@@ -1,11 +1,33 @@
 'use client'
 
 import { useUserStore } from "@/store/useUserStore"
+import { ICONS } from "../svg"
+import { useState } from "react"
+import { usePutApiUserId } from "@/services/api/generated"
+import Toast from "../_components/Toast"
 
 const Profile = () => {
-    const { user, isLoading } = useUserStore()
+    const { user, isLoading, setUser } = useUserStore()
+
+    const [nameEditing, setNameEditing] = useState(false)
+    const [toast, setToast] = useState<{
+        message: string
+        type: "success" | "error"
+    } | null>(null)
+    const { mutateAsync: rename } = usePutApiUserId()
 
     if (isLoading) return <div className="p-10 text-brand-red">Завантаження...</div>
+
+
+
+
+    const handleLogout = () => {
+        setUser(null)
+        localStorage.removeItem("token")
+        location.href = "/"
+    }
+
+
 
     const competitions = [
         { name: "Ліга Європи УЄФА", icon: "/Vector.svg" },
@@ -24,9 +46,9 @@ const Profile = () => {
     ];
 
     const stats = [
-        { label: "Публікації", value: 35 },
-        { label: "Коментарі", value: 123 },
-        { label: "Вподобайки", value: 241 },
+        { label: "Публікації", value: user?.countOfPosts },
+        { label: "Коментарі", value: user?.countOfComments },
+        { label: "Вподобайки", value: user?.countOfLkes },
     ];
 
     const players = [
@@ -58,10 +80,76 @@ const Profile = () => {
                                 {user?.name?.[0] || "?"}
                             </span>
                         </div>
-                        <h2 className="text-xl font-bold text-brand-red uppercase tracking-wide">
-                            {user?.name || "Гість"}
-                        </h2>
+                        <div className="flex flex-col gap-1">
+                            <div className="flex flex-row items-center gap-4">
+                                {nameEditing ? (
+                                    <input
+                                        autoFocus
+                                        className="text-xl font-bold text-brand-red uppercase tracking-wide bg-gray-50 border-b-2 border-brand-red outline-none px-1"
+                                        value={user?.name || ""}
+                                        onChange={(e) => {
+
+                                            if (user) setUser({ ...user, name: e.target.value });
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') setNameEditing(false);
+                                        }}
+                                    />
+                                ) : (
+                                    <h2 className="text-xl text-left font-bold text-brand-red uppercase tracking-wide">
+                                        {user?.name && user.name !== "someName"
+                                            ? user.name
+                                            : user?.email}
+                                    </h2>
+                                )}
+
+                                <div className="flex flex-row gap-4 items-center">
+                                    {nameEditing ? (
+                                        <span
+                                            className="cursor-pointer hover:scale-110 transition-transform"
+                                            onClick={async () => {
+                                                try {
+                                                    setNameEditing(false)
+
+                                                    const payload = { name: user?.name }
+
+                                                    await rename({ id: user?.id ?? "", data: payload })
+
+                                                    setToast({
+                                                        message: "Імʼя успішно змінено",
+                                                        type: "success",
+                                                    })
+                                                } catch (e) {
+                                                    console.error(e)
+
+                                                    setToast({
+                                                        message: "Помилка при зміні імені",
+                                                        type: "error",
+                                                    })
+                                                }
+                                            }}
+                                        >
+                                            {ICONS.MARK}
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className="cursor-pointer hover:opacity-70 transition-opacity"
+                                            onClick={() => setNameEditing(true)}
+                                        >
+                                            {ICONS.Edit}
+                                        </span>
+                                    )}
+                                    <span className="cursor-pointer hover:opacity-70 transition-opacity">
+                                        {ICONS.Share}
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+
+
                     </div>
+
 
                     <section className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
@@ -89,7 +177,7 @@ const Profile = () => {
                         </div>
 
                         <div className="flex flex-col gap-2 mt-4">
-                            <button className="w-full h-[50px] rounded-[20px] bg-brand-red text-white font-bold hover:opacity-90 transition-opacity cursor-pointer">
+                            <button onClick={handleLogout} className="w-full h-[50px] rounded-[20px] bg-brand-red text-white font-bold hover:opacity-90 transition-opacity cursor-pointer">
                                 Вийти
                             </button>
                             <button className="text-sm text-brand-red/50 font-medium hover:text-brand-red transition-colors cursor-pointer mt-2">
@@ -119,30 +207,79 @@ const Profile = () => {
                     </div>
                 </section>
 
-                {/* Секция Остання активність */}
+
                 <section className="w-full flex flex-col gap-6">
                     <h2 className="text-[1.5rem] font-bold uppercase leading-none">
                         Остання активність
                     </h2>
                     <div className="flex flex-col gap-3">
-                        {recentActivities.map((item, index) => (
-                            <div
-                                key={index}
-                                className="w-full min-h-[70px] bg-gray-50 border-2 border-brand-red rounded-[20px] flex flex-row items-center px-6 gap-4 hover:bg-brand-red/5 transition-colors cursor-pointer group"
-                            >
-                                <div className="flex flex-1 items-center justify-between">
-                                    <div className="flex flex-row gap-6 items-center">
-                                        <span className="text-[14px] font-bold uppercase text-brand-red">{item.type}</span>
-                                        <span className="text-[14px] font-medium text-brand-black ">
-                                            {item.title}
-                                        </span>
-                                    </div>
-                                    <span className="text-[12px] text-brand-black/40 font-medium">
-                                        {item.date}
-                                    </span>
-                                </div>
+                        {!user?.recentActivities || user.recentActivities.length === 0 ? (
+                            <div className="w-full min-h-[70px] bg-gray-50 border-2 border-brand-red/30 rounded-[20px] flex items-center justify-center px-6">
+                                <span className="text-[14px] text-brand-black/50 font-medium">
+                                    У вас ще немає активності
+                                </span>
                             </div>
-                        ))}
+                        ) : (
+                            user.recentActivities.map((item, index) => {
+                                const typeMap: Record<string, string> = {
+                                    Post: "Пост:",
+                                    Comment: "Коментар:",
+                                    Like: "Лайк:",
+                                }
+
+                                const formatDate = (dateString: string) => {
+                                    const date = new Date(dateString)
+                                    const now = new Date()
+
+                                    const isToday = date.toDateString() === now.toDateString()
+
+                                    const yesterday = new Date()
+                                    yesterday.setDate(now.getDate() - 1)
+
+                                    const isYesterday = date.toDateString() === yesterday.toDateString()
+
+                                    if (isToday) {
+                                        return `Сьогодні, ${date.toLocaleTimeString("uk-UA", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}`
+                                    }
+
+                                    if (isYesterday) {
+                                        return `Вчора, ${date.toLocaleTimeString("uk-UA", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}`
+                                    }
+
+                                    return date.toLocaleDateString("uk-UA", {
+                                        day: "numeric",
+                                        month: "long",
+                                    })
+                                }
+
+                                return (
+                                    <div
+                                        key={index}
+                                        className="w-full min-h-[70px] bg-gray-50 border-2 border-brand-red rounded-[20px] flex flex-row items-center px-6 gap-4 hover:bg-brand-red/5 transition-colors cursor-pointer group"
+                                    >
+                                        <div className="flex flex-1 items-center justify-between">
+                                            <div className="flex flex-row gap-6 items-center">
+                                                <span className="text-[14px] font-bold uppercase text-brand-red">
+                                                    {typeMap[item.type ?? ""] || item.type}
+                                                </span>
+                                                <span className="text-[14px] font-medium text-brand-black">
+                                                    {item.title}
+                                                </span>
+                                            </div>
+                                            <span className="text-[12px] text-brand-black/40 font-medium">
+                                                {formatDate(item.createdAt ?? "")}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        )}
                     </div>
                 </section>
 
@@ -202,7 +339,15 @@ const Profile = () => {
                 <img src={"banners/banner.png"} className="w-[200px] h-[700px] rounded-[20px];" />
 
             </div>
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </div>
+
 
     )
 }
