@@ -80,22 +80,53 @@ function statusBucket(
 export function formatElapsed(progress?: string, status?: string): string | undefined {
     const p = (progress ?? "").trim();
     const s = (status ?? "").trim();
-    const pick = p || s;
-    if (!pick) return undefined;
-    const low = pick.toLowerCase();
-    if (low === "0" || low === "ns" || low === "not started") return undefined;
-    // Finished phases — collapse into a single "FT" badge.
-    if (low === "ft" || low.includes("finish") || low === "aet" || low === "pen") return "FT";
-    // Phase codes — the API knows the game is in progress but hasn't sent a minute.
-    if (low === "ht" || low.includes("half time") || low.includes("half-time")) return "HT";
-    if (low === "1h" || low === "1st" || low.includes("first half")) return "1H";
-    if (low === "2h" || low === "2nd" || low.includes("second half")) return "2H";
-    if (low === "et" || low.includes("extra")) return "ET";
-    if (low === "pk" || low.includes("penalt")) return "PK";
-    // Pure numeric → append apostrophe minute marker ("67" → "67'").
-    if (/^\d{1,3}$/.test(pick)) return `${pick}'`;
-    // Already formatted with apostrophe / "45+2" / etc.
-    return pick;
+    if (!p && !s) return undefined;
+
+    // Priority:
+    //   1. TERMINAL phases (HT, FT, AET, PEN, ET, PK) — these override any
+    //      numeric minute. At half-time TheSportsDB sends progress="45" AND
+    //      status="HT"; without this, "HT" would lose to "45'" and the badge
+    //      would freeze on 45 for the whole break.
+    //   2. Numeric minute from `progress` — the common case during play.
+    //      Prefer this over "1H"/"2H" phase codes, which are only useful when
+    //      we don't have an actual minute.
+    //   3. "1H"/"2H" half marker — fallback when no minute is available.
+    //   4. Whatever string the feed sent, verbatim.
+    const sLow = s.toLowerCase();
+    const pLow = p.toLowerCase();
+    const isNotStarted = (low: string) => low === "0" || low === "ns" || low === "not started";
+    if (isNotStarted(sLow) && isNotStarted(pLow)) return undefined;
+    if (!p && isNotStarted(sLow)) return undefined;
+
+    const terminal = (low: string): string | undefined => {
+        if (!low) return undefined;
+        if (low === "ft" || low.includes("finish") || low === "aet" || low === "pen") return "FT";
+        if (low === "ht" || low.includes("half time") || low.includes("half-time")) return "HT";
+        if (low === "et" || low.includes("extra")) return "ET";
+        if (low === "pk" || low.includes("penalt")) return "PK";
+        return undefined;
+    };
+    // 1. Terminal phases (checked on status first, then progress).
+    const term = terminal(sLow) ?? terminal(pLow);
+    if (term) return term;
+
+    // 2. Numeric minute from progress.
+    if (/^\d{1,3}$/.test(p)) return `${p}'`;
+    // 2b. Already-formatted minute like "45+2" or "90+5" — pass through.
+    if (/^\d{1,3}\+\d{1,2}'?$/.test(p) || /^\d{1,3}'$/.test(p)) return p.endsWith("'") ? p : `${p}'`;
+
+    // 3. "1H"/"2H" half marker (only useful when we don't have a minute).
+    const half = (low: string): string | undefined => {
+        if (low === "1h" || low === "1st" || low.includes("first half")) return "1H";
+        if (low === "2h" || low === "2nd" || low.includes("second half")) return "2H";
+        return undefined;
+    };
+    const h = half(sLow) ?? half(pLow);
+    if (h) return h;
+
+    // 4. Fallback — return whatever the feed gave us.
+    if (p) return p;
+    return s || undefined;
 }
 
 // ----- Livescore → schedule row -----
@@ -109,6 +140,8 @@ export function liveToScheduleRow(ls: SDBLiveScore): Partial<ScheduleMatch> {
         id: ls.idEvent ?? ls.idLiveScore ?? crypto.randomUUID(),
         homeTeam: ls.strHomeTeam ?? "?",
         awayTeam: ls.strAwayTeam ?? "?",
+        homeTeamId: ls.idHomeTeam ?? undefined,
+        awayTeamId: ls.idAwayTeam ?? undefined,
         homeLogo: ls.strHomeTeamBadge ?? undefined,
         awayLogo: ls.strAwayTeamBadge ?? undefined,
         homeScore: showScore ? toInt(ls.intHomeScore) : undefined,
@@ -135,6 +168,8 @@ export function eventToScheduleRow(ev: SDBEvent): ScheduleMatch {
         startIso: ev.strTimestamp ?? undefined,
         homeTeam: ev.strHomeTeam ?? "?",
         awayTeam: ev.strAwayTeam ?? "?",
+        homeTeamId: ev.idHomeTeam ?? undefined,
+        awayTeamId: ev.idAwayTeam ?? undefined,
         homeLogo: ev.strHomeTeamBadge ?? undefined,
         awayLogo: ev.strAwayTeamBadge ?? undefined,
         homeScore: showScore && ev.intHomeScore != null ? toInt(ev.intHomeScore) : undefined,
@@ -155,6 +190,7 @@ export function eventToCarousel(ev: SDBEvent): CarouselMatch {
     return {
         id: ev.idEvent ?? crypto.randomUUID(),
         league: ev.strLeague ?? "",
+        idLeague: ev.idLeague ?? undefined,
         kickoff: iso,
         home: { name: ev.strHomeTeam ?? "?", logoUrl: ev.strHomeTeamBadge ?? undefined },
         away: { name: ev.strAwayTeam ?? "?", logoUrl: ev.strAwayTeamBadge ?? undefined },
@@ -368,7 +404,9 @@ export function lineupsToFormation(
     homeLabel: string,
     awayLabel: string,
     homeLogo?: string,
-    awayLogo?: string
+    awayLogo?: string,
+    homeCoach?: string,
+    awayCoach?: string
 ): { top: FormationTeam; bottom: FormationTeam } | null {
     if (!lineup || lineup.length === 0) return null;
 
@@ -393,7 +431,7 @@ export function lineupsToFormation(
         return f && /^\d(-\d)+$/.test(f) ? f : undefined;
     };
 
-    const build = (home: boolean, label: string, logoUrl?: string): FormationTeam => {
+    const build = (home: boolean, label: string, logoUrl?: string, coachName?: string): FormationTeam => {
         const gks = pick(home, "goalkeeper");
         const formation = teamFormation(home);
         // Reshape BEFORE sorting by side, so side-sort applies to the final lines.
@@ -412,7 +450,7 @@ export function lineupsToFormation(
         return {
             label,
             logoUrl,
-            coachName: undefined,
+            coachName,
             formation,
             goalkeeper: gk,
             defense: defs.map(toPlayer),
@@ -422,8 +460,8 @@ export function lineupsToFormation(
     };
 
     return {
-        top: build(true, homeLabel, homeLogo),
-        bottom: build(false, awayLabel, awayLogo),
+        top: build(true, homeLabel, homeLogo, homeCoach),
+        bottom: build(false, awayLabel, awayLogo, awayCoach),
     };
 }
 
@@ -439,7 +477,9 @@ export function predictedFormationFromPrevLineups(
     homeLabel: string,
     awayLabel: string,
     homeLogo?: string,
-    awayLogo?: string
+    awayLogo?: string,
+    homeCoach?: string,
+    awayCoach?: string
 ): { top: FormationTeam; bottom: FormationTeam } | null {
     const isSub = (p: SDBLineupPlayer) =>
         p.strSubstitute === "1" || p.strSubstitute?.toLowerCase() === "yes";
@@ -448,7 +488,8 @@ export function predictedFormationFromPrevLineups(
         lineup: SDBLineupPlayer[] | null | undefined,
         teamId: string | undefined,
         label: string,
-        logoUrl?: string
+        logoUrl?: string,
+        coachName?: string
     ): FormationTeam | null => {
         if (!lineup || lineup.length === 0 || !teamId) return null;
         const own = lineup.filter(p => p.idTeam === teamId && !isSub(p));
@@ -473,7 +514,7 @@ export function predictedFormationFromPrevLineups(
         return {
             label,
             logoUrl,
-            coachName: undefined,
+            coachName,
             formation,
             goalkeeper: gk,
             defense: defs.map(lineupPlayerToPitch),
@@ -482,8 +523,8 @@ export function predictedFormationFromPrevLineups(
         };
     };
 
-    const top = buildSide(homePrevLineup, homeTeamId, homeLabel, homeLogo);
-    const bottom = buildSide(awayPrevLineup, awayTeamId, awayLabel, awayLogo);
+    const top = buildSide(homePrevLineup, homeTeamId, homeLabel, homeLogo, homeCoach);
+    const bottom = buildSide(awayPrevLineup, awayTeamId, awayLabel, awayLogo, awayCoach);
     if (!top && !bottom) return null;
     const empty = (label: string, logoUrl?: string): FormationTeam => ({
         label,
@@ -499,19 +540,40 @@ export function predictedFormationFromPrevLineups(
     };
 }
 
-const STAT_UA: Record<string, string> = {
-    "Shots on Goal": "Удари по воротам",
-    "Goals": "Голи",
-    "Saves": "Відбиті воротарем",
-    "Fouls": "Фоли",
-    "Passes": "Паси",
-    "Tackles": "Відбір м'яча",
-    "Free Kicks": "Вільні удари",
-    "Yellow Cards": "Жовті картки",
-    "Red Cards": "Червоні картки",
-    "Corners": "Кутові",
-    "Ball Possession %": "Володіння м'ячем %",
-};
+// TheSportsDB labels are inconsistent across leagues/seasons — the same
+// underlying stat can arrive as "Shots on Goal", "Shots on Target", or
+// "ShotsOnGoal". We lowercase + strip non-alphanumerics to canonicalise,
+// then map to the Ukrainian label.
+const STAT_UA_MAP: Array<{ match: RegExp; ua: string }> = [
+    { match: /^ballpossession/, ua: "Володіння м'ячем %" },
+    { match: /^possession/, ua: "Володіння м'ячем %" },
+    { match: /^expectedgoals|^xg$/, ua: "Очікувані голи (xG)" },
+    { match: /^shotsongoal|^shotsontarget/, ua: "Удари у площину воріт" },
+    { match: /^shotsoffgoal|^shotsofftarget/, ua: "Удари повз" },
+    { match: /^totalshots|^shotstotal/, ua: "Всього ударів" },
+    { match: /^blockedshots/, ua: "Заблоковані удари" },
+    { match: /^goals$/, ua: "Голи" },
+    { match: /^saves|^goalkeepersaves/, ua: "Відбиті воротарем" },
+    { match: /^fouls/, ua: "Фоли" },
+    { match: /^passes$/, ua: "Паси" },
+    { match: /^passesaccurate|^accuratepasses/, ua: "Точні паси" },
+    { match: /^passaccuracy/, ua: "Точність пасів %" },
+    { match: /^tackles/, ua: "Відбір м'яча" },
+    { match: /^freekicks/, ua: "Вільні удари" },
+    { match: /^yellowcards/, ua: "Жовті картки" },
+    { match: /^redcards/, ua: "Червоні картки" },
+    { match: /^corners|^cornerkicks/, ua: "Кутові" },
+    { match: /^offsides/, ua: "Офсайди" },
+];
+
+function statUa(raw: string | undefined): string {
+    if (!raw) return "";
+    const key = raw.toLowerCase().replace(/[^a-z0-9]/g, "");
+    for (const { match, ua } of STAT_UA_MAP) {
+        if (match.test(key)) return ua;
+    }
+    return raw; // fall through so unmapped stats still show SOMETHING useful
+}
 
 // ----- Timeline → match scorers -----
 export interface Scorer {
@@ -534,14 +596,59 @@ export function timelineToScorers(
     const isHome = (t: SDBTimelineEvent) =>
         t.strHome === "1" || t.strHome?.toLowerCase() === "yes";
 
+    // Goal detection. `strTimeline` is the event TYPE ("Goal", "Yellow Card",
+    // "Substitution", "Penalty"), `strTimelineDetail` is free text.
+    //
+    // Accept rules (applied on strTimeline):
+    //   - starts with "goal"  → "Goal", "Goals", "Goal - Penalty", "Goal (OG)"
+    //   - "own goal" anywhere
+    //   - "penalty" — only if not explicitly missed/saved/awarded
+    //
+    // Reject rules (override accept):
+    //   - disallowed / cancelled / VAR no-goal
+    //   - missed / saved (guards against penalty-missed rows that still use
+    //     "Goal"-adjacent wording, and against the detail containing "goal" in
+    //     phrases like "would have been the equaliser")
     const isGoal = (t: SDBTimelineEvent) => {
-        const kind = (t.strTimeline ?? "").toLowerCase();
+        const kind = (t.strTimeline ?? "").trim().toLowerCase();
         const detail = (t.strTimelineDetail ?? "").toLowerCase();
-        if (!kind.includes("goal") && !detail.includes("goal")) return false;
+
+        // Reject first.
         if (kind.includes("disallow") || detail.includes("disallow")) return false;
         if (kind.includes("cancel") || detail.includes("cancel")) return false;
-        return true;
+        if (detail.includes("no goal")) return false;
+
+        // Accept: generic goal rows (incl. "Goal - Penalty" / "Goal (OG)").
+        if (kind.startsWith("goal")) {
+            // If the row is explicitly an own-goal/penalty/etc. it still counts.
+            // Only bail if the detail says the attempt failed.
+            if (detail.includes("saved") || detail.includes("missed")) return false;
+            return true;
+        }
+        // Accept: own goal.
+        if (kind.includes("own goal") || kind.includes("own-goal")) return true;
+        // Accept: penalty — unless it was missed / saved / just awarded.
+        if (kind.includes("penalty") || kind.includes("penalty kick")) {
+            if (
+                detail.includes("miss") ||
+                detail.includes("saved") ||
+                detail.includes("awarded") ||
+                detail.includes("won")
+            ) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     };
+
+    // Trust `strHome` as-is. Empirically TheSportsDB sets it to the BENEFITING
+    // team for own-goal rows (so an OG by a home-team player has strHome="No"
+    // because the away team gets the goal in the score). Earlier we tried
+    // flipping this for OGs assuming strHome was the player's team — that put
+    // OG scorers under the wrong crest. The OG label still tags the entry via
+    // the `ownGoal` flag in toScorer, so the user can tell it was an own goal.
+    const creditedToHome = (t: SDBTimelineEvent): boolean => isHome(t);
 
     const toScorer = (t: SDBTimelineEvent, idx: number): Scorer => {
         const raw = (t.intTime ?? "").trim();
@@ -564,17 +671,315 @@ export function timelineToScorers(
     };
 
     const goals = [...timeline].filter(isGoal).sort(byMinute);
+
+    // Dedupe defensively — some live feeds emit the same goal twice (once as an
+    // own-goal row credited to one side, once as a goal-for row on the other).
+    // Key on (minute, player) so true doubles survive but literal duplicates go.
+    const seen = new Set<string>();
+    const unique = goals.filter(g => {
+        const key = `${(g.intTime ?? "").trim()}|${(g.strPlayer ?? "").trim().toLowerCase()}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+
     return {
-        home: goals.filter(isHome).map(toScorer),
-        away: goals.filter(t => !isHome(t)).map(toScorer),
+        home: unique.filter(creditedToHome).map(toScorer),
+        away: unique.filter(t => !creditedToHome(t)).map(toScorer),
     };
+}
+
+// ----- Per-player event map (for pitch annotations) -----
+// Scans the timeline and groups every in-match event by the PLAYER IT AFFECTS:
+//   Goals     → scorer name
+//   Own goals → scorer name
+//   Assists   → assisting player name (strAssist on a goal row)
+//   Sub-off   → outgoing player (strAssist on a substitution row)
+//   Cards     → booked player
+// Keyed by the name lowercased, because that's the only join we have from the
+// timeline back to a lineup row (neither feed guarantees `idPlayer` parity).
+export interface PlayerMatchEvents {
+    goals: string[];        // minutes the player scored — ["34'", "72'"]
+    ownGoals: string[];     // minutes of any own goals
+    assists: string[];      // minutes they provided an assist
+    subOutMinute?: string;  // minute they were substituted off, if any
+    yellowCard?: string;    // minute of first yellow card
+    redCard?: string;       // minute of straight red or 2nd yellow
+}
+
+function fmtMinute(raw: string | undefined): string {
+    const m = (raw ?? "").trim();
+    return m ? `${m}'` : "";
+}
+
+export function timelineToPlayerEvents(
+    timeline: SDBTimelineEvent[] | null | undefined
+): Map<string, PlayerMatchEvents> {
+    const map = new Map<string, PlayerMatchEvents>();
+    if (!timeline) return map;
+
+    const get = (name: string | undefined): PlayerMatchEvents | null => {
+        const key = (name ?? "").trim().toLowerCase();
+        if (!key) return null;
+        let entry = map.get(key);
+        if (!entry) {
+            entry = { goals: [], ownGoals: [], assists: [] };
+            map.set(key, entry);
+        }
+        return entry;
+    };
+
+    for (const t of timeline) {
+        const kind = (t.strTimeline ?? "").trim().toLowerCase();
+        const detail = (t.strTimelineDetail ?? "").trim().toLowerCase();
+        const combined = `${kind} ${detail}`;
+        const minute = fmtMinute(t.intTime);
+
+        // Goals (incl. penalties and own goals). Disallowed/missed/saved goals
+        // shouldn't annotate the pitch — mirror the scorer filter.
+        if (kind.startsWith("goal") || kind.includes("penalty") || combined.includes("own goal")) {
+            if (
+                detail.includes("disallow") ||
+                detail.includes("cancel") ||
+                detail.includes("no goal") ||
+                detail.includes("missed") ||
+                detail.includes("saved") ||
+                detail.includes("awarded") ||
+                detail.includes("won")
+            ) {
+                continue;
+            }
+            const scorer = get(t.strPlayer);
+            if (scorer) {
+                if (combined.includes("own goal")) scorer.ownGoals.push(minute);
+                else scorer.goals.push(minute);
+            }
+            // Assists are only on true goals (ignore on OG)
+            if (!combined.includes("own goal")) {
+                const assister = get(t.strAssist);
+                if (assister) assister.assists.push(minute);
+            }
+            continue;
+        }
+
+        // Substitutions — strPlayer comes on, strAssist goes off.
+        if (kind.startsWith("sub")) {
+            const off = get(t.strAssist);
+            if (off) off.subOutMinute = minute;
+            continue;
+        }
+
+        // Cards. strTimeline is often "Card", with detail telling us the colour
+        // ("Yellow" / "Red" / "Second Yellow"). Some feeds put it directly in
+        // strTimeline ("Yellow Card").
+        if (kind.includes("card") || kind.includes("yellow") || kind.includes("red")) {
+            const booked = get(t.strPlayer);
+            if (!booked) continue;
+            const isRed = combined.includes("red") || combined.includes("second yellow");
+            const isYellow = combined.includes("yellow") && !isRed;
+            if (isRed) booked.redCard = minute;
+            else if (isYellow) booked.yellowCard = minute;
+        }
+    }
+
+    return map;
+}
+
+/** Convenience: safely pluck a player's events by name (case-insensitive). */
+export function playerEvents(
+    map: Map<string, PlayerMatchEvents>,
+    name: string | undefined
+): PlayerMatchEvents | undefined {
+    if (!name) return undefined;
+    return map.get(name.trim().toLowerCase());
+}
+
+// Walk a FormationTeam (top/bottom halves) and paste the timeline events onto
+// every PitchPlayer by name-match. Used to decorate the pitch with scorer
+// balls, assist boots, sub arrows and cards without touching the formation
+// adapters that build the layout.
+export function enrichPitchPlayersWithEvents<
+    T extends { goalkeeper: PitchPlayer; defense: PitchPlayer[]; midfield: PitchPlayer[]; attack: PitchPlayer[] }
+>(team: T, events: Map<string, PlayerMatchEvents>): T {
+    const apply = (p: PitchPlayer): PitchPlayer => {
+        const ev = playerEvents(events, p.name);
+        if (!ev) return p;
+        return {
+            ...p,
+            goals: ev.goals.length ? ev.goals : undefined,
+            ownGoals: ev.ownGoals.length ? ev.ownGoals : undefined,
+            assists: ev.assists.length ? ev.assists : undefined,
+            subOutMinute: ev.subOutMinute,
+            yellowCard: ev.yellowCard,
+            redCard: ev.redCard,
+        };
+    };
+    return {
+        ...team,
+        goalkeeper: apply(team.goalkeeper),
+        defense: team.defense.map(apply),
+        midfield: team.midfield.map(apply),
+        attack: team.attack.map(apply),
+    };
+}
+
+// Simple boolean summary — did each team receive any red card this match?
+// Used by the schedule list to pin a small red-card indicator next to team
+// names. Lives here so the list never needs to touch the timeline directly.
+export function teamsWithRedCards(
+    timeline: SDBTimelineEvent[] | null | undefined
+): { home: boolean; away: boolean } {
+    if (!timeline) return { home: false, away: false };
+    let home = false;
+    let away = false;
+    for (const t of timeline) {
+        const kind = (t.strTimeline ?? "").toLowerCase();
+        const detail = (t.strTimelineDetail ?? "").toLowerCase();
+        const combined = `${kind} ${detail}`;
+        if (!combined.includes("red") && !combined.includes("second yellow")) continue;
+        const isHome = t.strHome === "1" || t.strHome?.toLowerCase() === "yes";
+        if (isHome) home = true;
+        else away = true;
+    }
+    return { home, away };
 }
 
 export function statsToRows(stats: SDBEventStat[] | null | undefined): StatRow[] {
     if (!stats || stats.length === 0) return [];
     return stats.map(s => ({
-        label: STAT_UA[s.strStat ?? ""] ?? s.strStat ?? "",
+        label: statUa(s.strStat ?? undefined),
         home: toInt(s.intHome),
         away: toInt(s.intAway),
     }));
+}
+
+// ----- Bench / substitutes panel -----
+
+export interface BenchPlayer {
+    id: string;
+    name: string;
+    number?: number;
+    photoUrl?: string;
+    nationality?: string; // raw country name — UI resolves to a flag emoji
+    /** Name of the starter this bench player replaced on the pitch. If empty,
+     *  the player stayed on the bench the whole match (unused substitute). */
+    replacedName?: string;
+    /** Minute they came on, for sorting. Unused subs sort to the bottom. */
+    minuteOn?: number;
+}
+
+// Subscribe one team's bench from the lineup endpoint, then enrich with
+// timeline "Substitution" events to show who each came on for.
+//
+// Lineup sub rows: `strSubstitute` is "Yes"/"1" and we filter by home/away.
+// Timeline sub rows: `strTimeline` is "Substitution" (sometimes "Substitute"
+// or "Sub"). TheSportsDB encodes:
+//   strPlayer  = player coming ON
+//   strAssist  = player going OFF  (reuses the "assist" field)
+// We match those against the bench roster by name.
+export function lineupToBench(
+    lineup: SDBLineupPlayer[] | null | undefined,
+    timeline: SDBTimelineEvent[] | null | undefined
+): { home: BenchPlayer[]; away: BenchPlayer[] } {
+    if (!lineup || lineup.length === 0) return { home: [], away: [] };
+
+    const isHome = (p: SDBLineupPlayer) =>
+        p.strHome === "1" || p.strHome?.toLowerCase() === "yes";
+    const isSub = (p: SDBLineupPlayer) =>
+        p.strSubstitute === "1" || p.strSubstitute?.toLowerCase() === "yes";
+
+    // Map sub events keyed by the incoming player's name (lowercased). Timeline
+    // event types for subs vary by feed — accept any kind that starts with "sub".
+    const subsByIncoming = new Map<string, { out: string; minute: number }>();
+    for (const t of timeline ?? []) {
+        const kind = (t.strTimeline ?? "").trim().toLowerCase();
+        if (!kind.startsWith("sub")) continue;
+        const inName = (t.strPlayer ?? "").trim();
+        const outName = (t.strAssist ?? "").trim();
+        if (!inName) continue;
+        const minute = Number((t.intTime ?? "").split("+")[0]) || 0;
+        subsByIncoming.set(inName.toLowerCase(), { out: outName, minute });
+    }
+
+    const buildOne = (p: SDBLineupPlayer): BenchPlayer => {
+        const name = p.strPlayer ?? "?";
+        const sub = subsByIncoming.get(name.trim().toLowerCase());
+        const num = p.intSquadNumber ? Number(p.intSquadNumber) : NaN;
+        return {
+            id: p.idPlayer ?? p.idLineup ?? crypto.randomUUID(),
+            name,
+            number: Number.isFinite(num) ? num : undefined,
+            photoUrl: p.strCutout ?? p.strPlayerThumb ?? undefined,
+            nationality: p.strNationality ?? p.strCountry ?? undefined,
+            replacedName: sub?.out || undefined,
+            minuteOn: sub?.minute,
+        };
+    };
+
+    // Used subs (came on) sort first by minute; unused subs drag to the bottom
+    // ordered by jersey number so the list reads like a team sheet.
+    const sortBench = (a: BenchPlayer, b: BenchPlayer) => {
+        const aUsed = a.minuteOn != null;
+        const bUsed = b.minuteOn != null;
+        if (aUsed !== bUsed) return aUsed ? -1 : 1;
+        if (aUsed && bUsed) return (a.minuteOn ?? 0) - (b.minuteOn ?? 0);
+        return (a.number ?? 999) - (b.number ?? 999);
+    };
+
+    const subs = lineup.filter(isSub);
+    return {
+        home: subs.filter(isHome).map(buildOne).sort(sortBench),
+        away: subs.filter(p => !isHome(p)).map(buildOne).sort(sortBench),
+    };
+}
+
+// ----- Last 5 matches form -----
+// For each side's "Past 5" card we need the outcome from the perspective of
+// the CURRENT team (not the home/away slot), plus the opponent's name, crest
+// and the final score formatted as "H-A".
+export interface LastFiveRow {
+    id: string;
+    opponentName: string;
+    opponentLogo?: string;
+    result: "W" | "L" | "D";
+    score: string; // always "home-away" regardless of which side our team was
+}
+
+export function eventsToLastFive(
+    events: SDBEvent[] | null | undefined,
+    teamId: string | undefined
+): LastFiveRow[] {
+    if (!events || events.length === 0 || !teamId) return [];
+
+    // TheSportsDB's schedule/previous endpoint returns events newest-first
+    // most of the time, but we can't rely on that — sort by timestamp desc
+    // ourselves, then slice.
+    const finished = events
+        .filter(e => e.intHomeScore != null && e.intAwayScore != null)
+        .slice()
+        .sort((a, b) => {
+            const at = a.strTimestamp ?? a.dateEvent ?? "";
+            const bt = b.strTimestamp ?? b.dateEvent ?? "";
+            return bt.localeCompare(at);
+        })
+        .slice(0, 5);
+
+    return finished.map(e => {
+        const isHome = e.idHomeTeam === teamId;
+        const homeScore = Number(e.intHomeScore);
+        const awayScore = Number(e.intAwayScore);
+        const ourScore = isHome ? homeScore : awayScore;
+        const theirScore = isHome ? awayScore : homeScore;
+        let result: "W" | "L" | "D";
+        if (ourScore > theirScore) result = "W";
+        else if (ourScore < theirScore) result = "L";
+        else result = "D";
+        return {
+            id: e.idEvent ?? `${e.strTimestamp}-${e.strHomeTeam}`,
+            opponentName: (isHome ? e.strAwayTeam : e.strHomeTeam) ?? "",
+            opponentLogo: (isHome ? e.strAwayTeamBadge : e.strHomeTeamBadge) ?? undefined,
+            result,
+            score: `${homeScore}-${awayScore}`,
+        };
+    });
 }

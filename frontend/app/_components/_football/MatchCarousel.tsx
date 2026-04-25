@@ -1,171 +1,229 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import VoteCard from "./VoteCard";
 
 export interface CarouselMatch {
     id: string;
     league: string;
-    leagueIcon?: string;
-    kickoff: string; // ISO
-    home: { name: string; logoUrl?: string };
-    away: { name: string; logoUrl?: string };
-    odds?: { home: number; draw: number; away: number };
-    trend?: { home: "up" | "down" | "flat"; draw: "up" | "down" | "flat"; away: "up" | "down" | "flat" };
+    
+    idLeague?: string;
+    
+    leagueBadge?: string;
+    kickoff: string; 
+    home: { name: string; logoUrl?: string; score?: number };
+    away: { name: string; logoUrl?: string; score?: number };
+    
+    status?: "scheduled" | "live" | "finished";
+    
+    elapsed?: string;
 }
 
 function TeamCrest({ name, logoUrl }: { name: string; logoUrl?: string }) {
     return (
-        <div className="flex flex-col items-center gap-2">
-            <div className="w-[70px] h-[70px] rounded-full bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden">
+        <div className="flex flex-col items-center gap-2 shrink-0">
+            <div className="w-[110px] h-[110px] flex items-center justify-center">
                 {logoUrl ? (
                     <Image
                         src={logoUrl}
                         alt={name}
-                        width={70}
-                        height={70}
+                        width={110}
+                        height={110}
                         unoptimized
-                        className="w-full h-full object-contain p-2"
+                        className="w-full h-full object-contain drop-shadow-md"
                     />
                 ) : (
-                    <span className="text-white font-bold text-sm">
+                    <span className="text-white font-bold text-2xl">
                         {name.slice(0, 2).toUpperCase()}
                     </span>
                 )}
             </div>
-            <span className="text-white font-medium text-sm">{name}</span>
+            <span className="text-white text-[12px] font-bold uppercase tracking-wider">
+                {name.split(/\s+/)[0]}
+            </span>
         </div>
     );
 }
 
-function TrendIcon({ dir }: { dir?: "up" | "down" | "flat" }) {
-    if (dir === "up") return <span className="text-green-400 text-[10px]">▲</span>;
-    if (dir === "down") return <span className="text-red-400 text-[10px]">▼</span>;
-    return null;
-}
-
 function Slide({ match }: { match: CarouselMatch }) {
     const router = useRouter();
-    const date = new Date(match.kickoff);
-    const dateLabel = date.toLocaleDateString("uk-UA", { day: "2-digit", month: "2-digit", year: "numeric" });
-    const timeLabel = date.toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit" });
+    const normalisedIso =
+        /[zZ]|[+-]\d{2}:?\d{2}$/.test(match.kickoff)
+            ? match.kickoff
+            : `${match.kickoff}Z`;
+    const date = new Date(normalisedIso);
+    const dateLabel = date.toLocaleDateString("uk-UA", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
+    const timeLabel = date.toLocaleTimeString("uk-UA", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+    const isLive = match.status === "live";
+    const isFinished = match.status === "finished";
+    const showVote = match.status !== "live" && match.status !== "finished";
 
     return (
         <div
-            onClick={() => router.push(`/football/${match.id}`)}
-            className="w-full bg-[#101114] rounded-[16px] p-6 text-white cursor-pointer hover:bg-[#16171b] transition-colors"
+            onClick={(e) => {
+                const t = e.target as HTMLElement | null;
+                if (t?.closest("button, a, input")) return;
+                router.push(`/football/${match.id}`);
+            }}
+            className="w-full bg-[#af292a] rounded-[20px] p-[20px] flex flex-col gap-4 shadow-lg cursor-pointer hover:brightness-105 transition"
         >
-            {/* League header */}
-            <div className="flex items-center gap-2 mb-5">
-                <div className="w-5 h-5 rounded-full bg-[#af292a] flex items-center justify-center text-[10px]">⚽</div>
-                <span className="font-bold text-sm">{match.league}</span>
+            <div className="relative flex items-center gap-2">
+                <div className="w-[28px] h-[28px] rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0">
+                    {match.leagueBadge ? (
+                        <Image
+                            src={match.leagueBadge}
+                            alt=""
+                            width={28}
+                            height={28}
+                            unoptimized
+                            className="w-full h-full object-contain p-[2px]"
+                        />
+                    ) : (
+                        <span className="text-[#af292a] font-bold text-[10px]">
+                            {match.league.slice(0, 2).toUpperCase()}
+                        </span>
+                    )}
+                </div>
+                <span className="text-white font-bold text-sm uppercase tracking-wider">
+                    {match.league}
+                </span>
+                {isLive && (
+                    <span className="absolute right-0 top-0 bg-white text-[#af292a] text-[10px] font-bold uppercase px-2 py-[2px] rounded-full">
+                        Live
+                    </span>
+                )}
             </div>
 
-            {/* Teams + date */}
-            <div className="flex items-center justify-between mb-5">
+            
+            <div className="w-full flex items-center justify-between px-2">
                 <TeamCrest name={match.home.name} logoUrl={match.home.logoUrl} />
-                <div className="flex flex-col items-center gap-1">
-                    <span className="font-bold text-base font-data">{dateLabel}</span>
-                    <span className="text-gray-400 text-sm font-data">{timeLabel}</span>
+                <div className="flex flex-col items-center">
+                    {isLive || isFinished ? (
+                        <>
+                            <span
+                                className="text-[36px] leading-[34px] tracking-[-0.06em] text-[#f8f8f8]"
+                                style={{ fontFamily: "'Roboto Mono', monospace", fontWeight: 500 }}
+                            >
+                                {match.home.score ?? 0} ‑ {match.away.score ?? 0}
+                            </span>
+                            <span className="mt-1 text-[13px] font-bold text-white/80 font-data tracking-wider">
+                                {isFinished ? "FT" : match.elapsed ?? ""}
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <span
+                                className="text-[26px] leading-[30px] tracking-[-0.04em] text-[#f8f8f8]"
+                                style={{ fontFamily: "'Roboto Mono', monospace", fontWeight: 500 }}
+                            >
+                                {dateLabel}
+                            </span>
+                            <span
+                                className="text-[16px] tracking-[-0.04em] text-[#f8f8f8]/70"
+                                style={{ fontFamily: "'Roboto Mono', monospace", fontWeight: 500 }}
+                            >
+                                {timeLabel}
+                            </span>
+                        </>
+                    )}
                 </div>
                 <TeamCrest name={match.away.name} logoUrl={match.away.logoUrl} />
             </div>
 
-            {/* Who will win */}
-            <div className="bg-[#1a1b20] rounded-[12px] p-4 mb-4">
-                <div className="flex items-start justify-between mb-3">
-                    <div>
-                        <div className="font-bold text-sm">Who will win?</div>
-                        <div className="text-gray-400 text-xs">Cast your vote!</div>
-                    </div>
-                    <span className="text-purple-400 text-lg">🏆</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                    {[
-                        { key: "home", content: match.home.name.slice(0, 1) },
-                        { key: "draw", content: "X" },
-                        { key: "away", content: match.away.name.slice(0, 1) },
-                    ].map(opt => (
-                        <button
-                            key={opt.key}
-                            onClick={(e) => e.stopPropagation()}
-                            className="h-[36px] rounded-full border border-purple-500/40 hover:bg-purple-500/10 transition-colors flex items-center justify-center font-bold text-sm"
-                        >
-                            {opt.content}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Odds */}
-            {match.odds && (
-                <div>
-                    <div className="text-xs text-gray-400 mb-2">Full-time</div>
-                    <div className="grid grid-cols-3 gap-2">
-                        {[
-                            { label: "1", val: match.odds.home, trend: match.trend?.home },
-                            { label: "X", val: match.odds.draw, trend: match.trend?.draw },
-                            { label: "2", val: match.odds.away, trend: match.trend?.away },
-                        ].map(o => (
-                            <div
-                                key={o.label}
-                                className="bg-[#1a1b20] rounded-[8px] h-[36px] px-3 flex items-center justify-between text-sm"
-                            >
-                                <span className="text-gray-400">{o.label}</span>
-                                <span className="flex items-center gap-1 font-bold font-data">
-                                    <TrendIcon dir={o.trend} />
-                                    {o.val.toFixed(2)}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                    <button className="mt-3 text-purple-400 text-xs font-medium hover:text-purple-300 transition-colors">
-                        Additional odds ⌄
-                    </button>
+            
+            {showVote && (
+                <div onClick={(e) => e.stopPropagation()}>
+                    <VoteCard
+                        matchId={match.id}
+                        homeInitial={match.home.name.slice(0, 1)}
+                        awayInitial={match.away.name.slice(0, 1)}
+                    />
                 </div>
             )}
         </div>
     );
 }
 
+const AUTOPLAY_MS = 6000;
+
 export default function MatchCarousel({ matches }: { matches: CarouselMatch[] }) {
     const [idx, setIdx] = useState(0);
+    const safeIdx = Math.min(idx, Math.max(0, matches.length - 1));
+    const [paused, setPaused] = useState(false);
+    const len = matches.length;
+    
+    const pausedRef = useRef(paused);
+    useEffect(() => {
+        pausedRef.current = paused;
+    }, [paused]);
+    useEffect(() => {
+        if (len <= 1) return;
+        const id = setInterval(() => {
+            if (pausedRef.current) return;
+            setIdx(i => (i + 1) % len);
+        }, AUTOPLAY_MS);
+        return () => clearInterval(id);
+    }, [len]);
+
     if (matches.length === 0) return null;
-    const current = matches[idx];
+    const current = matches[safeIdx];
 
     const prev = () => setIdx(i => (i - 1 + matches.length) % matches.length);
     const next = () => setIdx(i => (i + 1) % matches.length);
 
     return (
-        <div className="w-full flex flex-col gap-3">
-            <Slide match={current} />
-
-            {/* Pager */}
-            <div className="flex items-center justify-between px-2">
-                <button
-                    onClick={prev}
-                    className="text-purple-400 text-sm font-medium hover:text-purple-300 transition-colors cursor-pointer flex items-center gap-1"
-                >
-                    ‹ Previous
-                </button>
-                <div className="flex items-center gap-2">
-                    {matches.map((_, i) => (
+        <div
+            className="w-full relative flex flex-col gap-3"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onFocusCapture={() => setPaused(true)}
+            onBlurCapture={() => setPaused(false)}
+        >
+            
+            <div className="relative">
+                <Slide match={current} />
+                {matches.length > 1 && (
+                    <>
                         <button
-                            key={i}
-                            onClick={() => setIdx(i)}
-                            className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${
-                                i === idx ? "bg-purple-400" : "bg-gray-600 hover:bg-gray-500"
-                            }`}
-                            aria-label={`Slide ${i + 1}`}
-                        />
-                    ))}
-                </div>
-                <button
-                    onClick={next}
-                    className="text-purple-400 text-sm font-medium hover:text-purple-300 transition-colors cursor-pointer flex items-center gap-1"
-                >
-                    Next ›
-                </button>
+                            type="button"
+                            onClick={prev}
+                            aria-label="Previous match"
+                            className="absolute left-[-14px] top-1/2 -translate-y-1/2 w-[36px] h-[36px] rounded-full bg-white text-[#af292a] text-[20px] font-bold flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer"
+                        >
+                            ‹
+                        </button>
+                        <button
+                            type="button"
+                            onClick={next}
+                            aria-label="Next match"
+                            className="absolute right-[-14px] top-1/2 -translate-y-1/2 w-[36px] h-[36px] rounded-full bg-white text-[#af292a] text-[20px] font-bold flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer"
+                        >
+                            ›
+                        </button>
+                    </>
+                )}
+            </div>
+
+            
+            <div className="flex items-center justify-center gap-2">
+                {matches.map((_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setIdx(i)}
+                        className={`w-[10px] h-[10px] rounded-full transition-colors cursor-pointer ${
+                            i === safeIdx ? "bg-[#af292a]" : "bg-gray-300 hover:bg-gray-400"
+                        }`}
+                        aria-label={`Slide ${i + 1}`}
+                    />
+                ))}
             </div>
         </div>
     );

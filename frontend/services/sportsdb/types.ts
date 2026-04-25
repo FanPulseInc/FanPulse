@@ -70,6 +70,8 @@ export interface SDBLineupPlayer {
     strCutout?: string | null; // v2: cutout photo URL (preferred over strPlayerThumb)
     strHome?: string; // v1: "1"/"0"   v2: "Yes"/"No"
     strSubstitute?: string; // v1: "1"/"0"   v2: "Yes"/"No"
+    strNationality?: string; // country name — populated on v2 lineup rows
+    strCountry?: string; // fallback field name some endpoints use
 }
 
 export interface SDBEventStat {

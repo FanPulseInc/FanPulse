@@ -94,6 +94,23 @@ export function useEventLineup(eventId: string | undefined) {
     });
 }
 
+// Parallel lineup fetches — used by the predicted-lineup fallback. Not every
+// past match has a published lineup (cup/European games in TheSportsDB often
+// don't), so we request several of the team's most recent fixtures in one
+// shot and the caller picks the first non-empty response. Without this,
+// clubs like Shakhtar or Strasbourg — whose most recent match is a cup tie
+// with no lineup data — end up with no predicted XI at all.
+export function useEventLineups(eventIds: (string | undefined)[]) {
+    return useQueries({
+        queries: eventIds.map(id => ({
+            queryKey: ["sdb", "event-lineup", id],
+            queryFn: () => sdbGet<SDBLineupResponse>(`lookup/event_lineup/${id}`),
+            enabled: !!id,
+            staleTime: 10 * 60_000,
+        })),
+    });
+}
+
 // Stats for an event
 export function useEventStats(eventId: string | undefined) {
     return useQuery({
@@ -102,6 +119,25 @@ export function useEventStats(eventId: string | undefined) {
         enabled: !!eventId,
         refetchInterval: 60_000,
         staleTime: 30_000,
+    });
+}
+
+// Parallel timeline fetches for a batch of events. Used by the schedule
+// list to detect red cards per match so the list can paint the card icon
+// next to the team. Each query is gated individually — pass undefined for
+// matches we don't want to fetch (e.g. future fixtures).
+export function useEventTimelines(eventIds: (string | undefined)[]) {
+    return useQueries({
+        queries: eventIds.map(id => ({
+            queryKey: ["sdb", "event-timeline", id],
+            queryFn: () => sdbGet<SDBTimelineResponse>(`lookup/event_timeline/${id}`),
+            enabled: !!id,
+            // Same cadence as the single-event version — goals/cards can land
+            // during a live match, stale data would paint stale icons.
+            refetchInterval: 60_000,
+            refetchOnWindowFocus: true,
+            staleTime: 60_000,
+        })),
     });
 }
 

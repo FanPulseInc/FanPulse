@@ -5,7 +5,6 @@ import type { StatRow } from "./StatsTable";
 import type { UpcomingTeam } from "./UpcomingGames";
 import type { CarouselMatch } from "./MatchCarousel";
 
-// Replace with API fetch once endpoints are available.
 export const MOCK_MATCHES: ScheduleMatch[] = Array.from({ length: 14 }, (_, i) => ({
     id: `match-${i + 1}`,
     time: "12:00",

@@ -6,26 +6,65 @@ export interface StatRow {
     away: number | string;
 }
 
-export default function StatsTable({ rows }: { rows: StatRow[] }) {
+const FIGMA_STATS: readonly string[] = [
+    "Очікувані голи (xG)",
+    "Володіння м'ячем %",
+    "Всього ударів",
+    "Удари у площину воріт",
+    "Удари повз",
+    "Заблоковані удари",
+    "Кутові",
+    "Офсайди",
+    "Фоли",
+    "Паси",
+    "Точні паси",
+    "Точність пасів %",
+    "Жовті картки",
+    "Червоні картки",
+];
+const FIGMA_STATS_SET: ReadonlySet<string> = new Set(FIGMA_STATS);
+
+
+function Row({ row }: { row: StatRow }) {
     return (
-        <div className="w-full bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
-            <div className="bg-[#af292a] h-[32px] flex items-center justify-center">
-                <span className="text-white font-bold text-xs uppercase tracking-wider">
-                    Статистика
-                </span>
+        <div className="grid grid-cols-3 items-center py-[10px] justify-items-center">
+            <span className="w-[87px] h-[19px] bg-[#d9d9d9] rounded-[6px] flex justify-center items-center text-[#212121] font-data font-bold text-[12px] leading-none"
+                  style={{ fontFamily: "'Roboto Mono'", fontSize: "16px", fontWeight: 500, lineHeight: "30px",letterSpacing: "0em", textAlign: "center", color: "#212121" }}>
+                {row.home}
+            </span>
+            <span
+                className="text-center text-[#212121] font-bold text-[16px]"
+                style={{ fontFamily: "'Space Grotesk', sans-serif", lineHeight: "30px", letterSpacing: "0em" }}
+            >
+                {row.label}
+            </span>
+            <span className="w-[87px] h-[19px] bg-[#d9d9d9] rounded-[6px] flex justify-center items-center text-[#212121] font-data font-bold text-[12px] leading-none"
+                  style={{ fontFamily: "'Roboto Mono'", fontSize: "16px", fontWeight: 500, lineHeight: "30px",letterSpacing: "0em", textAlign: "center", color: "#212121" }}>
+                {row.away}
+            </span>
+        </div>
+    );
+}
+
+export default function StatsTable({ rows }: { rows: StatRow[] }) {
+    const byLabel = new Map(rows.map(r => [r.label, r]));
+    const filtered = FIGMA_STATS
+        .map(label => byLabel.get(label))
+        .filter((r): r is StatRow => r != null && FIGMA_STATS_SET.has(r.label));
+    if (filtered.length === 0) return null;
+
+    return (
+        <div className="w-full p-[20px] bg-[#f8f8f8] rounded-[20px] flex flex-col gap-[10px]">
+            <div className="w-full flex justify-center mb-[4px]">
+                <div className="min-w-[220px] h-[42px] px-8 bg-[#af292a] rounded-[10px] flex items-center justify-center">
+                    <span className="text-white font-bold text-[16px] uppercase tracking-wider">
+                        Статистика
+                    </span>
+                </div>
             </div>
             <div className="flex flex-col">
-                {rows.map((row, i) => (
-                    <div
-                        key={row.label}
-                        className={`grid grid-cols-3 items-center h-[32px] px-4 ${
-                            i % 2 === 0 ? "bg-white" : "bg-gray-50"
-                        }`}
-                    >
-                        <span className="text-[#af292a] font-data font-bold text-xs text-left">{row.home}</span>
-                        <span className="text-[#212121] font-medium text-xs text-center">{row.label}</span>
-                        <span className="text-[#af292a] font-data font-bold text-xs text-right">{row.away}</span>
-                    </div>
+                {filtered.map(row => (
+                    <Row key={row.label} row={row} />
                 ))}
             </div>
         </div>
