@@ -57,7 +57,11 @@ const Header = () => {
                     {user ? (
                         <div className="w-11 h-11 lg:w-15 lg:h-15 rounded-full border-2 border-brand-red cursor-pointer flex items-center justify-center bg-gray-50 overflow-hidden" onClick={()=> router.push("/profile")}>
                             <span className="text-brand-red text-2xl lg:text-3xl font-bold">
-                                {user?.name?.[0] || "?"}
+                                {user?.name && user.name !== "someName"
+                                    ? user.name[0].toUpperCase()
+                                    : user?.email
+                                        ? user.email[0].toUpperCase()
+                                        : "?"}
                             </span>
                         </div>
                     ) :
