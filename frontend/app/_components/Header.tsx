@@ -55,7 +55,11 @@ const Header = () => {
                     {user ? (
                         <div className="w-15 h-15  rounded-full border-2 border-brand-red cursor-pointer flex items-center justify-center bg-gray-50 overflow-hidden" onClick={()=> router.push("/profile")}>
                             <span className="text-brand-red text-left text-3xl font-bold">
-                                {user?.name?.[0] || "?"}
+                                {user?.name && user.name !== "someName"
+                                    ? user.name[0].toUpperCase()
+                                    : user?.email
+                                        ? user.email[0].toUpperCase()
+                                        : "?"}            
                             </span>
                         </div>
                     ) :
@@ -133,7 +137,7 @@ const Header = () => {
                                                             className="flex items-center gap-1 group cursor-pointer w-full"
                                                         >
                                                             <div className="w-8 h-8 flex items-center justify-center">
-                                                                {/* Тут можна додати мапінг іконок, наприклад: {getIcon(cat.name)} */}
+                                                                
                                                                 {ICONS.SPORT}
                                                             </div>
                                                             <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
