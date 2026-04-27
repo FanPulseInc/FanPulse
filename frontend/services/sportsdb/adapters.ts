@@ -5,11 +5,11 @@ import type {
     SDBEventStat,
     SDBTimelineEvent,
 } from "./types";
-import type { ScheduleMatch } from "@/app/_components/_football/ScheduleColumn";
-import type { CarouselMatch } from "@/app/_components/_football/MatchCarousel";
-import type { FeaturedMatchData } from "@/app/_components/_football/FeaturedMatch";
+import type { ScheduleMatch } from "@/app/_components/_shared/ScheduleColumn";
+import type { CarouselMatch } from "@/app/_components/_shared/MatchCarousel";
+import type { FeaturedMatchData } from "@/app/_components/_shared/FeaturedMatch";
 import type { FormationTeam, PitchPlayer } from "@/app/_components/_football/FormationPitch";
-import type { StatRow } from "@/app/_components/_football/StatsTable";
+import type { StatRow } from "@/app/_components/_shared/StatsTable";
 
 // TheSportsDB `strTimestamp` is UTC without timezone suffix (e.g. "2025-08-15T19:00:00").
 // Append "Z" so the browser parses it as UTC, then format in the user's local timezone.
@@ -48,6 +48,33 @@ export function localDateIsoOf(ev: { strTimestamp?: string; dateEvent?: string }
 function toInt(s?: string | null): number {
     const n = Number(s ?? 0);
     return Number.isFinite(n) ? n : 0;
+}
+
+export function parseQuartersFromResult(
+    strResult: string | null | undefined
+): { home: number[]; away: number[] } | undefined {
+    if (!strResult) return undefined;
+    const cleaned = strResult
+        .replace(/<br\s*\/?>/gi, " \n ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&nbsp;/gi, " ");
+    const matches: number[][] = [];
+    const re = /Quarters\s*:\s*([0-9 \t\r\n]+?)(?=(?:[A-Za-z].*?Quarters\s*:)|$)/gi;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(cleaned)) !== null) {
+        const nums = m[1]
+            .split(/\s+/)
+            .map(s => s.trim())
+            .filter(Boolean)
+            .map(s => Number(s))
+            .filter(n => Number.isFinite(n));
+        if (nums.length >= 4 && nums.length <= 6) matches.push(nums);
+        if (matches.length === 2) break;
+    }
+    if (matches.length !== 2) return undefined;
+    const [home, away] = matches;
+    if (home.length !== away.length) return undefined;
+    return { home, away };
 }
 
 function statusBucket(
@@ -110,6 +137,35 @@ export function formatElapsed(progress?: string, status?: string): string | unde
     const term = terminal(sLow) ?? terminal(pLow);
     if (term) return term;
 
+    // 1b. Basketball quarter — check BEFORE the numeric-minute path, because
+    // basketball feeds often send strProgress="10" (a count) alongside
+    // strStatus="Q1", and a bare "10'" would be misread as a soccer minute.
+    const quarter = (low: string): string | undefined => {
+        if (!low) return undefined;
+        if (/^q[1-4]$/.test(low)) return low.toUpperCase();
+        if (/^[1-4]q$/.test(low)) return `Q${low[0]}`;
+        if (/^ot[0-9]?$/.test(low)) return low.toUpperCase();
+        return undefined;
+    };
+    const qEarly = quarter(sLow) ?? quarter(pLow);
+    if (qEarly) {
+        let clockEarly: string | undefined;
+        if (/^\d{1,2}:\d{2}$/.test(p)) {
+            clockEarly = p;
+        } else if (/^\d{1,2}$/.test(p)) {
+            const mins = Number(p);
+            if (mins >= 0 && mins <= 12) {
+                const remaining = 12 - mins;
+                clockEarly = `${remaining}:00`;
+            } else {
+                clockEarly = `${p}'`;
+            }
+        } else if (p && p.toLowerCase() !== sLow) {
+            clockEarly = p;
+        }
+        return clockEarly ? `${qEarly} ${clockEarly}` : qEarly;
+    }
+
     // 2. Numeric minute from progress.
     if (/^\d{1,3}$/.test(p)) return `${p}'`;
     // 2b. Already-formatted minute like "45+2" or "90+5" — pass through.
@@ -134,9 +190,12 @@ export function formatElapsed(progress?: string, status?: string): string | unde
 // without clobbering the locally-formatted `time`. TheSportsDB livescore's `strEventTime`
 // is UTC-only HH:mm:ss, which is NOT what the user should see — keep the base's local time.
 export function liveToScheduleRow(ls: SDBLiveScore): Partial<ScheduleMatch> {
+    const hasScores =
+        ls.intHomeScore != null && ls.intHomeScore !== "" &&
+        ls.intAwayScore != null && ls.intAwayScore !== "";
     const status = statusBucket(ls.strProgress, ls.strStatus);
-    const showScore = status !== "upcoming";
-    return {
+    const showScore = status !== "upcoming" || hasScores;
+    const out: Partial<ScheduleMatch> = {
         id: ls.idEvent ?? ls.idLiveScore ?? crypto.randomUUID(),
         homeTeam: ls.strHomeTeam ?? "?",
         awayTeam: ls.strAwayTeam ?? "?",
@@ -154,14 +213,17 @@ export function liveToScheduleRow(ls: SDBLiveScore): Partial<ScheduleMatch> {
                     ? "FT"
                     : undefined,
     };
+    return out;
 }
 
 // ----- Event → schedule row -----
 export function eventToScheduleRow(ev: SDBEvent): ScheduleMatch {
-    const status = statusBucket(undefined, ev.strStatus ?? undefined, ev.strTimestamp);
-    // Scores are meaningless for not-yet-played matches — TheSportsDB sometimes
-    // still returns "0"/"0" for those, which looked like a 0–0 draw on screen.
-    const showScore = status !== "upcoming";
+    const hasFinalScore =
+        ev.intHomeScore != null && ev.intHomeScore !== "" &&
+        ev.intAwayScore != null && ev.intAwayScore !== "";
+    let status = statusBucket(undefined, ev.strStatus ?? undefined, ev.strTimestamp);
+    if (hasFinalScore && status === "upcoming") status = "past";
+    const showScore = status !== "upcoming" || hasFinalScore;
     return {
         id: ev.idEvent ?? crypto.randomUUID(),
         time: hmFromTimestamp(ev.strTimestamp, ev.dateEvent, ev.strTime),
@@ -174,6 +236,7 @@ export function eventToScheduleRow(ev: SDBEvent): ScheduleMatch {
         awayLogo: ev.strAwayTeamBadge ?? undefined,
         homeScore: showScore && ev.intHomeScore != null ? toInt(ev.intHomeScore) : undefined,
         awayScore: showScore && ev.intAwayScore != null ? toInt(ev.intAwayScore) : undefined,
+        quarters: parseQuartersFromResult(ev.strResult),
         status,
         elapsed:
             status === "live"
@@ -200,7 +263,11 @@ export function eventToCarousel(ev: SDBEvent): CarouselMatch {
 // ----- Event → featured-match header -----
 export function eventToFeatured(ev: SDBEvent): FeaturedMatchData {
     const iso = ev.strTimestamp ?? `${ev.dateEvent ?? ""}T${ev.strTime ?? "00:00:00"}`;
-    const status = statusBucket(undefined, ev.strStatus ?? undefined, ev.strTimestamp);
+    const hasFinalScore =
+        ev.intHomeScore != null && ev.intHomeScore !== "" &&
+        ev.intAwayScore != null && ev.intAwayScore !== "";
+    let status = statusBucket(undefined, ev.strStatus ?? undefined, ev.strTimestamp);
+    if (hasFinalScore && status === "upcoming") status = "past";
     const featuredStatus: FeaturedMatchData["status"] =
         status === "past" ? "finished" : status === "upcoming" ? "scheduled" : "live";
     return {

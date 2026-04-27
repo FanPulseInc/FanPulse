@@ -40,7 +40,7 @@ export default function MatchHighlights({
             href={videoUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative block w-full h-[160px] rounded-[20px] overflow-hidden bg-[#212121] shadow-sm border border-gray-100"
+            className="group relative block w-full max-w-full aspect-video sm:aspect-auto sm:h-[160px] rounded-[20px] overflow-hidden bg-[#212121] shadow-sm border border-gray-100"
             aria-label="Огляд матчу"
         >
             

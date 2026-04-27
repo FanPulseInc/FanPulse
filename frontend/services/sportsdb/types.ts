@@ -33,6 +33,7 @@ export interface SDBEvent {
     strAwayTeam?: string;
     intHomeScore?: string | null;
     intAwayScore?: string | null;
+    strResult?: string | null;
     strHomeTeamBadge?: string | null;
     strAwayTeamBadge?: string | null;
     strThumb?: string | null;
@@ -116,5 +117,24 @@ export interface SDBEventsResponse { events?: SDBEvent[] | null; lookup?: SDBEve
 export interface SDBScheduleResponse { schedule?: SDBEvent[] | null }
 export interface SDBTeamsResponse { teams?: SDBTeam[] | null; lookup?: SDBTeam[] | null }
 export interface SDBLineupResponse { lineup?: SDBLineupPlayer[] | null; lookup?: SDBLineupPlayer[] | null }
+
+export interface SDBPlayer {
+    idPlayer?: string;
+    idTeam?: string;
+    strPlayer?: string;
+    strTeam?: string;
+    strSport?: string;
+    strPosition?: string;
+    strNumber?: string;
+    strNationality?: string;
+    strThumb?: string | null;
+    strCutout?: string | null;
+    strRender?: string | null;
+}
+
+export interface SDBTeamPlayersResponse {
+    player?: SDBPlayer[] | null;
+    list?: SDBPlayer[] | null;
+}
 export interface SDBStatsResponse { statistics?: SDBEventStat[] | null; lookup?: SDBEventStat[] | null }
 export interface SDBTimelineResponse { timeline?: SDBTimelineEvent[] | null; lookup?: SDBTimelineEvent[] | null }

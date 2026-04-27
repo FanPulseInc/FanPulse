@@ -9,6 +9,7 @@ import type {
     SDBStatsResponse,
     SDBLeagueResponse,
     SDBTimelineResponse,
+    SDBTeamPlayersResponse,
 } from "./types";
 const PROXY = "/api/sports";
 
@@ -203,6 +204,15 @@ export function useTeamPreviousEvents(teamId: string | undefined) {
         ),
         enabled: !!teamId,
         staleTime: 10 * 60_000,
+    });
+}
+
+export function useTeamPlayers(teamId: string | undefined) {
+    return useQuery({
+        queryKey: ["sdb", "team-players", teamId],
+        queryFn: () => sdbGet<SDBTeamPlayersResponse>(`list/players/${teamId}`),
+        enabled: !!teamId,
+        staleTime: 60 * 60_000,
     });
 }
 

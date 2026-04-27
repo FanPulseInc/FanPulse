@@ -26,8 +26,23 @@ export interface ScheduleMatch {
     
     homeRedCard?: boolean;
     awayRedCard?: boolean;
+
+    quarters?: { home: number[]; away: number[] };
 }
 
+
+const QUARTER_RE = /\b(Q[1-4]|[1-4]Q|OT[0-9]?|HT)\b/i;
+const CLOCK_RE = /\b(\d{1,2}:\d{2})\b/;
+
+function parseQuarterElapsed(elapsed: string | undefined): { quarter: string; clock?: string } | null {
+    if (!elapsed) return null;
+    const qMatch = elapsed.match(QUARTER_RE);
+    if (!qMatch) return null;
+    let quarter = qMatch[1].toUpperCase();
+    if (/^[1-4]Q$/.test(quarter)) quarter = "Q" + quarter[0];
+    const cMatch = elapsed.match(CLOCK_RE);
+    return { quarter, clock: cMatch ? cMatch[1] : undefined };
+}
 
 function relativeKickoff(startIso: string | undefined, now: number): string | null {
     if (!startIso) return null;
@@ -114,20 +129,58 @@ function MatchRow({
               return `${dd}.${mm}`;
           })()
         : m.time;
+    const hasQuarters = !!m.quarters && m.quarters.home.length > 0;
+    const gridCols = hasQuarters
+        ? "grid-cols-[54px_1fr_auto_28px]"
+        : "grid-cols-[54px_1fr_60px_28px]";
     return (
         <div
             onClick={onClick}
-            className={`grid grid-cols-[54px_1fr_60px_28px] items-center gap-2 h-[56px] px-2 rounded-[8px] cursor-pointer transition-colors border-b border-gray-200 last:border-none ${
+            className={`grid ${gridCols} items-center gap-2 h-[56px] px-2 rounded-[8px] cursor-pointer transition-colors border-b border-gray-200 last:border-none ${
                 selected ? "bg-[#af292a]/10" : "hover:bg-white"
             }`}
         >
             <div className="flex flex-col items-start leading-tight">
-                <span className="text-[#af292a] text-[14px] font-bold font-data">{timeLabel}</span>
-                {(m.status === "live" || isPast) && m.elapsed && (
-                    <span className="text-[10px] font-bold text-[#af292a] font-data pl-3">
-                        {m.elapsed}
-                    </span>
-                )}
+                {m.status === "live" && m.elapsed
+                    ? (() => {
+                          const parsed = parseQuarterElapsed(m.elapsed);
+                          if (parsed) {
+                              return (
+                                  <>
+                                      <span className="text-[#af292a] text-[14px] font-bold font-data leading-none">
+                                          {parsed.quarter}
+                                      </span>
+                                      {parsed.clock && (
+                                          <span className="text-[#af292a] text-[12px] font-bold font-data tabular-nums leading-tight mt-[2px]">
+                                              {parsed.clock}
+                                          </span>
+                                      )}
+                                  </>
+                              );
+                          }
+                          return (
+                              <>
+                                  <span className="text-[#af292a] text-[14px] font-bold font-data">
+                                      {timeLabel}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-[#af292a] font-data pl-3">
+                                      {m.elapsed}
+                                  </span>
+                              </>
+                          );
+                      })()
+                    : (
+                        <>
+                            <span className="text-[#af292a] text-[14px] font-bold font-data">
+                                {timeLabel}
+                            </span>
+                            {isPast && m.elapsed && (
+                                <span className="text-[10px] font-bold text-[#af292a] font-data pl-3">
+                                    {m.elapsed}
+                                </span>
+                            )}
+                        </>
+                    )}
             </div>
             <div className="flex flex-col gap-[2px] min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
@@ -196,6 +249,35 @@ function MatchRow({
                     ) : (
                         <span className="text-[12px] font-bold text-gray-400 font-data">–</span>
                     )
+                ) : hasQuarters ? (
+                    <div className="flex flex-col gap-[2px]">
+                        <div className="flex items-center gap-[6px]">
+                            {m.quarters!.home.map((q, i) => (
+                                <span
+                                    key={`h-${i}`}
+                                    className="font-data tracking-wider text-[11px] text-[#212121]/70 w-[18px] text-right tabular-nums"
+                                >
+                                    {q}
+                                </span>
+                            ))}
+                            <span className="text-[14px] font-bold text-[#af292a] font-data leading-tight tabular-nums w-[26px] text-right">
+                                {m.homeScore ?? "–"}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-[6px]">
+                            {m.quarters!.away.map((q, i) => (
+                                <span
+                                    key={`a-${i}`}
+                                    className="font-data tracking-wider text-[11px] text-[#212121]/70 w-[18px] text-right tabular-nums"
+                                >
+                                    {q}
+                                </span>
+                            ))}
+                            <span className="text-[14px] font-bold text-[#af292a] font-data leading-tight tabular-nums w-[26px] text-right">
+                                {m.awayScore ?? "–"}
+                            </span>
+                        </div>
+                    </div>
                 ) : (
                     <>
                         <span className="text-[14px] font-bold text-[#af292a] font-data leading-tight">
@@ -230,6 +312,8 @@ export default function ScheduleColumn({
     dateIso,
     competitions,
     onPickCompetition,
+    basePath = "/football",
+    showCompetitionsTab = true,
 }: {
     matches?: ScheduleMatch[];
     groups?: ScheduleGroup[];
@@ -239,10 +323,12 @@ export default function ScheduleColumn({
     onNextDay?: () => void;
     onPickDate?: (iso: string) => void;
     dateIso?: string;
-    
+
     competitions?: CompetitionOption[];
-    
+
     onPickCompetition?: (leagueId: string) => void;
+    basePath?: string;
+    showCompetitionsTab?: boolean;
 }) {
     const router = useRouter();
     const { isMatchFavOrTeam } = useFavorites();
@@ -272,14 +358,14 @@ export default function ScheduleColumn({
     const isEmpty = groups ? totalGrouped === 0 : filteredFlat.length === 0;
 
     return (
-        <div className="w-[560px] flex flex-col gap-[10px]">
+        <div className="w-full lg:w-[560px] flex flex-col gap-[10px]">
             
-            <div className="w-full h-[40px] bg-[#212121] rounded-[14px] flex flex-row justify-center items-center gap-[10px] px-3">
-                {topTabs.map(t => (
+            <div className="w-full min-h-[40px] bg-[#212121] rounded-[14px] flex flex-row flex-wrap justify-center items-center gap-2 px-3 py-1">
+                {topTabs.filter(t => showCompetitionsTab || t.id !== "compete").map(t => (
                     <button
                         key={t.id}
                         onClick={() => setTopTab(t.id)}
-                        className={`h-[26px] px-4 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                        className={`h-[26px] px-3 sm:px-4 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                             topTab === t.id ? "bg-[#af292a] text-white" : "text-white/80 hover:text-white"
                         }`}
                     >
@@ -327,7 +413,7 @@ export default function ScheduleColumn({
             </div>
 
             
-            <div className="w-full bg-[#f8f8f8] rounded-[20px] pt-[20px] pr-[32px] pb-[20px] pl-[32px] flex flex-col gap-[10px] shadow-sm">
+            <div className="w-full bg-[#f8f8f8] rounded-[20px] py-[20px] px-[16px] sm:px-[24px] lg:px-[32px] flex flex-col gap-[10px] shadow-sm">
                 {inCompeteMode && competitions && competitions.length > 0 && (
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between">
@@ -390,12 +476,12 @@ export default function ScheduleColumn({
                     </div>
                 )}
                 
-                <div className="w-full flex items-center gap-2">
+                <div className="w-full flex items-center flex-wrap gap-2">
                     {phaseTabs.map(t => (
                         <button
                             key={t.id}
                             onClick={() => setPhaseTab(phaseTab === t.id ? null : t.id)}
-                            className={`h-[30px] px-5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                            className={`h-[30px] px-3 sm:px-5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
                                 phaseTab === t.id
                                     ? "bg-[#212121] text-white"
                                     : "bg-[#af292a] text-white hover:opacity-90"
@@ -406,7 +492,7 @@ export default function ScheduleColumn({
                     ))}
                     <button
                         onClick={() => setPhaseTab(null)}
-                        className={`ml-auto h-[30px] px-5 rounded-full text-[11px] font-bold uppercase tracking-wider cursor-pointer transition-colors ${
+                        className={`sm:ml-auto h-[30px] px-3 sm:px-5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider cursor-pointer transition-colors whitespace-nowrap shrink-0 ${
                             phaseTab === null ? "bg-[#212121] text-white" : "bg-[#af292a] text-white hover:opacity-90"
                         }`}
                     >
@@ -452,7 +538,7 @@ export default function ScheduleColumn({
                                     selected={selectedMatchId === m.id}
                                     onClick={() => {
                                         const suffix = dateIso ? `?date=${dateIso}` : "";
-                                        router.push(`/football/${m.id}${suffix}`);
+                                        router.push(`${basePath}/${m.id}${suffix}`);
                                     }}
                                 />
                             ))}
@@ -471,7 +557,7 @@ export default function ScheduleColumn({
                                 selected={selectedMatchId === m.id}
                                 onClick={() => {
                                     const suffix = dateIso ? `?date=${dateIso}` : "";
-                                    router.push(`/football/${m.id}${suffix}`);
+                                    router.push(`${basePath}/${m.id}${suffix}`);
                                 }}
                             />
                         ))}

@@ -23,7 +23,7 @@ export interface CarouselMatch {
 function TeamCrest({ name, logoUrl }: { name: string; logoUrl?: string }) {
     return (
         <div className="flex flex-col items-center gap-2 shrink-0">
-            <div className="w-[110px] h-[110px] flex items-center justify-center">
+            <div className="w-[80px] h-[80px] sm:w-[110px] sm:h-[110px] flex items-center justify-center">
                 {logoUrl ? (
                     <Image
                         src={logoUrl}
@@ -109,7 +109,7 @@ function Slide({ match }: { match: CarouselMatch }) {
                     {isLive || isFinished ? (
                         <>
                             <span
-                                className="text-[36px] leading-[34px] tracking-[-0.06em] text-[#f8f8f8]"
+                                className="text-[26px] sm:text-[36px] leading-[28px] sm:leading-[34px] tracking-[-0.06em] text-[#f8f8f8]"
                                 style={{ fontFamily: "'Roboto Mono', monospace", fontWeight: 500 }}
                             >
                                 {match.home.score ?? 0} ‑ {match.away.score ?? 0}
@@ -121,13 +121,13 @@ function Slide({ match }: { match: CarouselMatch }) {
                     ) : (
                         <>
                             <span
-                                className="text-[26px] leading-[30px] tracking-[-0.04em] text-[#f8f8f8]"
+                                className="text-[18px] sm:text-[26px] leading-[22px] sm:leading-[30px] tracking-[-0.04em] text-[#f8f8f8]"
                                 style={{ fontFamily: "'Roboto Mono', monospace", fontWeight: 500 }}
                             >
                                 {dateLabel}
                             </span>
                             <span
-                                className="text-[16px] tracking-[-0.04em] text-[#f8f8f8]/70"
+                                className="text-[13px] sm:text-[16px] tracking-[-0.04em] text-[#f8f8f8]/70"
                                 style={{ fontFamily: "'Roboto Mono', monospace", fontWeight: 500 }}
                             >
                                 {timeLabel}

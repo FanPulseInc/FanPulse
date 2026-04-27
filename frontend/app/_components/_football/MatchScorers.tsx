@@ -1,6 +1,6 @@
 "use client";
 import type { Scorer } from "@/services/sportsdb/adapters";
-import { Icon } from "./Icon";
+import { Icon } from "../_shared/Icon";
 
 function ScorerLine({
     scorer,
