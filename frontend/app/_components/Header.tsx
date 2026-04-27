@@ -61,7 +61,7 @@ const Header = () => {
                                     ? user.name[0].toUpperCase()
                                     : user?.email
                                         ? user.email[0].toUpperCase()
-                                        : "?"}
+                                        : "?"}            
                             </span>
                         </div>
                     ) :
@@ -157,7 +157,7 @@ const Header = () => {
                                                             className="flex items-center gap-1 group cursor-pointer w-full"
                                                         >
                                                             <div className="w-8 h-8 flex items-center justify-center">
-                                                                {/* Тут можна додати мапінг іконок, наприклад: {getIcon(cat.name)} */}
+                                                                
                                                                 {ICONS.SPORT}
                                                             </div>
                                                             <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">

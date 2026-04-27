@@ -40,6 +40,7 @@ public class User
 
     public ICollection<Post> Posts { get; set; } = new List<Post>();
     public ICollection<PostLike> Likes { get; set; } = new List<PostLike>();
+    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
     
     

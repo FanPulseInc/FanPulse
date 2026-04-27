@@ -33,7 +33,30 @@ public class UserService: IUserService
     public async Task<UserResponse?> GetUserByIdAsync(Guid id)
     {
         var user  = await _repository.GetUserByIdAsync(id);
-        return user?.ToDto();
+        var recentActivities = user.Posts
+        .Select(p => new UserActivityDto
+        {
+        Type = "Пост",
+        Title = p.Title,
+        CreatedAt = p.CreatedAt
+        })
+        .Concat(user.Comments.Select(c => new UserActivityDto
+       {
+        Type = "Коментар",
+        Title = c.CommentText,
+        CreatedAt = c.CreatedAt
+    }))
+    .Concat(user.Likes.Select(l => new UserActivityDto
+    {
+        Type = "Лайк",
+        Title = l.Post.Title,
+        CreatedAt = l.CreatedAt
+    }))
+    .OrderByDescending(x => x.CreatedAt)
+    .Take(3)
+    .ToList();
+
+        return user?.ToDto(recentActivities);
     }
 
     public async Task<IEnumerable<UserResponse>> GetAllUsersAsync()
@@ -61,9 +84,9 @@ public class UserService: IUserService
             throw new ValidationException(errors); 
         }
         
-        if (addRequest.FavCategoryIds.Count != 2)
+        if (addRequest.FavCategoryIds.Count < 1 || addRequest.FavCategoryIds.Count > 2)
         {
-            throw new Exception("You must select exactly 2 favorite categories.");
+            throw new Exception("You must select 1 or 2 favorite categories.");
         }
         
         var existingUser = await _repository.GetUserByEmailAsync(addRequest.Email);
@@ -89,7 +112,7 @@ public class UserService: IUserService
         {
             Id = Guid.NewGuid(),
             Email = addRequest.Email,
-            Name = addRequest.Name,
+            Name = addRequest.Name??null,
             AvatarUrl = addRequest.AvatarUrl,
             PasswordHash = passwordResult.Hash,
             PasswordSalt = passwordResult.Salt,

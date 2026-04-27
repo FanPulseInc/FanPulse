@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { Category } from './category';
+import type { Comment } from './comment';
 import type { Post } from './post';
 import type { PostLike } from './postLike';
 
@@ -39,4 +40,6 @@ export interface User {
   posts?: Post[] | null;
   /** @nullable */
   likes?: PostLike[] | null;
+  /** @nullable */
+  comments?: Comment[] | null;
 }
