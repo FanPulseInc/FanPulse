@@ -20,7 +20,7 @@ const Auth = () => {
   }
 
   return (
-    <ModalLayout isOpen={!!type} onClose={close}>
+    <ModalLayout isOpen={!!type} onCloseAction={close}>
       {type === 'login' && <Login />}
       {type === 'register' && <Register />}
       {type === 'reset' && <ResetPassword />}

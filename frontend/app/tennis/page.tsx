@@ -11,6 +11,7 @@ import {
     useLiveScores,
     useLeagueSeasons,
     useLeagueLookups,
+    usePreviousLeagueEvents,
 } from "@/services/sportsdb/hooks";
 import {
     liveToScheduleRow,
@@ -21,28 +22,16 @@ import {
 } from "@/services/sportsdb/adapters";
 import type { SDBEvent } from "@/services/sportsdb/types";
 
-// Top European leagues for the homepage list.
-// Keep the list stable — order here is the render order.
 const TOP_LEAGUES: { id: string; name: string }[] = [
-    { id: "4328", name: "Premier League" },
-    { id: "4335", name: "La Liga" },
-    { id: "4331", name: "Bundesliga" },
-    { id: "4332", name: "Serie A" },
-    { id: "4334", name: "Ligue 1" },
-    { id: "4480", name: "UEFA Champions League" },
-    { id: "4481", name: "UEFA Europa League" },
-    { id: "5071", name: "UEFA Conference League" },
+    { id: "4464", name: "ATP World Tour" },
+    { id: "4517", name: "WTA Tour" },
+    { id: "4581", name: "Laver Cup" },
 ];
 
-// Soccer season format "YYYY-YYYY"; rolls over in August.
-function currentSoccerSeason(now = new Date()): string {
-    const year = now.getFullYear();
-    const startYear = now.getMonth() >= 7 ? year : year - 1;
-    return `${startYear}-${startYear + 1}`;
+function currentTennisSeason(now = new Date()): string {
+    return String(now.getFullYear());
 }
 
-// Local-date helpers. We must NOT use toISOString() — it converts to UTC and
-// silently rolls the date back for anyone east of Greenwich.
 function formatLocalIso(d: Date): string {
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -62,43 +51,40 @@ function shiftIso(iso: string, days: number): string {
 }
 
 function formatDateLabel(iso: string): string {
-    // "2026-04-21" → "21.04.26"
     const [y, m, d] = iso.split("-");
     return `${d}.${m}.${y.slice(2)}`;
 }
 
-export default function FootballPage() {
+export default function TennisPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialDate = searchParams.get("date") || todayIso();
     const [dateIso, setDateIso] = useState<string>(initialDate);
 
-    // Keep ?date=... in the URL so navigating to a match and back preserves
-    // it. CRITICAL: preserve every other query param. The carousel's vote
-    // flow opens the login modal by pushing `?auth=login` — if we naively
-    // replace the URL with just `?date=...` we strip `auth=login` on the
-    // very next render and the modal flashes then disappears.
     useEffect(() => {
         const current = searchParams.get("date");
         if (current === dateIso) return;
         const next = new URLSearchParams(searchParams.toString());
         next.set("date", dateIso);
-        router.replace(`/football?${next.toString()}`, { scroll: false });
+        router.replace(`/tennis?${next.toString()}`, { scroll: false });
     }, [dateIso, router, searchParams]);
 
-    const season = currentSoccerSeason(new Date(dateIso + "T00:00:00"));
+    const season = currentTennisSeason(new Date(dateIso + "T00:00:00"));
 
     const leagueIds = TOP_LEAGUES.map(l => l.id);
     const seasonQueries = useLeagueSeasons(leagueIds, season);
     const leagueQueries = useLeagueLookups(leagueIds);
-    const { data: liveData } = useLiveScores("soccer");
+    const { data: liveData } = useLiveScores("tennis");
+    const { data: previousData } = usePreviousLeagueEvents(leagueIds[0]);
 
     const anyLoading = seasonQueries.some(q => q.isLoading);
 
-    // Group events by league, filter to selected date, overlay live scores.
     const groups: ScheduleGroup[] = useMemo(() => {
         const liveById = new Map(
             (liveData?.livescore ?? []).map(l => [l.idEvent ?? "", l])
+        );
+        const previousById = new Map(
+            (previousData?.events ?? previousData?.lookup ?? []).map(e => [e.idEvent ?? "", e])
         );
 
         return TOP_LEAGUES.map((cfg, i) => {
@@ -112,7 +98,20 @@ export default function FootballPage() {
             const forDay = events.filter(ev => localDateIsoOf(ev) === dateIso);
 
             const rows = forDay.map(ev => {
-                const base = eventToScheduleRow(ev);
+                const missingScore =
+                    ev.intHomeScore == null || ev.intHomeScore === "" ||
+                    ev.intAwayScore == null || ev.intAwayScore === "";
+                const prev = ev.idEvent ? previousById.get(ev.idEvent) : undefined;
+                const merged: SDBEvent =
+                    missingScore && prev
+                        ? {
+                              ...ev,
+                              intHomeScore: prev.intHomeScore ?? ev.intHomeScore,
+                              intAwayScore: prev.intAwayScore ?? ev.intAwayScore,
+                              strResult: prev.strResult ?? ev.strResult,
+                          }
+                        : ev;
+                const base = eventToScheduleRow(merged);
                 const live = ev.idEvent ? liveById.get(ev.idEvent) : undefined;
                 return live ? { ...base, ...liveToScheduleRow(live) } : base;
             });
@@ -133,10 +132,8 @@ export default function FootballPage() {
                 matches: rows,
             };
         });
-    }, [seasonQueries, leagueQueries, liveData, dateIso]);
+    }, [seasonQueries, leagueQueries, liveData, previousData, dateIso]);
 
-    // Competition picker: list of top leagues enriched with their badges
-    // (pulled from the league lookup). Feeds ScheduleColumn's "Змагання" tab.
     const competitions: CompetitionOption[] = useMemo(
         () =>
             TOP_LEAGUES.map((cfg, i) => ({
@@ -147,9 +144,6 @@ export default function FootballPage() {
         [leagueQueries]
     );
 
-    // When the user taps a competition icon: find the nearest date that league
-    // has a fixture (≥ today first, else the latest past date) and jump the
-    // calendar there, so they see something instead of an empty page.
     const onPickCompetitionAction = (leagueId: string) => {
         const idx = TOP_LEAGUES.findIndex(l => l.id === leagueId);
         if (idx < 0) return;
@@ -167,8 +161,6 @@ export default function FootballPage() {
         if (target && target !== dateIso) setDateIso(target);
     };
 
-    // Carousel: 5 earliest upcoming matches from ANY of the top leagues,
-    // looking forward from today.
     const carouselMatches = useMemo(() => {
         const today = todayIso();
         const all: SDBEvent[] = seasonQueries.flatMap(
@@ -183,16 +175,11 @@ export default function FootballPage() {
             })
             .sort((a, b) => (a.strTimestamp ?? "").localeCompare(b.strTimestamp ?? ""))
             .slice(0, 5);
-        // Map idLeague → strBadge via the already-fetched league lookups so the
-        // carousel header shows the real UCL/EPL/Bundesliga crest instead of
-        // the old emoji placeholder.
         const badgeByLeague = new Map<string, string>();
         leagueQueries.forEach((q, i) => {
             const b = q.data?.lookup?.[0]?.strBadge;
             if (b) badgeByLeague.set(leagueIds[i], b);
         });
-        // Merge /livescore data so a match that has just kicked off switches
-        // to score display + LIVE pill in the carousel without a hard refresh.
         const liveById = new Map(
             (liveData?.livescore ?? []).map(l => [l.idEvent ?? "", l])
         );
@@ -201,16 +188,13 @@ export default function FootballPage() {
             const badge = base.idLeague ? badgeByLeague.get(base.idLeague) : undefined;
             const live = ev.idEvent ? liveById.get(ev.idEvent) : undefined;
             const statusStr = (live?.strStatus ?? ev.strStatus ?? "").toLowerCase();
-            const progressN = Number(live?.strProgress ?? NaN);
             const finished =
                 statusStr === "ft" ||
                 statusStr.includes("finish") ||
-                statusStr === "aet" ||
-                statusStr === "pen";
+                statusStr === "final";
             const liveNow =
                 !finished &&
-                (!!(live?.strProgress && live.strProgress !== "0") ||
-                    (Number.isFinite(progressN) && progressN > 0));
+                !!(live?.strProgress && live.strProgress !== "0");
             return {
                 ...base,
                 leagueBadge: badge ?? base.leagueBadge,
@@ -239,7 +223,6 @@ export default function FootballPage() {
     return (
         <SportContainer>
             <div className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-start justify-start">
-                {/* Left — schedule grouped by league, navigable by day */}
                 <div className="flex flex-col gap-2 w-full lg:w-auto">
                     {anyLoading && (
                         <div className="w-full lg:w-[560px] text-center text-gray-500 text-sm py-2">
@@ -255,10 +238,10 @@ export default function FootballPage() {
                         onPickDateAction={(iso) => setDateIso(iso)}
                         competitions={competitions}
                         onPickCompetitionAction={onPickCompetitionAction}
+                        basePath="/tennis"
                     />
                 </div>
 
-                {/* Middle — carousel of upcoming matches */}
                 <div className="flex-1 min-w-0">
                     {anyLoading ? (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
@@ -273,7 +256,6 @@ export default function FootballPage() {
                     )}
                 </div>
 
-                {/* Right — blank banner placeholder */}
                 <div className="hidden lg:block w-[220px] h-[500px] bg-white rounded-[20px] border border-gray-200 shadow-sm shrink-0" />
             </div>
         </SportContainer>

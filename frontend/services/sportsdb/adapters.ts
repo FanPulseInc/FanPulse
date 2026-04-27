@@ -166,6 +166,27 @@ export function formatElapsed(progress?: string, status?: string): string | unde
         return clockEarly ? `${qEarly} ${clockEarly}` : qEarly;
     }
 
+    // 1c. Tennis set/game progress.
+    const tennisSet = (low: string): string | undefined => {
+        if (!low) return undefined;
+        let m = low.match(/^set\s*([1-5])$/);
+        if (m) return `Set ${m[1]}`;
+        m = low.match(/^s([1-5])$/);
+        if (m) return `Set ${m[1]}`;
+        m = low.match(/^([1-5])(?:st|nd|rd|th)?\s*set$/);
+        if (m) return `Set ${m[1]}`;
+        return undefined;
+    };
+    const tennisProgress = (raw: string): string | undefined => {
+        if (/^\d+-\d+$/.test(raw)) return raw;
+        return undefined;
+    };
+    const setMarker = tennisSet(sLow) ?? tennisSet(pLow);
+    const gameSplit = tennisProgress(p) ?? tennisProgress(s);
+    if (setMarker && gameSplit) return `${setMarker} · ${gameSplit}`;
+    if (setMarker) return setMarker;
+    if (gameSplit) return gameSplit;
+
     // 2. Numeric minute from progress.
     if (/^\d{1,3}$/.test(p)) return `${p}'`;
     // 2b. Already-formatted minute like "45+2" or "90+5" — pass through.
@@ -183,6 +204,82 @@ export function formatElapsed(progress?: string, status?: string): string | unde
     // 4. Fallback — return whatever the feed gave us.
     if (p) return p;
     return s || undefined;
+}
+
+export function parseTennisResult(
+    strResult: string | null | undefined,
+    homeName: string | undefined,
+    awayName: string | undefined
+): { homeSets: number; awaySets: number; homeBySet: number[]; awayBySet: number[] } | undefined {
+    if (!strResult) return undefined;
+    const lines = strResult.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (lines.length < 3) return undefined;
+
+    const norm = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim();
+    const homeKey = norm(homeName ?? "");
+    const awayKey = norm(awayName ?? "");
+
+    const playerLine = (line: string): { name: string; scores: number[] } | null => {
+        const m = line.match(/^(.+?)\s*:\s*(.+)$/);
+        if (!m) return null;
+        const name = m[1].trim();
+        const scores = m[2]
+            .split(/\s+/)
+            .map(s => Number(s))
+            .filter(n => Number.isFinite(n));
+        return { name, scores };
+    };
+
+    const parsedLines = lines.slice(1).map(playerLine).filter((x): x is { name: string; scores: number[] } => !!x);
+    if (parsedLines.length < 2) return undefined;
+
+    const findFor = (key: string) =>
+        parsedLines.find(p => norm(p.name).includes(key) || key.includes(norm(p.name)));
+    const homeRow = (homeKey && findFor(homeKey)) || parsedLines[0];
+    const awayRow = (awayKey && findFor(awayKey)) || parsedLines[1];
+    if (!homeRow || !awayRow) return undefined;
+
+    const homeBySet = homeRow.scores;
+    const awayBySet = awayRow.scores;
+    const len = Math.min(homeBySet.length, awayBySet.length);
+    let homeSets = 0;
+    let awaySets = 0;
+    for (let i = 0; i < len; i++) {
+        if (homeBySet[i] > awayBySet[i]) homeSets++;
+        else if (awayBySet[i] > homeBySet[i]) awaySets++;
+    }
+    return { homeSets, awaySets, homeBySet: homeBySet.slice(0, len), awayBySet: awayBySet.slice(0, len) };
+}
+
+const TENNIS_TOURNAMENT_TOKENS = new Set([
+    "open", "international", "cup", "championship", "championships",
+    "masters", "classic", "tour", "atp", "wta", "challenger",
+    "trophy", "invitational", "series",
+]);
+
+export function extractTennisPlayers(
+    strEvent: string | null | undefined,
+    strLeague: string | null | undefined
+): { home?: string; away?: string } {
+    if (!strEvent) return {};
+    const split = strEvent.split(/\s+vs\s+/i);
+    if (split.length !== 2) return {};
+    let before = split[0].trim();
+    const after = split[1].trim();
+    if (strLeague && before.toLowerCase().startsWith(strLeague.toLowerCase())) {
+        before = before.slice(strLeague.length).trim();
+    }
+    const beforeWords = before.split(/\s+/).filter(Boolean);
+    let homeStart = beforeWords.length;
+    for (let i = beforeWords.length - 1; i >= 0; i--) {
+        const lower = beforeWords[i].toLowerCase();
+        if (TENNIS_TOURNAMENT_TOKENS.has(lower)) break;
+        if (/^\d+$/.test(lower)) break;
+        homeStart = i;
+    }
+    const home = beforeWords.slice(homeStart).join(" ") || undefined;
+    const away = after || undefined;
+    return { home, away };
 }
 
 // ----- Livescore → schedule row -----
@@ -222,21 +319,29 @@ export function eventToScheduleRow(ev: SDBEvent): ScheduleMatch {
         ev.intHomeScore != null && ev.intHomeScore !== "" &&
         ev.intAwayScore != null && ev.intAwayScore !== "";
     let status = statusBucket(undefined, ev.strStatus ?? undefined, ev.strTimestamp);
-    if (hasFinalScore && status === "upcoming") status = "past";
-    const showScore = status !== "upcoming" || hasFinalScore;
+    const fallback = (!ev.strHomeTeam || !ev.strAwayTeam)
+        ? extractTennisPlayers(ev.strEvent, ev.strLeague)
+        : {};
+    const homeName = ev.strHomeTeam ?? fallback.home ?? "?";
+    const awayName = ev.strAwayTeam ?? fallback.away ?? "?";
+    const looksLikeTennis = !!ev.strResult && / beat /i.test(ev.strResult);
+    const tennis = looksLikeTennis ? parseTennisResult(ev.strResult, homeName, awayName) : undefined;
+    const hasTennisFinal = !!tennis;
+    if ((hasFinalScore || hasTennisFinal) && status === "upcoming") status = "past";
+    const showScore = status !== "upcoming" || hasFinalScore || hasTennisFinal;
     return {
         id: ev.idEvent ?? crypto.randomUUID(),
         time: hmFromTimestamp(ev.strTimestamp, ev.dateEvent, ev.strTime),
         startIso: ev.strTimestamp ?? undefined,
-        homeTeam: ev.strHomeTeam ?? "?",
-        awayTeam: ev.strAwayTeam ?? "?",
+        homeTeam: homeName,
+        awayTeam: awayName,
         homeTeamId: ev.idHomeTeam ?? undefined,
         awayTeamId: ev.idAwayTeam ?? undefined,
         homeLogo: ev.strHomeTeamBadge ?? undefined,
         awayLogo: ev.strAwayTeamBadge ?? undefined,
-        homeScore: showScore && ev.intHomeScore != null ? toInt(ev.intHomeScore) : undefined,
-        awayScore: showScore && ev.intAwayScore != null ? toInt(ev.intAwayScore) : undefined,
-        quarters: parseQuartersFromResult(ev.strResult),
+        homeScore: tennis ? tennis.homeSets : (showScore && ev.intHomeScore != null ? toInt(ev.intHomeScore) : undefined),
+        awayScore: tennis ? tennis.awaySets : (showScore && ev.intAwayScore != null ? toInt(ev.intAwayScore) : undefined),
+        quarters: tennis ? { home: tennis.homeBySet, away: tennis.awayBySet } : parseQuartersFromResult(ev.strResult),
         status,
         elapsed:
             status === "live"
@@ -250,13 +355,16 @@ export function eventToScheduleRow(ev: SDBEvent): ScheduleMatch {
 // ----- Event → carousel slide -----
 export function eventToCarousel(ev: SDBEvent): CarouselMatch {
     const iso = ev.strTimestamp ?? `${ev.dateEvent ?? ""}T${ev.strTime ?? "00:00:00"}`;
+    const fallback = (!ev.strHomeTeam || !ev.strAwayTeam)
+        ? extractTennisPlayers(ev.strEvent, ev.strLeague)
+        : {};
     return {
         id: ev.idEvent ?? crypto.randomUUID(),
         league: ev.strLeague ?? "",
         idLeague: ev.idLeague ?? undefined,
         kickoff: iso,
-        home: { name: ev.strHomeTeam ?? "?", logoUrl: ev.strHomeTeamBadge ?? undefined },
-        away: { name: ev.strAwayTeam ?? "?", logoUrl: ev.strAwayTeamBadge ?? undefined },
+        home: { name: ev.strHomeTeam ?? fallback.home ?? "?", logoUrl: ev.strHomeTeamBadge ?? undefined },
+        away: { name: ev.strAwayTeam ?? fallback.away ?? "?", logoUrl: ev.strAwayTeamBadge ?? undefined },
     };
 }
 
@@ -282,16 +390,28 @@ export function eventToFeatured(ev: SDBEvent): FeaturedMatchData {
                     ? "FT"
                     : undefined,
         venue: ev.strVenue ?? undefined,
-        home: {
-            name: ev.strHomeTeam ?? "?",
-            logoUrl: ev.strHomeTeamBadge ?? undefined,
-            score: ev.intHomeScore != null ? toInt(ev.intHomeScore) : undefined,
-        },
-        away: {
-            name: ev.strAwayTeam ?? "?",
-            logoUrl: ev.strAwayTeamBadge ?? undefined,
-            score: ev.intAwayScore != null ? toInt(ev.intAwayScore) : undefined,
-        },
+        home: (() => {
+            const players = extractTennisPlayers(ev.strEvent, ev.strLeague);
+            const tennisRes = ev.strResult && / beat /i.test(ev.strResult)
+                ? parseTennisResult(ev.strResult, ev.strHomeTeam ?? players.home, ev.strAwayTeam ?? players.away)
+                : undefined;
+            return {
+                name: ev.strHomeTeam ?? players.home ?? "?",
+                logoUrl: ev.strHomeTeamBadge ?? undefined,
+                score: ev.intHomeScore != null ? toInt(ev.intHomeScore) : tennisRes?.homeSets,
+            };
+        })(),
+        away: (() => {
+            const players = extractTennisPlayers(ev.strEvent, ev.strLeague);
+            const tennisRes = ev.strResult && / beat /i.test(ev.strResult)
+                ? parseTennisResult(ev.strResult, ev.strHomeTeam ?? players.home, ev.strAwayTeam ?? players.away)
+                : undefined;
+            return {
+                name: ev.strAwayTeam ?? players.away ?? "?",
+                logoUrl: ev.strAwayTeamBadge ?? undefined,
+                score: ev.intAwayScore != null ? toInt(ev.intAwayScore) : tennisRes?.awaySets,
+            };
+        })(),
     };
 }
 
