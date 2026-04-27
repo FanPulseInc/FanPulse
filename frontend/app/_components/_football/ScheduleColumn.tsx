@@ -2,29 +2,33 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Icon } from "./Icon";
+import { useFavorites } from "@/services/favorites";
 
 export interface ScheduleMatch {
     id: string;
     time: string;
-    /** UTC ISO timestamp of kickoff, used for dynamic countdowns. */
+    
     startIso?: string;
     homeTeam: string;
     awayTeam: string;
+    
+    homeTeamId?: string;
+    awayTeamId?: string;
     homeLogo?: string;
     awayLogo?: string;
     homeScore?: number;
     awayScore?: number;
-    /** Short time-state label — "67'" / "HT" during a live match, "FT" after it ends.
-     *  Shown under the time/date cell whenever the match is live or past. */
+    
     elapsed?: string;
     favorite?: boolean;
     status?: "live" | "past" | "upcoming";
+    
+    homeRedCard?: boolean;
+    awayRedCard?: boolean;
 }
 
-/**
- * "за 2г 15хв", "за 3 дн", "зараз" — relative kickoff label for upcoming matches.
- * Returns null if we can't compute (no timestamp or already started).
- */
+
 function relativeKickoff(startIso: string | undefined, now: number): string | null {
     if (!startIso) return null;
     const iso = /[zZ]|[+-]\d{2}:?\d{2}$/.test(startIso) ? startIso : `${startIso}Z`;
@@ -51,6 +55,12 @@ export interface ScheduleGroup {
     matches: ScheduleMatch[];
 }
 
+export interface CompetitionOption {
+    id: string;
+    name: string;
+    badge?: string;
+}
+
 const topTabs = [
     { id: "all", label: "Все" },
     { id: "fav", label: "Улюблене" },
@@ -66,10 +76,11 @@ const phaseTabs = [
 function applyFilter(
     matches: ScheduleMatch[],
     topTab: string,
-    phaseTab: string | null
+    phaseTab: string | null,
+    isFav: (matchId?: string, homeId?: string, awayId?: string) => boolean
 ): ScheduleMatch[] {
     return matches.filter(m =>
-        (topTab !== "fav" || m.favorite) &&
+        (topTab !== "fav" || isFav(m.id, m.homeTeamId, m.awayTeamId)) &&
         (!phaseTab || m.status === phaseTab)
     );
 }
@@ -85,11 +96,14 @@ function MatchRow({
     onClick: () => void;
     now: number;
 }) {
+    const { toggleMatch, toggleTeam, isMatchFav, isTeamFav } = useFavorites();
+    const starred =
+        isMatchFav(m.id) || isTeamFav(m.homeTeamId) || isTeamFav(m.awayTeamId);
+    const homeTeamFav = isTeamFav(m.homeTeamId);
+    const awayTeamFav = isTeamFav(m.awayTeamId);
     const isUpcoming = m.status === "upcoming";
     const isPast = m.status === "past";
     const countdown = isUpcoming ? relativeKickoff(m.startIso, now) : null;
-    // Finished matches: swap the kickoff time for the play date (DD.MM) so the
-    // user sees when the game was played, not when it would've started today.
     const timeLabel = isPast && m.startIso
         ? (() => {
               const iso = /[zZ]|[+-]\d{2}:?\d{2}$/.test(m.startIso!) ? m.startIso! : `${m.startIso!}Z`;
@@ -117,34 +131,60 @@ function MatchRow({
             </div>
             <div className="flex flex-col gap-[2px] min-w-0">
                 <div className="flex items-center gap-2 min-w-0">
-                    {m.homeLogo ? (
-                        <Image
-                            src={m.homeLogo}
-                            alt=""
-                            width={18}
-                            height={18}
-                            unoptimized
-                            className="w-[18px] h-[18px] object-contain shrink-0"
-                        />
-                    ) : (
-                        <span className="w-5 h-5 rounded-full bg-gray-300 shrink-0" />
-                    )}
+                    <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); toggleTeam(m.homeTeamId); }}
+                        className={`shrink-0 rounded-full transition ${homeTeamFav ? "ring-2 ring-[#af292a]" : "hover:ring-1 hover:ring-[#af292a]/40"}`}
+                        aria-label={`Favourite ${m.homeTeam}`}
+                        title={homeTeamFav ? "Прибрати з улюблених" : "Додати команду в улюблені"}
+                    >
+                        {m.homeLogo ? (
+                            <Image
+                                src={m.homeLogo}
+                                alt=""
+                                width={18}
+                                height={18}
+                                unoptimized
+                                className="w-[18px] h-[18px] object-contain"
+                            />
+                        ) : (
+                            <span className="block w-5 h-5 rounded-full bg-gray-300" />
+                        )}
+                    </button>
                     <span className="text-[13px] text-[#212121] truncate">{m.homeTeam}</span>
+                    {m.homeRedCard && (
+                        <span className="shrink-0" title="Red card">
+                            <Icon name="REDCARD" size={10} />
+                        </span>
+                    )}
                 </div>
                 <div className="flex items-center gap-2 min-w-0">
-                    {m.awayLogo ? (
-                        <Image
-                            src={m.awayLogo}
-                            alt=""
-                            width={18}
-                            height={18}
-                            unoptimized
-                            className="w-[18px] h-[18px] object-contain shrink-0"
-                        />
-                    ) : (
-                        <span className="w-5 h-5 rounded-full bg-gray-300 shrink-0" />
-                    )}
+                    <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); toggleTeam(m.awayTeamId); }}
+                        className={`shrink-0 rounded-full transition ${awayTeamFav ? "ring-2 ring-[#af292a]" : "hover:ring-1 hover:ring-[#af292a]/40"}`}
+                        aria-label={`Favourite ${m.awayTeam}`}
+                        title={awayTeamFav ? "Прибрати з улюблених" : "Додати команду в улюблені"}
+                    >
+                        {m.awayLogo ? (
+                            <Image
+                                src={m.awayLogo}
+                                alt=""
+                                width={18}
+                                height={18}
+                                unoptimized
+                                className="w-[18px] h-[18px] object-contain"
+                            />
+                        ) : (
+                            <span className="block w-5 h-5 rounded-full bg-gray-300" />
+                        )}
+                    </button>
                     <span className="text-[13px] text-[#212121] truncate">{m.awayTeam}</span>
+                    {m.awayRedCard && (
+                        <span className="shrink-0" title="Red card">
+                            <Icon name="REDCARD" size={10} />
+                        </span>
+                    )}
                 </div>
             </div>
             <div className="flex flex-col items-end justify-center min-w-0">
@@ -168,11 +208,12 @@ function MatchRow({
                 )}
             </div>
             <button
-                onClick={(e) => { e.stopPropagation(); }}
-                className={`text-xl leading-none ${m.favorite ? "text-[#af292a]" : "text-gray-300 hover:text-[#af292a]"} transition-colors cursor-pointer`}
-                aria-label="Favorite"
+                onClick={(e) => { e.stopPropagation(); toggleMatch(m.id); }}
+                className={`text-xl leading-none ${starred ? "text-[#af292a]" : "text-gray-300 hover:text-[#af292a]"} transition-colors cursor-pointer`}
+                aria-label="Favorite match"
+                title={starred ? "Прибрати з улюблених" : "Додати матч в улюблені"}
             >
-                ☆
+                {starred ? "★" : "☆"}
             </button>
         </div>
     );
@@ -187,6 +228,8 @@ export default function ScheduleColumn({
     onNextDay,
     onPickDate,
     dateIso,
+    competitions,
+    onPickCompetition,
 }: {
     matches?: ScheduleMatch[];
     groups?: ScheduleGroup[];
@@ -196,32 +239,41 @@ export default function ScheduleColumn({
     onNextDay?: () => void;
     onPickDate?: (iso: string) => void;
     dateIso?: string;
+    
+    competitions?: CompetitionOption[];
+    
+    onPickCompetition?: (leagueId: string) => void;
 }) {
     const router = useRouter();
+    const { isMatchFavOrTeam } = useFavorites();
     const [topTab, setTopTab] = useState("all");
     const [phaseTab, setPhaseTab] = useState<string | null>(null);
+    const [pickedCompetition, setPickedCompetition] = useState<string | null>(null);
     const [pickerOpen, setPickerOpen] = useState(false);
-    // Re-tick once a minute so countdowns stay accurate without being chatty.
     const [now, setNow] = useState(() => Date.now());
     useEffect(() => {
         const id = setInterval(() => setNow(Date.now()), 60_000);
         return () => clearInterval(id);
     }, []);
 
-    // Apply filters to either source
-    const filteredFlat = matches ? applyFilter(matches, topTab, phaseTab) : [];
+    const filteredFlat = matches ? applyFilter(matches, topTab, phaseTab, isMatchFavOrTeam) : [];
     const filteredGroups = groups
         ? groups
-              .map(g => ({ ...g, matches: applyFilter(g.matches, topTab, phaseTab) }))
+              .filter(g =>
+                  topTab !== "compete" || !pickedCompetition || g.leagueId === pickedCompetition
+              )
+              .map(g => ({ ...g, matches: applyFilter(g.matches, topTab, phaseTab, isMatchFavOrTeam) }))
               .filter(g => g.matches.length > 0)
         : [];
+
+    const inCompeteMode = topTab === "compete";
 
     const totalGrouped = filteredGroups.reduce((n, g) => n + g.matches.length, 0);
     const isEmpty = groups ? totalGrouped === 0 : filteredFlat.length === 0;
 
     return (
         <div className="w-[560px] flex flex-col gap-[10px]">
-            {/* Black mini header with tabs + date — separate card */}
+            
             <div className="w-full h-[40px] bg-[#212121] rounded-[14px] flex flex-row justify-center items-center gap-[10px] px-3">
                 {topTabs.map(t => (
                     <button
@@ -234,21 +286,32 @@ export default function ScheduleColumn({
                         {t.label}
                     </button>
                 ))}
-                <div className="ml-auto flex items-center gap-1 relative">
-                    <button
-                        onClick={onPrevDay}
-                        disabled={!onPrevDay}
-                        className="h-[26px] w-[22px] rounded-[6px] border border-white/30 text-white text-xs flex items-center justify-center hover:bg-white/10 disabled:opacity-40 disabled:cursor-default cursor-pointer"
-                        aria-label="Previous day"
-                    >
-                        ‹
-                    </button>
-                    <button
-                        onClick={() => setPickerOpen(v => !v)}
-                        className="h-[26px] px-3 rounded-[8px] border border-white/30 text-white text-[11px] font-bold hover:bg-white/10 cursor-pointer"
-                    >
-                        {dateLabel}
-                    </button>
+                
+                <div className="ml-auto relative">
+                    <div className="h-[30px] pl-[6px] pr-[6px] bg-white rounded-[10px] flex items-center gap-[4px] shadow-sm">
+                        <button
+                            onClick={onPrevDay}
+                            disabled={!onPrevDay}
+                            className="h-[22px] w-[22px] flex items-center justify-center text-[#af292a] text-[18px] font-bold leading-none rounded hover:bg-[#af292a]/10 disabled:opacity-40 disabled:cursor-default cursor-pointer"
+                            aria-label="Previous day"
+                        >
+                            ‹
+                        </button>
+                        <button
+                            onClick={() => setPickerOpen(v => !v)}
+                            className="h-[22px] px-1 text-[#af292a] text-[14px] font-bold font-data leading-none cursor-pointer tracking-wider"
+                        >
+                            {dateLabel}
+                        </button>
+                        <button
+                            onClick={onNextDay}
+                            disabled={!onNextDay}
+                            className="h-[22px] w-[22px] flex items-center justify-center text-[#af292a] text-[18px] font-bold leading-none rounded hover:bg-[#af292a]/10 disabled:opacity-40 disabled:cursor-default cursor-pointer"
+                            aria-label="Next day"
+                        >
+                            ›
+                        </button>
+                    </div>
                     {pickerOpen && onPickDate && (
                         <input
                             type="date"
@@ -257,23 +320,76 @@ export default function ScheduleColumn({
                                 onPickDate(e.target.value);
                                 setPickerOpen(false);
                             }}
-                            className="absolute right-0 top-[30px] z-10 text-[11px] rounded-[6px] border border-gray-300 bg-white px-2 py-1 text-[#212121]"
+                            className="absolute right-0 top-[34px] z-10 text-[11px] rounded-[6px] border border-gray-300 bg-white px-2 py-1 text-[#212121]"
                         />
                     )}
-                    <button
-                        onClick={onNextDay}
-                        disabled={!onNextDay}
-                        className="h-[26px] w-[22px] rounded-[6px] border border-white/30 text-white text-xs flex items-center justify-center hover:bg-white/10 disabled:opacity-40 disabled:cursor-default cursor-pointer"
-                        aria-label="Next day"
-                    >
-                        ›
-                    </button>
                 </div>
             </div>
 
-            {/* List card: phase row + match rows */}
+            
             <div className="w-full bg-[#f8f8f8] rounded-[20px] pt-[20px] pr-[32px] pb-[20px] pl-[32px] flex flex-col gap-[10px] shadow-sm">
-                {/* Red phase buttons row */}
+                {inCompeteMode && competitions && competitions.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-[#212121]">
+                                Вибери змагання
+                            </span>
+                            {pickedCompetition && (
+                                <button
+                                    type="button"
+                                    onClick={() => setPickedCompetition(null)}
+                                    className="text-[10px] font-bold uppercase tracking-wider text-[#af292a] hover:underline cursor-pointer"
+                                >
+                                    Скинути
+                                </button>
+                            )}
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                            {competitions.map(c => {
+                                const active = pickedCompetition === c.id;
+                                return (
+                                    <button
+                                        key={c.id}
+                                        type="button"
+                                        onClick={() => {
+                                            const next = active ? null : c.id;
+                                            setPickedCompetition(next);
+                                            if (next) onPickCompetition?.(next);
+                                        }}
+                                        title={c.name}
+                                        aria-label={c.name}
+                                        style={{
+                                            backgroundColor: active
+                                                ? "rgba(175, 41, 42, 0.45)"
+                                                : "rgba(175, 41, 42, 0.18)",
+                                        }}
+                                        className={`group relative w-[52px] h-[52px] rounded-[12px] border flex items-center justify-center shrink-0 cursor-pointer transition-all ${
+                                            active
+                                                ? "border-[#af292a] shadow-[0_0_0_2px_#af292a]"
+                                                : "border-transparent"
+                                        }`}
+                                    >
+                                        {c.badge ? (
+                                            <Image
+                                                src={c.badge}
+                                                alt=""
+                                                width={40}
+                                                height={40}
+                                                unoptimized
+                                                className="w-10 h-10 object-contain"
+                                            />
+                                        ) : (
+                                            <span className="text-[10px] font-bold text-[#212121] text-center leading-tight px-1">
+                                                {c.name.slice(0, 3).toUpperCase()}
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+                
                 <div className="w-full flex items-center gap-2">
                     {phaseTabs.map(t => (
                         <button
@@ -302,7 +418,7 @@ export default function ScheduleColumn({
                     <div className="text-center text-gray-400 text-[12px] py-8">Немає матчів</div>
                 )}
 
-                {/* Grouped rendering */}
+                
                 {groups && filteredGroups.map(g => (
                     <div key={g.leagueId} className="flex flex-col">
                         <div className="flex items-center gap-2 px-2 py-[8px] border-b-2 border-[#af292a]/30">
@@ -344,7 +460,7 @@ export default function ScheduleColumn({
                     </div>
                 ))}
 
-                {/* Flat rendering (detail page) */}
+                
                 {!groups && (
                     <div className="flex flex-col">
                         {filteredFlat.map(m => (

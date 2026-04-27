@@ -1,24 +1,6 @@
 "use client";
 import type { Scorer } from "@/services/sportsdb/adapters";
-
-function FootballIcon({ size = 14 }: { size?: number }) {
-    return (
-        <svg
-            width={size}
-            height={size}
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden
-            className="shrink-0"
-        >
-            <circle cx="12" cy="12" r="10" fill="white" stroke="currentColor" strokeWidth="1.5" />
-            <path
-                d="M12 7l3.8 2.8-1.5 4.4h-4.6l-1.5-4.4L12 7z"
-                fill="currentColor"
-            />
-        </svg>
-    );
-}
+import { Icon } from "./Icon";
 
 function ScorerLine({
     scorer,
@@ -28,7 +10,6 @@ function ScorerLine({
     side: "home" | "away";
 }) {
     const tag = scorer.ownGoal ? "OG" : scorer.penalty ? "PEN" : null;
-    // Home goals align right-to-center, away align left-to-center.
     const rowJustify = side === "home" ? "justify-end" : "justify-start";
     const orderIcon = side === "home" ? "order-2" : "order-1";
     const orderText = side === "home" ? "order-1" : "order-2";
@@ -49,8 +30,9 @@ function ScorerLine({
                     </span>
                 )}
             </div>
-            <span className={`text-[#af292a] ${orderIcon}`}>
-                <FootballIcon />
+            
+            <span className={`inline-flex items-center ${orderIcon}`}>
+                <Icon name={scorer.ownGoal ? "REDBALL" : "WHITEBALL"} size={14} />
             </span>
         </div>
     );
@@ -70,7 +52,7 @@ export default function MatchScorers({
     if (home.length === 0 && away.length === 0) return null;
     return (
         <div className="w-full bg-white rounded-[20px] shadow-sm border border-gray-100 p-4">
-            {/* Small header strip — team names on either side of the divider. */}
+            
             <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#212121] truncate max-w-[48%]">
                     {homeLabel ?? ""}
@@ -80,7 +62,7 @@ export default function MatchScorers({
                 </span>
             </div>
 
-            {/* Two-column grid with a thin red divider down the middle. */}
+            
             <div className="relative grid grid-cols-2 gap-4">
                 <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-px bg-[#af292a]/30" />
                 <div className="flex flex-col gap-[10px] pr-3">

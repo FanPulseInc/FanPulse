@@ -17,7 +17,7 @@ export default function PromoCard() {
                 </button>
             </div>
             <div className="relative flex-1 min-h-[220px] bg-gradient-to-b from-[#3a1515] to-[#212121]">
-                {/* Decorative football visual area */}
+                
                 <div className="absolute inset-0 flex items-center justify-center opacity-80">
                     <div className="w-20 h-20 rounded-full bg-white/10 border-2 border-white/20" />
                 </div>

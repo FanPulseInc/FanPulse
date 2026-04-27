@@ -1,13 +1,14 @@
 "use client";
 import Image from "next/image";
 import type { Scorer } from "@/services/sportsdb/adapters";
+import { Icon } from "./Icon";
 
 export interface MatchTeam {
     name: string;
     logoUrl?: string;
     score?: number;
-    possession?: number; // e.g. 100
-    accuracy?: number;   // e.g. 100 (percent)
+    possession?: number; 
+    accuracy?: number;   
 }
 
 export interface FeaturedMatchData {
@@ -17,7 +18,7 @@ export interface FeaturedMatchData {
     home: MatchTeam;
     away: MatchTeam;
     status?: "scheduled" | "live" | "finished";
-    /** Live elapsed minutes ("67'", "HT") — shown under the score when live. */
+    
     elapsed?: string;
     venue?: string;
 }
@@ -43,7 +44,7 @@ function TeamCrest({ team }: { team: MatchTeam }) {
     );
 }
 
-/** "Brighton and Hove Albion" → "Brighton", "Athletic Bilbao" → "Athletic". */
+
 function shortTeamName(name: string): string {
     return (name ?? "").trim().split(/\s+/)[0] ?? name;
 }
@@ -55,23 +56,6 @@ function TeamLabel({ team }: { team: MatchTeam }) {
                 {shortTeamName(team.name)}
             </span>
         </div>
-    );
-}
-
-
-/** White football icon used inside the red header — sized for inline scorer rows. */
-function FootballIconWhite({ size = 12 }: { size?: number }) {
-    return (
-        <svg
-            width={size}
-            height={size}
-            viewBox="0 0 24 24"
-            aria-hidden
-            className="shrink-0"
-        >
-            <circle cx="12" cy="12" r="10" fill="white" stroke="white" strokeWidth="1.5" />
-            <path d="M12 7l3.8 2.8-1.5 4.4h-4.6l-1.5-4.4L12 7z" fill="#af292a" />
-        </svg>
     );
 }
 
@@ -103,8 +87,9 @@ function HeaderScorerLine({
                     </span>
                 )}
             </div>
-            <span className={orderIcon}>
-                <FootballIconWhite />
+            
+            <span className={`inline-flex items-center ${orderIcon}`}>
+                <Icon name={scorer.ownGoal ? "REDBALL" : "WHITEBALL"} size={14} />
             </span>
         </div>
     );
@@ -114,12 +99,16 @@ export default function FeaturedMatch({
     match,
     homeScorers = [],
     awayScorers = [],
+    footerSlot,
 }: {
     match: FeaturedMatchData;
     homeScorers?: Scorer[];
     awayScorers?: Scorer[];
+    
+    footerSlot?: React.ReactNode;
 }) {
     const hasScorers = homeScorers.length > 0 || awayScorers.length > 0;
+    const hasFooter = !!footerSlot;
     const kickoffDate = match.kickoff ? new Date(match.kickoff) : null;
     const dateLabel = kickoffDate
         ? kickoffDate.toLocaleDateString("uk-UA", { day: "2-digit", month: "2-digit" }) +
@@ -133,8 +122,8 @@ export default function FeaturedMatch({
             : `${match.home.score ?? 0} ‑ ${match.away.score ?? 0}`;
 
     return (
-        <div className={`relative w-full ${hasScorers ? "min-h-[237px] pb-[48px]" : "h-[237px]"} p-[20px] bg-[#af292a] rounded-[20px] flex flex-col justify-between items-center gap-[10px] shadow-lg`}>
-            {/* Top: tournament */}
+        <div className={`relative w-full ${hasScorers || hasFooter ? "min-h-[237px] pb-[48px]" : "h-[237px]"} p-[20px] bg-[#af292a] rounded-[20px] flex flex-col justify-between items-center gap-[10px] shadow-lg`}>
+            
             <div className="w-full flex items-center justify-between">
                 <span className="text-white font-bold text-sm uppercase tracking-wider mx-auto">
                     {match.tournament}
@@ -146,7 +135,7 @@ export default function FeaturedMatch({
                 )}
             </div>
 
-            {/* Middle: crests + score */}
+            
             <div className="w-full flex items-center justify-between px-2">
                 <TeamCrest team={match.home} />
 
@@ -162,8 +151,7 @@ export default function FeaturedMatch({
                 <TeamCrest team={match.away} />
             </div>
 
-            {/* Bottom row: team labels — mirror the crest row (w-[130px] slots +
-                flex-1 spacer in the middle) so each label sits centered under its logo. */}
+            
             <div className="w-full flex items-center justify-between px-2">
                 <div className="w-[100px] flex justify-center">
                     <TeamLabel team={match.home} />
@@ -174,9 +162,7 @@ export default function FeaturedMatch({
                 </div>
             </div>
 
-            {/* Scorers — two columns under the crests, split by a faint white
-                divider. Lives inside the red card so colours invert: white text,
-                white ball, white minute, white divider. */}
+            
             {hasScorers && (
                 <div className="relative w-full grid grid-cols-2 gap-3 mt-1">
                     <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-px bg-white/40" />
@@ -201,8 +187,14 @@ export default function FeaturedMatch({
                 </div>
             )}
 
-            {/* "Футбол" tab pinned flush to the bottom edge of the red card —
-                rounded top corners, flat bottom that merges with the card's edge. */}
+            
+            {footerSlot && (
+                <div className="w-full mt-1" onClick={(e) => e.stopPropagation()}>
+                    {footerSlot}
+                </div>
+            )}
+
+            
             {match.stage && (
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-[#212121] rounded-t-[26px] px-4 w-[186px] h-[28px] flex items-center justify-center">
                     <span
