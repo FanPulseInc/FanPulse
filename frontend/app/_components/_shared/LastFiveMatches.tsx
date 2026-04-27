@@ -26,7 +26,7 @@ export default function LastFiveMatches({ home, away, title = "Останні 5 
                 </span>
             </div>
             
-            <div className="grid grid-cols-2" style={{ columnGap: 60 }}>
+            <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:[column-gap:60px]">
                 <TeamCard side={home} />
                 <TeamCard side={away} />
             </div>
@@ -99,14 +99,14 @@ function MatchRow({ row }: { row: LastFiveRow }) {
             </span>
             
             <span
-                className="w-[22px] h-[22px] rounded-full flex items-center justify-center text-white font-bold text-[11px] shrink-0"
+                className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-white font-bold text-[12px] shrink-0 shadow-sm"
                 style={{ backgroundColor: RESULT_BG[row.result] }}
             >
                 {row.result}
             </span>
             <span
-                className="bg-[#af292a] text-white text-[12px] font-bold font-data rounded-full py-[3px] text-center shrink-0"
-                style={{ width: 35 }}
+                className="bg-[#af292a] text-white font-bold font-data rounded-[8px] flex items-center justify-center shrink-0 px-[8px] h-[26px] text-[13px] tracking-tight tabular-nums"
+                style={{ minWidth: 56 }}
             >
                 {row.score}
             </span>

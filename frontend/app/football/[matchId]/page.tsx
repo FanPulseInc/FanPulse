@@ -1,17 +1,17 @@
 "use client";
 import { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { FootballContainer } from "../../_components/_football/FootballContainer";
+import { SportContainer } from "../../_components/_shared/SportContainer";
 import ScheduleColumn, {
     type ScheduleGroup,
     type CompetitionOption,
-} from "../../_components/_football/ScheduleColumn";
-import FeaturedMatch from "../../_components/_football/FeaturedMatch";
+} from "../../_components/_shared/ScheduleColumn";
+import FeaturedMatch from "../../_components/_shared/FeaturedMatch";
 import FormationPitch from "../../_components/_football/FormationPitch";
-import StatsTable from "../../_components/_football/StatsTable";
-import LastFiveMatches from "../../_components/_football/LastFiveMatches";
-import MatchHighlights from "../../_components/_football/MatchHighlights";
-import VoteCard from "../../_components/_football/VoteCard";
+import StatsTable from "../../_components/_shared/StatsTable";
+import LastFiveMatches from "../../_components/_shared/LastFiveMatches";
+import MatchHighlights from "../../_components/_shared/MatchHighlights";
+import VoteCard from "../../_components/_shared/VoteCard";
 import {
     useLiveScores,
     useLeagueSeasons,
@@ -226,7 +226,7 @@ export default function FootballMatchPage() {
     const homePrevLineupQueries = useEventLineups(homePrevEventIds);
     const awayPrevLineupQueries = useEventLineups(awayPrevEventIds);
     const firstNonEmpty = (
-        queries: { data?: { lineup?: unknown[]; lookup?: unknown[] } | undefined }[],
+        queries: { data?: { lineup?: unknown[] | null; lookup?: unknown[] | null } | undefined }[],
         teamId: string | undefined
     ) => {
         if (!teamId) return undefined;
@@ -391,8 +391,8 @@ export default function FootballMatchPage() {
     }));
 
     return (
-        <FootballContainer>
-            <div className="flex gap-6 items-start justify-start">
+        <SportContainer>
+            <div className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-start justify-start">
                 {/* Left — grouped schedule with day nav */}
                 <ScheduleColumn
                     groups={annotatedGroups}
@@ -607,8 +607,8 @@ export default function FootballMatchPage() {
                 </div>
 
                 {/* Right — blank banner placeholder */}
-                <div className="w-[220px] h-[500px] bg-white rounded-[20px] border border-gray-200 shadow-sm shrink-0" />
+                <div className="hidden lg:block w-[220px] h-[500px] bg-white rounded-[20px] border border-gray-200 shadow-sm shrink-0" />
             </div>
-        </FootballContainer>
+        </SportContainer>
     );
 }

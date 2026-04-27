@@ -25,7 +25,7 @@ export interface FeaturedMatchData {
 
 function TeamCrest({ team }: { team: MatchTeam }) {
     return (
-        <div className="w-[110px] h-[110px] flex items-center justify-center shrink-0">
+        <div className="w-[80px] h-[80px] sm:w-[110px] sm:h-[110px] flex items-center justify-center shrink-0">
             {team.logoUrl ? (
                 <Image
                     src={team.logoUrl}
@@ -141,7 +141,7 @@ export default function FeaturedMatch({
 
                 <div className="flex flex-col items-center gap-0">
                     <span
-                        className="text-[36px] leading-[30px] tracking-[-0.08em] text-center text-[#f8f8f8]"
+                        className="text-[28px] sm:text-[36px] leading-[26px] sm:leading-[30px] tracking-[-0.08em] text-center text-[#f8f8f8]"
                         style={{ fontFamily: "'Roboto Mono', monospace", fontWeight: 500 }}
                     >
                         {scoreLabel}
