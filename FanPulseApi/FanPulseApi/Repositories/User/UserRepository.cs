@@ -22,6 +22,9 @@ public class UserRepository : IUserRepository
     {
        return await _context.Users
            .Include(u => u.FavCategories)
+           .Include(u=>u.Likes).ThenInclude(l => l.Post)
+           .Include(u => u.Posts)
+           .Include(u=> u.Comments)
            .FirstOrDefaultAsync(u => u.Id == userId);
     }
 

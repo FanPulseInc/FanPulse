@@ -14,24 +14,28 @@ const Login = () => {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
 
-  
 
-  const {mutateAsync:login,isPending,isSuccess,isError} = usePostApiAuthLogin()
-  
+
+  const { mutateAsync: login, isPending, isSuccess, isError } = usePostApiAuthLogin()
+
 
 
 
   const onLogin = async () => {
-    console.log("login started")
-    const res = await login({data:{email:email,password:password}})
+    try {
+      console.log("login started")
 
-     if(res.token != undefined && isSuccess){
-       localStorage.setItem("token",res.token) 
-       window.location.href = "/profile";
-     }
-     
-  
+      const res = await login({
+        data: { email, password }
+      })
 
+      if (res?.token) {
+        localStorage.setItem("token", res.token)
+        window.location.href = "/profile";
+      }
+    } catch (error) {
+      console.error("Login error:", error)
+    }
   }
 
   return (
@@ -41,12 +45,12 @@ const Login = () => {
       className="w-[370px] min-h-[650px] bg-card-bg rounded-[20px] py-10 p-8 flex flex-col gap-4 shadow-sm"
     >
       <h1 className="text-h1 text-brand-black text-left">Увійти</h1>
-       
-       {isError ? (
+
+      {isError ? (
         <div className="bg-red-500  rounded-full flex items-center justify-center p-2">
           <span className="text-center">Неправильний email або пароль</span>
         </div>
-       ):null}
+      ) : null}
 
       {/* Email */}
       <div className="flex flex-col gap-1.5">
