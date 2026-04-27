@@ -34,6 +34,7 @@ export interface SDBEvent {
     intHomeScore?: string | null;
     intAwayScore?: string | null;
     strResult?: string | null;
+    strEvent?: string | null;
     strHomeTeamBadge?: string | null;
     strAwayTeamBadge?: string | null;
     strThumb?: string | null;

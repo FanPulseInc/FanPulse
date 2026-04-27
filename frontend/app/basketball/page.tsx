@@ -205,9 +205,9 @@ export default function BasketballPage() {
                         groups={groups}
                         dateLabel={formatDateLabel(dateIso)}
                         dateIso={dateIso}
-                        onPrevDay={() => setDateIso(d => shiftIso(d, -1))}
-                        onNextDay={() => setDateIso(d => shiftIso(d, +1))}
-                        onPickDate={(iso) => setDateIso(iso)}
+                        onPrevDayAction={() => setDateIso(d => shiftIso(d, -1))}
+                        onNextDayAction={() => setDateIso(d => shiftIso(d, +1))}
+                        onPickDateAction={(iso) => setDateIso(iso)}
                         basePath="/basketball"
                         showCompetitionsTab={false}
                     />

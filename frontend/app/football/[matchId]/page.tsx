@@ -325,7 +325,7 @@ export default function FootballMatchPage() {
     // Jump the calendar to the nearest date this league has a fixture — next
     // upcoming day preferred, else latest past day. Keeps the page useful even
     // when the chosen competition has no game on the currently-selected date.
-    const onPickCompetition = (leagueId: string) => {
+    const onPickCompetitionAction = (leagueId: string) => {
         const idx = TOP_LEAGUES.findIndex(l => l.id === leagueId);
         if (idx < 0) return;
         const events: SDBEvent[] =
@@ -399,11 +399,11 @@ export default function FootballMatchPage() {
                     selectedMatchId={matchId}
                     dateLabel={formatDateLabel(dateIso)}
                     dateIso={dateIso}
-                    onPrevDay={() => setDateIso(d => shiftIso(d, -1))}
-                    onNextDay={() => setDateIso(d => shiftIso(d, +1))}
-                    onPickDate={(iso) => setDateIso(iso)}
+                    onPrevDayAction={() => setDateIso(d => shiftIso(d, -1))}
+                    onNextDayAction={() => setDateIso(d => shiftIso(d, +1))}
+                    onPickDateAction={(iso) => setDateIso(iso)}
                     competitions={competitions}
-                    onPickCompetition={onPickCompetition}
+                    onPickCompetitionAction={onPickCompetitionAction}
                 />
 
                 {/* Middle — match detail */}

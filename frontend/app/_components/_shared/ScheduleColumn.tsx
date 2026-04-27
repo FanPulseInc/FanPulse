@@ -33,9 +33,17 @@ export interface ScheduleMatch {
 
 const QUARTER_RE = /\b(Q[1-4]|[1-4]Q|OT[0-9]?|HT)\b/i;
 const CLOCK_RE = /\b(\d{1,2}:\d{2})\b/;
+const SET_RE = /\bSet\s*([1-5])\b/i;
+const GAME_SPLIT_RE = /\b(\d+-\d+)\b/;
 
 function parseQuarterElapsed(elapsed: string | undefined): { quarter: string; clock?: string } | null {
     if (!elapsed) return null;
+    const setMatch = elapsed.match(SET_RE);
+    if (setMatch) {
+        const quarter = `Set ${setMatch[1]}`;
+        const gMatch = elapsed.match(GAME_SPLIT_RE);
+        return { quarter, clock: gMatch ? gMatch[1] : undefined };
+    }
     const qMatch = elapsed.match(QUARTER_RE);
     if (!qMatch) return null;
     let quarter = qMatch[1].toUpperCase();
@@ -306,12 +314,12 @@ export default function ScheduleColumn({
     groups,
     dateLabel = "22.03.26",
     selectedMatchId,
-    onPrevDay,
-    onNextDay,
-    onPickDate,
+    onPrevDayAction,
+    onNextDayAction,
+    onPickDateAction,
     dateIso,
     competitions,
-    onPickCompetition,
+    onPickCompetitionAction,
     basePath = "/football",
     showCompetitionsTab = true,
 }: {
@@ -319,14 +327,14 @@ export default function ScheduleColumn({
     groups?: ScheduleGroup[];
     dateLabel?: string;
     selectedMatchId?: string;
-    onPrevDay?: () => void;
-    onNextDay?: () => void;
-    onPickDate?: (iso: string) => void;
+    onPrevDayAction?: () => void;
+    onNextDayAction?: () => void;
+    onPickDateAction?: (iso: string) => void;
     dateIso?: string;
 
     competitions?: CompetitionOption[];
 
-    onPickCompetition?: (leagueId: string) => void;
+    onPickCompetitionAction?: (leagueId: string) => void;
     basePath?: string;
     showCompetitionsTab?: boolean;
 }) {
@@ -376,8 +384,8 @@ export default function ScheduleColumn({
                 <div className="ml-auto relative">
                     <div className="h-[30px] pl-[6px] pr-[6px] bg-white rounded-[10px] flex items-center gap-[4px] shadow-sm">
                         <button
-                            onClick={onPrevDay}
-                            disabled={!onPrevDay}
+                            onClick={onPrevDayAction}
+                            disabled={!onPrevDayAction}
                             className="h-[22px] w-[22px] flex items-center justify-center text-[#af292a] text-[18px] font-bold leading-none rounded hover:bg-[#af292a]/10 disabled:opacity-40 disabled:cursor-default cursor-pointer"
                             aria-label="Previous day"
                         >
@@ -390,20 +398,20 @@ export default function ScheduleColumn({
                             {dateLabel}
                         </button>
                         <button
-                            onClick={onNextDay}
-                            disabled={!onNextDay}
+                            onClick={onNextDayAction}
+                            disabled={!onNextDayAction}
                             className="h-[22px] w-[22px] flex items-center justify-center text-[#af292a] text-[18px] font-bold leading-none rounded hover:bg-[#af292a]/10 disabled:opacity-40 disabled:cursor-default cursor-pointer"
                             aria-label="Next day"
                         >
                             ›
                         </button>
                     </div>
-                    {pickerOpen && onPickDate && (
+                    {pickerOpen && onPickDateAction && (
                         <input
                             type="date"
                             defaultValue={dateIso}
                             onChange={(e) => {
-                                onPickDate(e.target.value);
+                                onPickDateAction(e.target.value);
                                 setPickerOpen(false);
                             }}
                             className="absolute right-0 top-[34px] z-10 text-[11px] rounded-[6px] border border-gray-300 bg-white px-2 py-1 text-[#212121]"
@@ -440,7 +448,7 @@ export default function ScheduleColumn({
                                         onClick={() => {
                                             const next = active ? null : c.id;
                                             setPickedCompetition(next);
-                                            if (next) onPickCompetition?.(next);
+                                            if (next) onPickCompetitionAction?.(next);
                                         }}
                                         title={c.name}
                                         aria-label={c.name}

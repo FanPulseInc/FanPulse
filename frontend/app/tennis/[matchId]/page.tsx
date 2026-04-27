@@ -4,62 +4,85 @@ import { useParams, useSearchParams } from "next/navigation";
 import { SportContainer } from "../../_components/_shared/SportContainer";
 import ScheduleColumn, {
     type ScheduleGroup,
+    type CompetitionOption,
 } from "../../_components/_shared/ScheduleColumn";
 import FeaturedMatch from "../../_components/_shared/FeaturedMatch";
 import StatsTable from "../../_components/_shared/StatsTable";
 import LastFiveMatches from "../../_components/_shared/LastFiveMatches";
 import MatchHighlights from "../../_components/_shared/MatchHighlights";
 import VoteCard from "../../_components/_shared/VoteCard";
-import BoxScorePanel, {
-    type BoxScorePlayer,
-} from "../../_components/_basketball/BoxScorePanel";
 import {
     useLiveScores,
     useLeagueSeasons,
     useLeagueLookups,
     useEventLookup,
-    useEventStats,
     useTeamPreviousEvents,
-    useTeamPlayers,
 } from "@/services/sportsdb/hooks";
 import {
     liveToScheduleRow,
     eventToScheduleRow,
     eventToFeatured,
-    statsToRows,
     eventsToLastFive,
     localDateIsoOf,
     formatElapsed,
 } from "@/services/sportsdb/adapters";
-import type { SDBEvent, SDBPlayer } from "@/services/sportsdb/types";
+import type { SDBEvent } from "@/services/sportsdb/types";
 import { useFavorites } from "@/services/favorites";
 
 const TOP_LEAGUES: { id: string; name: string }[] = [
-    { id: "4387", name: "NBA" },
+    { id: "4464", name: "ATP World Tour" },
+    { id: "4517", name: "WTA Tour" },
+    { id: "4581", name: "Laver Cup" },
 ];
 
-const BASKETBALL_STAT_LABELS: readonly string[] = [
-    "Підбори",
-    "Підбори в обороні",
-    "Підбори в атаці",
-    "Втрати",
-    "Перехвати",
-    "Блоки",
-    "Фоли",
-    "Макс. очків впідряд",
-    "Жовті картки",
+const TENNIS_SERVE_LABELS: readonly string[] = [
+    "Ейси",
+    "Подвійні помилки",
+    "Перша подача",
+    "Друга подача",
+    "Поінти першої подачі",
+    "Поінти другої подачі",
+    "Зіграні подачі",
+    "Захищені брейк-поінти",
 ];
 
-const BASKETBALL_STAT_RANGES: Record<string, [number, number]> = {
-    "Підбори": [32, 56],
-    "Підбори в обороні": [22, 40],
-    "Підбори в атаці": [6, 16],
-    "Втрати": [8, 18],
-    "Перехвати": [4, 12],
-    "Блоки": [2, 9],
-    "Фоли": [12, 26],
-    "Макс. очків впідряд": [6, 18],
-    "Жовті картки": [0, 3],
+const TENNIS_POINTS_LABELS: readonly string[] = [
+    "Всього",
+    "Очки (за свою подачу)",
+    "Очки (за подачу суперника)",
+    "Максимум очків впідряд",
+];
+
+const TENNIS_GAMES_LABELS: readonly string[] = [
+    "Всього",
+    "Очки (за свою подачу)",
+    "Очки (за подачу суперника)",
+];
+
+type StatRange = [number, number];
+
+const TENNIS_SERVE_RANGES: Record<string, StatRange> = {
+    "Ейси": [3, 18],
+    "Подвійні помилки": [0, 8],
+    "Перша подача": [50, 80],
+    "Друга подача": [50, 80],
+    "Поінти першої подачі": [30, 80],
+    "Поінти другої подачі": [10, 40],
+    "Зіграні подачі": [4, 18],
+    "Захищені брейк-поінти": [0, 6],
+};
+
+const TENNIS_POINTS_RANGES: Record<string, StatRange> = {
+    "Всього": [30, 120],
+    "Очки (за свою подачу)": [20, 80],
+    "Очки (за подачу суперника)": [5, 40],
+    "Максимум очків впідряд": [3, 14],
+};
+
+const TENNIS_GAMES_RANGES: Record<string, StatRange> = {
+    "Всього": [12, 40],
+    "Очки (за свою подачу)": [5, 20],
+    "Очки (за подачу суперника)": [3, 18],
 };
 
 function hash01(s: string): number {
@@ -71,11 +94,16 @@ function hash01(s: string): number {
     return ((h >>> 0) % 10000) / 10000;
 }
 
-function pseudoBasketballStats(matchId: string): { label: string; home: number; away: number }[] {
-    return BASKETBALL_STAT_LABELS.map(label => {
-        const [lo, hi] = BASKETBALL_STAT_RANGES[label] ?? [0, 20];
-        const h = hash01(matchId + ":h:" + label);
-        const a = hash01(matchId + ":a:" + label);
+function pseudoTennisStats(
+    matchId: string,
+    section: string,
+    labels: readonly string[],
+    ranges: Record<string, StatRange>
+): { label: string; home: number; away: number }[] {
+    return labels.map(label => {
+        const [lo, hi] = ranges[label] ?? [0, 20];
+        const h = hash01(`${matchId}:${section}:h:${label}`);
+        const a = hash01(`${matchId}:${section}:a:${label}`);
         const span = hi - lo;
         return {
             label,
@@ -85,10 +113,8 @@ function pseudoBasketballStats(matchId: string): { label: string; home: number; 
     });
 }
 
-function currentBasketballSeason(now = new Date()): string {
-    const year = now.getFullYear();
-    const startYear = now.getMonth() >= 8 ? year : year - 1;
-    return `${startYear}-${startYear + 1}`;
+function currentTennisSeason(now = new Date()): string {
+    return String(now.getFullYear());
 }
 
 function formatLocalIso(d: Date): string {
@@ -114,35 +140,7 @@ function formatDateLabel(iso: string): string {
     return `${d}.${m}.${y.slice(2)}`;
 }
 
-function rosterToBoxScorePlayers(
-    roster: SDBPlayer[] | null | undefined
-): BoxScorePlayer[] {
-    if (!roster) return [];
-    const isStaff = (pos: string | undefined) => {
-        const p = (pos ?? "").toLowerCase();
-        return (
-            p.includes("coach") ||
-            p.includes("manager") ||
-            p.includes("assistant") ||
-            p.includes("trainer") ||
-            p.includes("staff") ||
-            p.includes("president") ||
-            p.includes("owner") ||
-            p.includes("general")
-        );
-    };
-    return roster
-        .filter(p => !!p.strPlayer && !isStaff(p.strPosition))
-        .slice(0, 15)
-        .map(p => ({
-            id: p.idPlayer ?? `${p.strPlayer ?? "p"}-${Math.random()}`,
-            name: p.strPlayer ?? "?",
-            position: p.strPosition ?? undefined,
-            photoUrl: p.strCutout ?? p.strThumb ?? undefined,
-        }));
-}
-
-export default function BasketballMatchPage() {
+export default function TennisMatchPage() {
     const params = useParams();
     const searchParams = useSearchParams();
     const matchId = params.matchId as string;
@@ -150,16 +148,15 @@ export default function BasketballMatchPage() {
     const [dateIso, setDateIso] = useState<string>(
         searchParams.get("date") || todayIso()
     );
-    const { isMatchFav, isTeamFav, toggleMatch, toggleTeam } = useFavorites();
-    const season = currentBasketballSeason(new Date(dateIso + "T00:00:00"));
+    const { isMatchFav, toggleMatch } = useFavorites();
+    const season = currentTennisSeason(new Date(dateIso + "T00:00:00"));
 
     const leagueIds = TOP_LEAGUES.map(l => l.id);
     const seasonQueries = useLeagueSeasons(leagueIds, season);
     const leagueQueries = useLeagueLookups(leagueIds);
-    const { data: liveData } = useLiveScores("basketball");
+    const { data: liveData } = useLiveScores("tennis");
 
     const { data: eventData, isLoading: eventLoading } = useEventLookup(matchId);
-    const { data: statsData } = useEventStats(matchId);
 
     const groups: ScheduleGroup[] = useMemo(() => {
         const liveById = new Map(
@@ -199,12 +196,39 @@ export default function BasketballMatchPage() {
         });
     }, [seasonQueries, leagueQueries, liveData, dateIso]);
 
+    const competitions: CompetitionOption[] = useMemo(
+        () =>
+            TOP_LEAGUES.map((cfg, i) => ({
+                id: cfg.id,
+                name: leagueQueries[i].data?.lookup?.[0]?.strLeague ?? cfg.name,
+                badge: leagueQueries[i].data?.lookup?.[0]?.strBadge ?? undefined,
+            })),
+        [leagueQueries]
+    );
+
+    const onPickCompetitionAction = (leagueId: string) => {
+        const idx = TOP_LEAGUES.findIndex(l => l.id === leagueId);
+        if (idx < 0) return;
+        const events: SDBEvent[] =
+            seasonQueries[idx].data?.schedule ?? seasonQueries[idx].data?.events ?? [];
+        if (events.length === 0) return;
+        const dates = events
+            .map(ev => localDateIsoOf(ev))
+            .filter((d): d is string => !!d);
+        if (dates.length === 0) return;
+        const today = todayIso();
+        const future = dates.filter(d => d >= today).sort();
+        const past = dates.filter(d => d < today).sort().reverse();
+        const target = future[0] ?? past[0];
+        if (target && target !== dateIso) setDateIso(target);
+    };
+
     const event = (eventData?.events ?? eventData?.lookup)?.[0];
     const liveForMatch = (liveData?.livescore ?? []).find(l => l.idEvent === matchId);
     const liveElapsed = formatElapsed(liveForMatch?.strProgress, liveForMatch?.strStatus);
     const featured = event ? eventToFeatured(event) : null;
     if (featured) {
-        featured.stage = "Баскетбол";
+        featured.stage = "Теніс";
     }
     if (featured && liveForMatch) {
         if (liveElapsed) featured.elapsed = liveElapsed;
@@ -231,13 +255,9 @@ export default function BasketballMatchPage() {
         }
     }
 
-    const { data: homeRoster } = useTeamPlayers(event?.idHomeTeam);
-    const { data: awayRoster } = useTeamPlayers(event?.idAwayTeam);
-    const homePlayers = rosterToBoxScorePlayers(homeRoster?.player ?? homeRoster?.list);
-    const awayPlayers = rosterToBoxScorePlayers(awayRoster?.player ?? awayRoster?.list);
-
-    const apiStats = statsToRows(statsData?.statistics ?? statsData?.lookup);
-    const stats = apiStats.length > 0 ? apiStats : pseudoBasketballStats(matchId);
+    const serveStats = pseudoTennisStats(matchId, "serve", TENNIS_SERVE_LABELS, TENNIS_SERVE_RANGES);
+    const pointsStats = pseudoTennisStats(matchId, "points", TENNIS_POINTS_LABELS, TENNIS_POINTS_RANGES);
+    const gamesStats = pseudoTennisStats(matchId, "games", TENNIS_GAMES_LABELS, TENNIS_GAMES_RANGES);
 
     const { data: homePrevEvents } = useTeamPreviousEvents(event?.idHomeTeam);
     const { data: awayPrevEvents } = useTeamPreviousEvents(event?.idAwayTeam);
@@ -261,8 +281,9 @@ export default function BasketballMatchPage() {
                     onPrevDayAction={() => setDateIso(d => shiftIso(d, -1))}
                     onNextDayAction={() => setDateIso(d => shiftIso(d, +1))}
                     onPickDateAction={(iso) => setDateIso(iso)}
-                    basePath="/basketball"
-                    showCompetitionsTab={false}
+                    competitions={competitions}
+                    onPickCompetitionAction={onPickCompetitionAction}
+                    basePath="/tennis"
                 />
 
                 <div className="flex-1 min-w-0 flex flex-col gap-4">
@@ -293,50 +314,6 @@ export default function BasketballMatchPage() {
                                     : undefined
                             }
                         />
-                    )}
-
-                    {event && (
-                        <div className="w-full h-[42px] px-4 bg-white rounded-[14px] border border-gray-200 flex items-center justify-between shadow-sm">
-                            <button
-                                type="button"
-                                onClick={() => toggleTeam(event.idHomeTeam ?? undefined)}
-                                className={`text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors ${
-                                    isTeamFav(event.idHomeTeam ?? undefined)
-                                        ? "text-[#af292a]"
-                                        : "text-gray-400 hover:text-[#af292a]"
-                                }`}
-                                title="Додати команду в улюблені"
-                            >
-                                <span>{isTeamFav(event.idHomeTeam ?? undefined) ? "★" : "☆"}</span>
-                                <span className="truncate max-w-[160px]">{event.strHomeTeam}</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => toggleMatch(matchId)}
-                                className={`text-[13px] font-bold flex items-center gap-1 cursor-pointer transition-colors ${
-                                    isMatchFav(matchId) ? "text-[#af292a]" : "text-gray-400 hover:text-[#af292a]"
-                                }`}
-                                title="Додати матч в улюблені"
-                            >
-                                <span className="text-lg">{isMatchFav(matchId) ? "★" : "☆"}</span>
-                                <span className="text-[11px] uppercase tracking-wider">Матч</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() => toggleTeam(event.idAwayTeam ?? undefined)}
-                                className={`text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors ${
-                                    isTeamFav(event.idAwayTeam ?? undefined)
-                                        ? "text-[#af292a]"
-                                        : "text-gray-400 hover:text-[#af292a]"
-                                }`}
-                                title="Додати команду в улюблені"
-                            >
-                                <span className="truncate max-w-[160px]">{event.strAwayTeam}</span>
-                                <span>{isTeamFav(event.idAwayTeam ?? undefined) ? "★" : "☆"}</span>
-                            </button>
-                        </div>
                     )}
 
                     {event?.strVideo && (
@@ -390,35 +367,22 @@ export default function BasketballMatchPage() {
                     )}
 
                     {event && (
-                        <div className="flex flex-col gap-3">
-                            <BoxScorePanel
-                                team={{
-                                    teamName: event.strHomeTeam ?? "Команда 1",
-                                    teamLogo: event.strHomeTeamBadge ?? undefined,
-                                    players: homePlayers,
-                                }}
-                            />
-                            <BoxScorePanel
-                                team={{
-                                    teamName: event.strAwayTeam ?? "Команда 2",
-                                    teamLogo: event.strAwayTeamBadge ?? undefined,
-                                    players: awayPlayers,
-                                }}
-                            />
-                        </div>
+                        <>
+                            <StatsTable rows={serveStats} labels={TENNIS_SERVE_LABELS} title="Подача" />
+                            <StatsTable rows={pointsStats} labels={TENNIS_POINTS_LABELS} title="Очки" />
+                            <StatsTable rows={gamesStats} labels={TENNIS_GAMES_LABELS} title="Ігри" />
+                        </>
                     )}
-
-                    {event && <StatsTable rows={stats} labels={BASKETBALL_STAT_LABELS} />}
 
                     {event && (homeLastFive.length > 0 || awayLastFive.length > 0) && (
                         <LastFiveMatches
                             home={{
-                                teamName: event.strHomeTeam ?? "Команда 1",
+                                teamName: event.strHomeTeam ?? "Гравець 1",
                                 teamLogo: event.strHomeTeamBadge ?? undefined,
                                 rows: homeLastFive,
                             }}
                             away={{
-                                teamName: event.strAwayTeam ?? "Команда 2",
+                                teamName: event.strAwayTeam ?? "Гравець 2",
                                 teamLogo: event.strAwayTeamBadge ?? undefined,
                                 rows: awayLastFive,
                             }}

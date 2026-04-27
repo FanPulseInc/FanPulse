@@ -46,7 +46,7 @@ function Row({ row }: { row: StatRow }) {
     );
 }
 
-export default function StatsTable({ rows, labels }: { rows: StatRow[]; labels?: readonly string[] }) {
+export default function StatsTable({ rows, labels, title }: { rows: StatRow[]; labels?: readonly string[]; title?: string }) {
     const order = labels ?? FIGMA_STATS;
     const orderSet: ReadonlySet<string> = labels ? new Set(labels) : FIGMA_STATS_SET;
     const byLabel = new Map(rows.map(r => [r.label, r]));
@@ -74,7 +74,7 @@ export default function StatsTable({ rows, labels }: { rows: StatRow[]; labels?:
             <div className="w-full flex justify-center mb-[4px]">
                 <div className="min-w-[220px] h-[42px] px-8 bg-[#af292a] rounded-[10px] flex items-center justify-center">
                     <span className="text-white font-bold text-[16px] uppercase tracking-wider">
-                        Статистика
+                        {title ?? "Статистика"}
                     </span>
                 </div>
             </div>

@@ -142,10 +142,25 @@ const Header = () => {
                                                         Баскетбол
                                                     </span>
                                                 </button>
+                                                <button
+                                                    key="tennis"
+                                                    onClick={() => {
+                                                        router.push("/tennis");
+                                                        setIsSportOpen(false);
+                                                    }}
+                                                    className="flex items-center gap-1 group cursor-pointer w-full"
+                                                >
+                                                    <div className="w-8 h-8 flex items-center justify-center">
+                                                        {ICONS.TENIS}
+                                                    </div>
+                                                    <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
+                                                        Теніс
+                                                    </span>
+                                                </button>
                                                 {categories
                                                     ?.filter((cat) => {
                                                         const n = cat.name?.toLowerCase() ?? "";
-                                                        return n !== "футбол" && n !== "football" && n !== "баскетбол" && n !== "basketball";
+                                                        return n !== "футбол" && n !== "football" && n !== "баскетбол" && n !== "basketball" && n !== "теніс" && n !== "tennis";
                                                     })
                                                     .map((cat) => (
                                                         <button

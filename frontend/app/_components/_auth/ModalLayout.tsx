@@ -3,11 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 
 type Props = {
   isOpen: boolean;
-  onClose: () => void;
+  onCloseAction: () => void;
   children: React.ReactNode;
 };
 
-export const ModalLayout = ({ isOpen, onClose, children }: Props) => {
+export const ModalLayout = ({ isOpen, onCloseAction, children }: Props) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -21,7 +21,7 @@ export const ModalLayout = ({ isOpen, onClose, children }: Props) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          onClick={onClose} 
+          onClick={onCloseAction}
         >
           <motion.div
             onClick={(e) => e.stopPropagation()} 
