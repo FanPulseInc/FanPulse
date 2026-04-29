@@ -97,10 +97,10 @@ public class UserService: IUserService
             var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
             throw new ValidationException(errors);
         }
-
-        if (addRequest.FavCategoryIds.Count != 2)
+        
+        if (addRequest.FavCategoryIds.Count < 1 || addRequest.FavCategoryIds.Count > 2)
         {
-            throw new Exception("You must select exactly 2 favorite categories.");
+            throw new Exception("You must select 1 or 2 favorite categories.");
         }
 
         var existingUser = await _repository.GetUserByEmailAsync(addRequest.Email);
