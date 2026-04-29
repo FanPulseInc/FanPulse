@@ -16,12 +16,15 @@ const navItems = [
 
 
 
+
+
 const Header = () => {
 
     const { user } = useUserStore()
     const router = useRouter()
     const [isSportOpen, setIsSportOpen] = useState(false);
     const { data: categories } = useGetApiCategoryRoots();
+    const [isEsportOpen, setIsEsportOpen] = useState(false);
 
 
     return (
@@ -55,23 +58,34 @@ const Header = () => {
 
 
                     {user ? (
-                        <div className="w-11 h-11 lg:w-15 lg:h-15 rounded-full border-2 border-brand-red cursor-pointer flex items-center justify-center bg-gray-50 overflow-hidden" onClick={()=> router.push("/profile")}>
-                            <span className="text-brand-red text-2xl lg:text-3xl font-bold">
-                                {user?.name && user.name !== "someName"
-                                    ? user.name[0].toUpperCase()
-                                    : user?.email
-                                        ? user.email[0].toUpperCase()
-                                        : "?"}
-                            </span>
+                        <div
+                            className="w-15 h-15 rounded-full border-2 border-brand-red cursor-pointer flex items-center justify-center bg-gray-50 overflow-hidden"
+                            onClick={() => router.push("/profile")}
+                        >
+                            {user?.avatarUrl ? (
+                                <img
+                                    src={user.avatarUrl}
+                                    alt="avatar"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <span className="text-brand-red text-left text-3xl font-bold">
+                                    {user?.name && user.name !== "someName"
+                                        ? user.name[0].toUpperCase()
+                                        : user?.email
+                                            ? user.email[0].toUpperCase()
+                                            : "?"}
+                                </span>
+                            )}
                         </div>
-                    ) :
-                        (<Link
+                    ) : (
+                        <Link
                             href="?auth=login"
                             className="flex h-[44px] lg:h-[50px] min-w-[80px] lg:min-w-[100px] items-center justify-center px-4 lg:px-6 bg-brand-red rounded-[50px] text-white text-body-l font-medium hover:opacity-90 transition-opacity"
                         >
                             Увійти
-                        </Link> )
-                    }
+                        </Link>
+                    )}
 
 
 
@@ -109,7 +123,7 @@ const Header = () => {
                                                 isSportOpen
                                                     ? "opacity-100 scale-y-100 pointer-events-auto"
                                                     : "opacity-0 scale-y-0 pointer-events-none"
-                                            }`}
+                                                }`}
                                         >
                                             <div className="flex flex-col gap-6">
                                                 <button
@@ -172,7 +186,7 @@ const Header = () => {
                                                             className="flex items-center gap-1 group cursor-pointer w-full"
                                                         >
                                                             <div className="w-8 h-8 flex items-center justify-center">
-                                                                {/* Тут можна додати мапінг іконок, наприклад: {getIcon(cat.name)} */}
+
                                                                 {ICONS.SPORT}
                                                             </div>
                                                             <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
@@ -180,6 +194,72 @@ const Header = () => {
                                                             </span>
                                                         </button>
                                                     ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            }
+                            if (item.label === "КІБЕРСПОРТ") {
+                                return (
+                                    <div key={index} className="relative">
+                                        <button
+                                            onClick={() => setIsEsportOpen(!isEsportOpen)}
+                                            className="flex items-center justify-center gap-2 p-2.5 rounded-[10px] hover:bg-brand-red/5 transition-colors group cursor-pointer"
+                                        >
+                                            <div className="w-[18px] h-[18px] flex items-center justify-center">
+                                                {item.icon}
+                                            </div>
+                                            <span className="text-body-l font-medium text-brand-red uppercase">
+                                                {item.label}
+                                            </span>
+                                            <div className={`${isEsportOpen ? "rotate-180" : ""} transition-transform duration-200`}>
+                                                {ICONS.ArrowDown}
+                                            </div>
+                                        </button>
+
+                                        <div
+                                            className={`absolute top-[75px] left-0 z-50 w-[760px] 
+          pt-8 pl-12 pr-8 pb-10 
+          bg-white border-[2px] border-[#af292a] rounded-[20px] 
+          shadow-2xl transition-all duration-300 origin-top ${isEsportOpen
+                                                    ? "opacity-100 scale-y-100 pointer-events-auto"
+                                                    : "opacity-0 scale-y-0 pointer-events-none"
+                                                }`}
+                                        >
+                                            <div className="flex flex-col gap-6">
+
+                                                {/* CS2 */}
+                                                <button
+                                                    onClick={() => {
+                                                        router.push("/esport/cs2");
+                                                        setIsEsportOpen(false);
+                                                    }}
+                                                    className="flex items-center gap-3 group cursor-pointer w-full"
+                                                >
+                                                    <div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
+                                                        <img src="/icons/cs2.jpg"/>
+                                                    </div>
+                                                    <span className="text-[18px] font-bold text-[#212121] group-hover:text-[#af292a]">
+                                                        CS 2
+                                                    </span>
+                                                </button>
+
+                                            
+                                                <button
+                                                    onClick={() => {
+                                                        router.push("/esport/dota");
+                                                        setIsEsportOpen(false);
+                                                    }}
+                                                    className="flex items-center gap-3 group cursor-pointer w-full"
+                                                >
+                                                    <div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
+                                                        <img src={"/icons/dota2.png"}/>
+                                                    </div>
+                                                    <span className="text-[18px] font-bold text-[#212121] group-hover:text-[#af292a]">
+                                                        Dota 2
+                                                    </span>
+                                                </button>
+
                                             </div>
                                         </div>
                                     </div>

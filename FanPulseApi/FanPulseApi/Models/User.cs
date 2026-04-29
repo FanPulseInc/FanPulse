@@ -27,7 +27,8 @@ public class User
     public bool IsBanned { get; set; } = false;
     
     public int BanCount { get; set; } = 0;
-
+    public string? EmailVerificationTokenHash { get; set; }
+    public DateTimeOffset? EmailVerificationTokenExpiresAt { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = TimeProvider.System.GetUtcNow();
     
     public DateTimeOffset UpdatedAt { get; set; } = TimeProvider.System.GetUtcNow();
