@@ -1132,6 +1132,100 @@ export interface LastFiveRow {
     score: string; // always "home-away" regardless of which side our team was
 }
 
+export interface ScoringPlayRow {
+    quarter: 1 | 2 | 3 | 4 | 5;
+    minute: string;
+    side: "home" | "away";
+    playerName: string;
+    homeScoreAfter: number;
+    awayScoreAfter: number;
+}
+
+function detectScoringKind(kind: string, detail: string): { points: number; matched: boolean } {
+    const k = `${kind} ${detail}`.toLowerCase();
+    if (k.includes("touchdown") || /\btd\b/.test(k)) return { points: 6, matched: true };
+    if (k.includes("two-point") || k.includes("two point") || k.includes("2-point") || k.includes("2 pt") || k.includes("2pt")) {
+        return { points: 2, matched: true };
+    }
+    if (k.includes("extra point") || k.includes("extra-point") || /\bpat\b/.test(k) || /\bxp\b/.test(k)) {
+        return { points: 1, matched: true };
+    }
+    if (k.includes("field goal") || k.includes("field-goal") || /\bfg\b/.test(k)) return { points: 3, matched: true };
+    if (k.includes("safety")) return { points: 2, matched: true };
+    return { points: 0, matched: false };
+}
+
+function parseQuarter(raw: string | undefined): 1 | 2 | 3 | 4 | 5 {
+    const s = (raw ?? "").trim().toLowerCase();
+    if (!s) return 1;
+    if (s.includes("ot") || s.includes("overtime")) return 5;
+    const m = s.match(/q?\s*([1-5])/);
+    if (m) {
+        const n = Number(m[1]);
+        if (n >= 1 && n <= 5) return n as 1 | 2 | 3 | 4 | 5;
+    }
+    return 1;
+}
+
+export function timelineToScoringPlays(
+    timeline: SDBTimelineEvent[] | null | undefined,
+    finalHomeScore?: number,
+    finalAwayScore?: number
+): ScoringPlayRow[] {
+    if (!timeline || timeline.length === 0) return [];
+
+    const isHome = (t: SDBTimelineEvent) =>
+        t.strHome === "1" || t.strHome?.toLowerCase() === "yes";
+
+    const scoring = timeline
+        .map((t, idx) => {
+            const kind = (t.strTimeline ?? "").trim();
+            const detail = (t.strTimelineDetail ?? "").trim();
+            const { points, matched } = detectScoringKind(kind, detail);
+            if (!matched || points <= 0) return null;
+            const home = isHome(t);
+            const time = (t.intTime ?? "").trim();
+            const minute = /\d{1,2}:\d{2}/.test(time) ? time : (time ? `${time}:00` : "");
+            const quarter = parseQuarter((t as { strPeriod?: string }).strPeriod ?? detail);
+            return {
+                idx,
+                quarter,
+                minute,
+                side: (home ? "home" : "away") as "home" | "away",
+                playerName: t.strPlayer ?? "?",
+                points,
+            };
+        })
+        .filter((x): x is NonNullable<typeof x> => !!x);
+
+    let runHome = 0;
+    let runAway = 0;
+    const rows: ScoringPlayRow[] = scoring.map((s) => {
+        if (s.side === "home") runHome += s.points;
+        else runAway += s.points;
+        return {
+            quarter: s.quarter,
+            minute: s.minute,
+            side: s.side,
+            playerName: s.playerName,
+            homeScoreAfter: runHome,
+            awayScoreAfter: runAway,
+        };
+    });
+
+    if (
+        rows.length > 0 &&
+        Number.isFinite(finalHomeScore) && Number.isFinite(finalAwayScore) &&
+        (runHome !== finalHomeScore || runAway !== finalAwayScore)
+    ) {
+        const last = rows[rows.length - 1];
+        last.homeScoreAfter = Number(finalHomeScore);
+        last.awayScoreAfter = Number(finalAwayScore);
+    }
+
+    return rows;
+}
+
 export function eventsToLastFive(
     events: SDBEvent[] | null | undefined,
     teamId: string | undefined

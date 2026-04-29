@@ -171,10 +171,25 @@ const Header = () => {
                                                         Теніс
                                                     </span>
                                                 </button>
+                                                <button
+                                                    key="american-football"
+                                                    onClick={() => {
+                                                        router.push("/american-football");
+                                                        setIsSportOpen(false);
+                                                    }}
+                                                    className="flex items-center gap-2 group cursor-pointer w-full"
+                                                >
+                                                    <div className="w-8 h-8 flex items-center justify-center">
+                                                        {ICONS.RUGBY}
+                                                    </div>
+                                                    <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
+                                                        Американський футбол
+                                                    </span>
+                                                </button>
                                                 {categories
                                                     ?.filter((cat) => {
                                                         const n = cat.name?.toLowerCase() ?? "";
-                                                        return n !== "футбол" && n !== "football" && n !== "баскетбол" && n !== "basketball" && n !== "теніс" && n !== "tennis";
+                                                        return n !== "футбол" && n !== "football" && n !== "баскетбол" && n !== "basketball" && n !== "теніс" && n !== "tennis" && n !== "американський футбол" && n !== "american football";
                                                     })
                                                     .map((cat) => (
                                                         <button

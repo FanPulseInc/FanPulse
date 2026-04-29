@@ -196,9 +196,9 @@ export default function FeaturedMatch({
 
             
             {match.stage && (
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-[#212121] rounded-t-[26px] px-4 w-[186px] h-[28px] flex items-center justify-center">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-[#212121] rounded-t-[26px] px-5 min-w-[140px] h-[28px] flex items-center justify-center whitespace-nowrap">
                     <span
-                        className="text-[15px] font-bold leading-[30px] tracking-normal text-center text-[#f8f8f8]"
+                        className="text-[13px] sm:text-[15px] font-bold leading-none tracking-normal text-center text-[#f8f8f8]"
                         style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                     >
                         {match.stage}
