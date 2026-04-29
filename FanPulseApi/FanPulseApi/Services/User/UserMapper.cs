@@ -16,10 +16,12 @@ public static class UserMapper
             AvatarUrl = user.AvatarUrl,
             IsVerifiedUser = user.IsVerifiedUser,
             CreatedAt = user.CreatedAt,
-            CountOfComments = user.Comments.Count,
-            CountOfLkes = user.Likes.Count,
-            CountOfPosts = user.Posts.Count,
-            RecentActivities = recentActivities
+
+            CountOfComments = user.Comments?.Count ?? 0,
+            CountOfLkes = user.Likes?.Count ?? 0,
+            CountOfPosts = user.Posts?.Count ?? 0,
+
+            RecentActivities = recentActivities ?? new List<UserActivityDto>()
         };
     }
 
