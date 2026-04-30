@@ -31,25 +31,40 @@ const Profile = () => {
     if (isLoading) return <div className="p-10 text-brand-red">Завантаження...</div>
 
     const uploadAvatar = async (file: File) => {
-        const formData = new FormData()
-        formData.append("file", file)
-
         const res = await fetch("/api/upload/avatar", {
             method: "POST",
-            body: formData,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                fileName: file.name,
+                fileType: file.type,
+            }),
         })
 
-        // для дебага оставим
-        const text = await res.text()
-        console.log("STATUS:", res.status)
-        console.log("RESPONSE:", text)
-
         if (!res.ok) {
+            const text = await res.text()
+            console.error("Create signed URL failed:", text)
             throw new Error("Upload failed")
         }
 
-        const data = JSON.parse(text)
-        return data.url as string
+        const { uploadUrl, publicUrl } = await res.json()
+
+        const uploadRes = await fetch(uploadUrl, {
+            method: "PUT",
+            headers: {
+                "Content-Type": file.type,
+            },
+            body: file,
+        })
+
+        if (!uploadRes.ok) {
+            const text = await uploadRes.text()
+            console.error("S3 upload failed:", text)
+            throw new Error("S3 upload failed")
+        }
+
+        return publicUrl as string
     }
 
 
