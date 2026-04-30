@@ -31,20 +31,28 @@ const Profile = () => {
     if (isLoading) return <div className="p-10 text-brand-red">Завантаження...</div>
 
     const uploadAvatar = async (file: File) => {
-        const formData = new FormData()
-        formData.append("file", file)
-
         const res = await fetch("/api/upload/avatar", {
             method: "POST",
-            body: formData,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                test: true,
+                fileName: file.name,
+                size: file.size,
+                type: file.type,
+            }),
         })
+
+        const text = await res.text()
+        console.log("STATUS:", res.status)
+        console.log("RESPONSE:", text)
 
         if (!res.ok) {
             throw new Error("Upload failed")
         }
 
-        const data = await res.json()
-        return data.url as string
+        return ""
     }
 
 

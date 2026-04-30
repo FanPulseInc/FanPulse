@@ -24,6 +24,24 @@ export async function POST(req: Request) {
       )
     }
 
+    const contentType = req.headers.get("content-type") || ""
+
+    if (contentType.includes("application/json")) {
+      const body = await req.json()
+
+      return NextResponse.json({
+        ok: true,
+        message: "JSON POST reached avatar route",
+        body,
+        env: {
+          region: !!region,
+          bucket: !!bucket,
+          accessKeyId: !!accessKeyId,
+          secretAccessKey: !!secretAccessKey,
+        },
+      })
+    }
+
     const formData = await req.formData()
     const file = formData.get("file") as File | null
 
