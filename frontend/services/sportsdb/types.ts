@@ -33,9 +33,12 @@ export interface SDBEvent {
     strAwayTeam?: string;
     intHomeScore?: string | null;
     intAwayScore?: string | null;
+    strResult?: string | null;
+    strEvent?: string | null;
     strHomeTeamBadge?: string | null;
     strAwayTeamBadge?: string | null;
     strThumb?: string | null;
+    strVideo?: string | null; // YouTube highlights URL — present after the match ends
     strVenue?: string | null;
     strStatus?: string | null;
     strTimestamp?: string;
@@ -69,6 +72,8 @@ export interface SDBLineupPlayer {
     strCutout?: string | null; // v2: cutout photo URL (preferred over strPlayerThumb)
     strHome?: string; // v1: "1"/"0"   v2: "Yes"/"No"
     strSubstitute?: string; // v1: "1"/"0"   v2: "Yes"/"No"
+    strNationality?: string; // country name — populated on v2 lineup rows
+    strCountry?: string; // fallback field name some endpoints use
 }
 
 export interface SDBEventStat {
@@ -78,6 +83,20 @@ export interface SDBEventStat {
     strStat?: string; // "Shots on Goal", "Ball Possession %", etc.
     intHome?: string;
     intAway?: string;
+}
+
+export interface SDBTimelineEvent {
+    idTimeline?: string;
+    idEvent?: string;
+    idTeam?: string;
+    idPlayer?: string;
+    idAssist?: string;
+    intTime?: string; // minute as a numeric string — "56", "90+2"
+    strTimeline?: string; // event type: "Goal", "Yellow Card", "Substitute"
+    strTimelineDetail?: string; // sub-type: "Penalty", "Own Goal", "Disallowed Goal"
+    strPlayer?: string;
+    strAssist?: string;
+    strHome?: string; // "1"/"0" (v1) or "Yes"/"No" (v2)
 }
 
 export interface SDBLeague {
@@ -99,4 +118,24 @@ export interface SDBEventsResponse { events?: SDBEvent[] | null; lookup?: SDBEve
 export interface SDBScheduleResponse { schedule?: SDBEvent[] | null }
 export interface SDBTeamsResponse { teams?: SDBTeam[] | null; lookup?: SDBTeam[] | null }
 export interface SDBLineupResponse { lineup?: SDBLineupPlayer[] | null; lookup?: SDBLineupPlayer[] | null }
+
+export interface SDBPlayer {
+    idPlayer?: string;
+    idTeam?: string;
+    strPlayer?: string;
+    strTeam?: string;
+    strSport?: string;
+    strPosition?: string;
+    strNumber?: string;
+    strNationality?: string;
+    strThumb?: string | null;
+    strCutout?: string | null;
+    strRender?: string | null;
+}
+
+export interface SDBTeamPlayersResponse {
+    player?: SDBPlayer[] | null;
+    list?: SDBPlayer[] | null;
+}
 export interface SDBStatsResponse { statistics?: SDBEventStat[] | null; lookup?: SDBEventStat[] | null }
+export interface SDBTimelineResponse { timeline?: SDBTimelineEvent[] | null; lookup?: SDBTimelineEvent[] | null }
