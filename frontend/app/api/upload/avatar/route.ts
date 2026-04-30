@@ -1,11 +1,22 @@
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
   try {
+    const contentType = req.headers.get("content-type") || ""
+
+    if (contentType.includes("application/json")) {
+      const body = await req.json()
+
+      return NextResponse.json({
+        ok: true,
+        message: "JSON POST reached avatar route",
+        body,
+      })
+    }
+
     const region = process.env.NEXT_PUBLIC_S3_REGION
     const bucket = process.env.NEXT_PUBLIC_S3_BUCKET_NAME
     const accessKeyId = process.env.S3_ACCESS_KEY_ID
@@ -24,23 +35,7 @@ export async function POST(req: Request) {
       )
     }
 
-    const contentType = req.headers.get("content-type") || ""
-
-    if (contentType.includes("application/json")) {
-      const body = await req.json()
-
-      return NextResponse.json({
-        ok: true,
-        message: "JSON POST reached avatar route",
-        body,
-        env: {
-          region: !!region,
-          bucket: !!bucket,
-          accessKeyId: !!accessKeyId,
-          secretAccessKey: !!secretAccessKey,
-        },
-      })
-    }
+    const { PutObjectCommand, S3Client } = await import("@aws-sdk/client-s3")
 
     const formData = await req.formData()
     const file = formData.get("file") as File | null
@@ -72,9 +67,9 @@ export async function POST(req: Request) {
       })
     )
 
-    const url = `https://${bucket}.s3.${region}.amazonaws.com/${fileName}`
-
-    return NextResponse.json({ url })
+    return NextResponse.json({
+      url: `https://${bucket}.s3.${region}.amazonaws.com/${fileName}`,
+    })
   } catch (error: any) {
     return NextResponse.json(
       {
