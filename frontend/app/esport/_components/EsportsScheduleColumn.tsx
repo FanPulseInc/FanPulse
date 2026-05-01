@@ -39,14 +39,10 @@ const phaseTabs = [
   { id: "upcoming", label: "Майбутні" },
 ];
 
-function relativeKickoff(startIso: string | undefined, now: number): string | null {
+function relativeKickoff(startIso: string | undefined, now: number) {
   if (!startIso) return null;
 
-  const iso = /[zZ]|[+-]\d{2}:?\d{2}$/.test(startIso)
-    ? startIso
-    : `${startIso}Z`;
-
-  const t = new Date(iso).getTime();
+  const t = new Date(startIso).getTime();
   if (Number.isNaN(t)) return null;
 
   const diffMs = t - now;
@@ -57,11 +53,9 @@ function relativeKickoff(startIso: string | undefined, now: number): string | nu
   if (min < 60) return `за ${min} хв`;
 
   const hr = Math.floor(min / 60);
+  const rem = min % 60;
 
-  if (hr < 24) {
-    const rem = min % 60;
-    return rem > 0 ? `за ${hr}г ${rem}хв` : `за ${hr}г`;
-  }
+  if (hr < 24) return rem > 0 ? `за ${hr}г ${rem}хв` : `за ${hr}г`;
 
   return `за ${Math.floor(hr / 24)} дн`;
 }
@@ -70,7 +64,7 @@ function applyFilter(
   matches: EsportsMatch[],
   topTab: string,
   phaseTab: string | null
-): EsportsMatch[] {
+) {
   return matches.filter(
     (match) =>
       (topTab !== "fav" || match.favorite) &&
@@ -78,31 +72,23 @@ function applyFilter(
   );
 }
 
-function TeamLine({
-  name,
-  logo,
-}: {
-  name: string;
-  logo?: string;
-}) {
+function TeamLine({ name, logo }: { name: string; logo?: string }) {
+  const src = logo && logo !== "" ? logo : "/icons/question_mark.png";
+
   return (
     <div className="flex items-center gap-2 min-w-0">
-      {logo ? (
+      <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center shrink-0 overflow-hidden">
         <Image
-          src={logo}
+          src={src}
           alt=""
-          width={24}
-          height={24}
+          width={14}
+          height={14}
           unoptimized
-          className="w-6 h-6 object-contain shrink-0"
+          className="object-contain"
         />
-      ) : (
-        <span className="w-5 h-5 rounded-full bg-gray-300 shrink-0" />
-      )}
+      </div>
 
-      <span className="text-[13px] text-[#212121] truncate">
-        {name}
-      </span>
+      <span className="text-[13px] text-[#212121] truncate">{name}</span>
     </div>
   );
 }
@@ -140,21 +126,13 @@ function EsportsMatchRow({
       <div className="flex flex-col items-end justify-center min-w-0">
         {isUpcoming ? (
           <>
-            {match.format && (
-              <span className="text-[10px] font-bold text-[#212121] whitespace-nowrap">
-                {match.format}
-              </span>
-            )}
+            <span className="text-[10px] font-bold text-[#212121] whitespace-nowrap">
+              {match.format ?? "BO3"}
+            </span>
 
-            {countdown ? (
-              <span className="text-[10px] font-semibold text-gray-500 whitespace-nowrap">
-                {countdown}
-              </span>
-            ) : (
-              <span className="text-[12px] font-bold text-gray-400 font-data">
-                –
-              </span>
-            )}
+            <span className="text-[10px] font-semibold text-gray-500 whitespace-nowrap">
+              {countdown ?? "–"}
+            </span>
           </>
         ) : (
           <>
@@ -169,9 +147,7 @@ function EsportsMatchRow({
       </div>
 
       <button
-        onClick={(event) => {
-          event.stopPropagation();
-        }}
+        onClick={(event) => event.stopPropagation()}
         className={`text-xl leading-none ${
           match.favorite
             ? "text-[#af292a]"
@@ -186,13 +162,14 @@ function EsportsMatchRow({
 }
 
 export default function EsportsScheduleColumn({
-  groups,
+  groups = [],
   dateLabel = "29.04.26",
   selectedMatchId,
   onPrevDay,
   onNextDay,
   onPickDate,
   dateIso,
+  onPhaseChange,
 }: {
   groups?: EsportsTournamentGroup[];
   dateLabel?: string;
@@ -201,6 +178,7 @@ export default function EsportsScheduleColumn({
   onNextDay?: () => void;
   onPickDate?: (iso: string) => void;
   dateIso?: string;
+  onPhaseChange?: (phase: string | null) => void;
 }) {
   const router = useRouter();
 
@@ -214,9 +192,7 @@ export default function EsportsScheduleColumn({
     return () => clearInterval(id);
   }, []);
 
-  const safeGroups = groups ?? [];
-
-  const filteredGroups = safeGroups
+  const filteredGroups = groups
     .map((group) => ({
       ...group,
       matches: applyFilter(group.matches, topTab, phaseTab),
@@ -224,6 +200,11 @@ export default function EsportsScheduleColumn({
     .filter((group) => group.matches.length > 0);
 
   const isEmpty = filteredGroups.length === 0;
+
+  function handlePhaseClick(next: string | null) {
+    setPhaseTab(next);
+    onPhaseChange?.(next);
+  }
 
   return (
     <div className="w-[560px] flex flex-col gap-[10px]">
@@ -284,24 +265,26 @@ export default function EsportsScheduleColumn({
 
       <div className="w-full bg-[#f8f8f8] rounded-[20px] pt-[20px] pr-[32px] pb-[20px] pl-[32px] flex flex-col gap-[10px] shadow-sm">
         <div className="w-full flex items-center gap-2">
-          {phaseTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() =>
-                setPhaseTab(phaseTab === tab.id ? null : tab.id)
-              }
-              className={`h-[30px] px-5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                phaseTab === tab.id
-                  ? "bg-[#212121] text-white"
-                  : "bg-[#af292a] text-white hover:opacity-90"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {phaseTabs.map((tab) => {
+            const active = phaseTab === tab.id;
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handlePhaseClick(active ? null : tab.id)}
+                className={`h-[30px] px-5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                  active
+                    ? "bg-[#212121] text-white"
+                    : "bg-[#af292a] text-white hover:opacity-90"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
 
           <button
-            onClick={() => setPhaseTab(null)}
+            onClick={() => handlePhaseClick(null)}
             className={`ml-auto h-[30px] px-5 rounded-full text-[11px] font-bold uppercase tracking-wider cursor-pointer transition-colors ${
               phaseTab === null
                 ? "bg-[#212121] text-white"
@@ -312,55 +295,53 @@ export default function EsportsScheduleColumn({
           </button>
         </div>
 
-        {isEmpty && (
+        {isEmpty ? (
           <div className="text-center text-gray-400 text-[12px] py-8">
             Немає матчів
           </div>
-        )}
+        ) : (
+          filteredGroups.map((group) => (
+            <div key={group.tournamentId} className="flex flex-col">
+              <div className="flex items-center gap-2 px-2 py-[8px] border-b-2 border-[#af292a]/30">
+                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden shrink-0">
+                  <Image
+                    src={group.tournamentLogo || "/icons/question_mark.png"}
+                    alt=""
+                    width={16}
+                    height={16}
+                    unoptimized
+                    className="object-contain"
+                  />
+                </div>
 
-        {filteredGroups.map((group) => (
-          <div key={group.tournamentId} className="flex flex-col">
-            <div className="flex items-center gap-2 px-2 py-[8px] border-b-2 border-[#af292a]/30">
-              {group.tournamentLogo ? (
-                <Image
-                  src={group.tournamentLogo}
-                  alt=""
-                  width={32}
-                  height={32}
-                  unoptimized
-                  className="w-8 h-8 object-contain"
-                />
-              ) : (
-                <span className="w-8 h-8 rounded-full bg-gray-300" />
-              )}
-
-              <span className="text-[13px] font-bold uppercase tracking-wider text-[#212121] truncate">
-                {group.tournamentName}
-              </span>
-
-              {group.stage && (
-                <span className="text-[11px] text-gray-500">
-                  · {group.stage}
+                <span className="text-[13px] font-bold uppercase tracking-wider text-[#212121] truncate">
+                  {group.tournamentName}
                 </span>
-              )}
-            </div>
 
-            <div className="flex flex-col">
-              {group.matches.map((match) => (
-                <EsportsMatchRow
-                  key={match.id}
-                  match={match}
-                  now={now}
-                  selected={selectedMatchId === match.id}
-                  onClick={() => {
-                    const suffix = dateIso ? `?date=${dateIso}` : "";
-                    router.push(`/esport/cs2/${match.id}${suffix}`);
-                  }}
-                />
-              ))}
+                {group.stage && (
+                  <span className="text-[11px] text-gray-500">
+                    · {group.stage}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col">
+                {group.matches.map((match) => (
+                  <EsportsMatchRow
+                    key={match.id}
+                    match={match}
+                    now={now}
+                    selected={selectedMatchId === match.id}
+                    onClick={() => {
+                      const suffix = dateIso ? `?date=${dateIso}` : "";
+                      router.push(`/esport/cs2/${match.id}${suffix}`);
+                    }}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

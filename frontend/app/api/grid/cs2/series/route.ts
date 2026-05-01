@@ -1,25 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCs2Series } from "@/app/_lib/grid/cs2"; 
+import { getCs2Series } from "@/app/_lib/grid/cs2";
 
-export async function GET(req: NextRequest) {
+function getDateRange(dateParam: string | null) {
+  const now = new Date();
+
+  const baseDate = dateParam
+    ? new Date(`${dateParam}T12:00:00.000Z`)
+    : now;
+
+  const gte = new Date(baseDate);
+  gte.setUTCHours(0, 0, 0, 0);
+
+  const lte = new Date(baseDate);
+  lte.setUTCHours(23, 59, 59, 999);
+
+  return {
+    gte: gte.toISOString(),
+    lte: lte.toISOString(),
+  };
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-
-    const gte =
-      searchParams.get("gte") ?? new Date().toISOString();
-
-    const lte =
-      searchParams.get("lte") ??
-      new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    const dateParam = request.nextUrl.searchParams.get("date");
+    const { gte, lte } = getDateRange(dateParam);
 
     const data = await getCs2Series(gte, lte);
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error("GRID route error:", error);
+    console.error("CS2 series route error:", error);
 
     return NextResponse.json(
-      { error: "Failed to fetch CS2 series" },
+      { totalCount: 0, series: [] },
       { status: 500 }
     );
   }
