@@ -34,7 +34,7 @@ export interface FormationTeam {
 
 function TeamHeader({ team }: { team: FormationTeam }) {
     return (
-        <div className="w-full h-[67px] px-4 bg-[#af292a] rounded-[20px] flex items-center gap-3">
+        <div className="w-full min-h-[67px] px-4 py-2 bg-[#af292a] rounded-[20px] flex items-center gap-3">
             <div className="w-[40px] h-[40px] flex items-center justify-center overflow-hidden shrink-0">
                 {team.logoUrl ? (
                     <Image
@@ -55,9 +55,37 @@ function TeamHeader({ team }: { team: FormationTeam }) {
                 {team.label}
             </span>
             {team.formation && (
-                <span className="ml-auto text-white/90 text-[11px] font-bold font-data bg-black/20 px-2 py-[2px] rounded-full tracking-wider">
+                <span className="text-white/90 text-[11px] font-bold font-data bg-black/20 px-2 py-[2px] rounded-full tracking-wider">
                     {team.formation}
                 </span>
+            )}
+            {team.coachName && (
+                <div className="ml-auto flex items-center gap-2 bg-white/15 rounded-full pl-1 pr-3 py-1">
+                    <div className="w-[34px] h-[34px] rounded-full overflow-hidden bg-white/20 flex items-center justify-center shrink-0">
+                        {team.coachPhotoUrl ? (
+                            <Image
+                                src={team.coachPhotoUrl}
+                                alt={team.coachName}
+                                width={34}
+                                height={34}
+                                unoptimized
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <span className="text-white text-[11px] font-bold">
+                                {team.coachName.slice(0, 1).toUpperCase()}
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex flex-col leading-tight">
+                        <span className="text-white text-[11px] font-bold uppercase tracking-wider truncate max-w-[140px]">
+                            {team.coachName}
+                        </span>
+                        <span className="text-white/70 text-[9px] font-bold uppercase tracking-wider">
+                            Тренер
+                        </span>
+                    </div>
+                </div>
             )}
         </div>
     );

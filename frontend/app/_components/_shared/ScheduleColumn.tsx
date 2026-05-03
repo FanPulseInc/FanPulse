@@ -28,6 +28,12 @@ export interface ScheduleMatch {
     awayRedCard?: boolean;
 
     quarters?: { home: number[]; away: number[] };
+
+    competitionName?: string;
+    competitionBadge?: string;
+    countryFlag?: string;
+    trackName?: string;
+    stageLabel?: string;
 }
 
 
@@ -124,6 +130,71 @@ function MatchRow({
         isMatchFav(m.id) || isTeamFav(m.homeTeamId) || isTeamFav(m.awayTeamId);
     const homeTeamFav = isTeamFav(m.homeTeamId);
     const awayTeamFav = isTeamFav(m.awayTeamId);
+
+    if (m.competitionName) {
+        return (
+            <div
+                onClick={onClick}
+                className={`grid grid-cols-[54px_1fr_auto_28px] items-center gap-2 h-[56px] px-2 rounded-[8px] cursor-pointer transition-colors border-b border-gray-200 last:border-none ${
+                    selected ? "bg-[#af292a]/10" : "hover:bg-white"
+                }`}
+            >
+                <div className="flex flex-col items-start leading-tight">
+                    <span className="text-[#af292a] text-[14px] font-bold font-data">
+                        {m.time}
+                    </span>
+                </div>
+                <div className="flex items-center gap-3 min-w-0">
+                    {m.countryFlag ? (
+                        <div className="w-[36px] h-[36px] rounded-full overflow-hidden shrink-0 ring-1 ring-gray-200">
+                            {m.countryFlag.startsWith("http") ? (
+                                <Image
+                                    src={m.countryFlag}
+                                    alt=""
+                                    width={36}
+                                    height={36}
+                                    unoptimized
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <span className="w-full h-full flex items-center justify-center text-[22px] leading-none">{m.countryFlag}</span>
+                            )}
+                        </div>
+                    ) : m.competitionBadge ? (
+                        <Image
+                            src={m.competitionBadge}
+                            alt=""
+                            width={36}
+                            height={36}
+                            unoptimized
+                            className="w-[36px] h-[36px] object-contain shrink-0"
+                        />
+                    ) : (
+                        <span className="block w-[36px] h-[36px] rounded-full bg-gray-300 shrink-0" />
+                    )}
+                    <span className="text-[13px] font-bold text-[#212121] truncate">
+                        {m.trackName ?? m.competitionName}
+                    </span>
+                </div>
+                <div className="flex flex-col items-end justify-center min-w-0">
+                    {m.stageLabel && (
+                        <span className="text-[12px] font-bold text-[#af292a] whitespace-nowrap">
+                            {m.stageLabel}
+                        </span>
+                    )}
+                </div>
+                <button
+                    onClick={(e) => { e.stopPropagation(); toggleMatch(m.id); }}
+                    className={`text-xl leading-none ${starred ? "text-[#af292a]" : "text-gray-300 hover:text-[#af292a]"} transition-colors cursor-pointer`}
+                    aria-label="Favorite match"
+                    title={starred ? "Прибрати з улюблених" : "Додати матч в улюблені"}
+                >
+                    {starred ? "★" : "☆"}
+                </button>
+            </div>
+        );
+    }
+
     const isUpcoming = m.status === "upcoming";
     const isPast = m.status === "past";
     const countdown = isUpcoming ? relativeKickoff(m.startIso, now) : null;

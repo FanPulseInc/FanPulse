@@ -95,18 +95,99 @@ function HeaderScorerLine({
     );
 }
 
+export interface MotorsportHero {
+    competitionName: string;
+    raceName: string;
+    competitionLogo?: string;
+    stageLabel?: string;
+    countryFlag?: string;
+}
+
 export default function FeaturedMatch({
     match,
     homeScorers = [],
     awayScorers = [],
     footerSlot,
+    motorsportHero,
 }: {
     match: FeaturedMatchData;
     homeScorers?: Scorer[];
     awayScorers?: Scorer[];
-    
     footerSlot?: React.ReactNode;
+    motorsportHero?: MotorsportHero;
 }) {
+    if (motorsportHero) {
+        const hasFooter = !!footerSlot;
+        const isFlagUrl = !!motorsportHero.countryFlag && motorsportHero.countryFlag.startsWith("http");
+        return (
+            <div className={`relative w-full ${hasFooter ? "min-h-[237px] pb-[48px]" : "min-h-[200px] pb-[40px]"} p-[20px] bg-[#af292a] rounded-[20px] flex flex-col items-center gap-3 shadow-lg`}>
+                <div className="w-full flex items-center justify-center">
+                    <span className="text-white font-bold text-sm uppercase tracking-wider">
+                        {motorsportHero.competitionName}
+                    </span>
+                </div>
+
+                <div className="w-full flex-1 flex items-center justify-center px-2">
+                    <div className="relative w-full max-w-[420px] mx-auto bg-[#212121] rounded-[24px] pl-[80px] pr-5 py-4 flex flex-col items-center gap-1 shadow-md">
+                        <div className="absolute left-[-12px] top-1/2 -translate-y-1/2 w-[88px] h-[88px] rounded-full bg-white flex items-center justify-center overflow-hidden shadow-md ring-2 ring-[#af292a]">
+                            {motorsportHero.countryFlag ? (
+                                isFlagUrl ? (
+                                    <Image
+                                        src={motorsportHero.countryFlag}
+                                        alt=""
+                                        width={88}
+                                        height={88}
+                                        unoptimized
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <span className="text-[44px] leading-none">{motorsportHero.countryFlag}</span>
+                                )
+                            ) : motorsportHero.competitionLogo ? (
+                                <Image
+                                    src={motorsportHero.competitionLogo}
+                                    alt=""
+                                    width={88}
+                                    height={88}
+                                    unoptimized
+                                    className="w-full h-full object-contain p-1"
+                                />
+                            ) : null}
+                        </div>
+                        <span
+                            className="text-white text-[18px] sm:text-[22px] font-bold leading-tight text-center truncate w-full"
+                            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                        >
+                            {motorsportHero.raceName}
+                        </span>
+                        {motorsportHero.stageLabel && (
+                            <span className="text-white/80 text-[12px] font-bold uppercase tracking-wider">
+                                {motorsportHero.stageLabel}
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                {footerSlot && (
+                    <div className="w-full" onClick={(e) => e.stopPropagation()}>
+                        {footerSlot}
+                    </div>
+                )}
+
+                {match.stage && (
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 bg-[#212121] rounded-t-[26px] px-5 min-w-[140px] h-[28px] flex items-center justify-center whitespace-nowrap">
+                        <span
+                            className="text-[13px] sm:text-[15px] font-bold leading-none tracking-normal text-center text-[#f8f8f8]"
+                            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                        >
+                            {match.stage}
+                        </span>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
     const hasScorers = homeScorers.length > 0 || awayScorers.length > 0;
     const hasFooter = !!footerSlot;
     const kickoffDate = match.kickoff ? new Date(match.kickoff) : null;

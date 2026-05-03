@@ -17,6 +17,8 @@ import {
     useLeagueLookups,
     useEventLookup,
     useTeamPreviousEvents,
+    usePlayerSearch,
+    usePlayerPhotos,
 } from "@/services/sportsdb/hooks";
 import {
     liveToScheduleRow,
@@ -25,6 +27,7 @@ import {
     eventsToLastFive,
     localDateIsoOf,
     formatElapsed,
+    extractTennisPlayers,
 } from "@/services/sportsdb/adapters";
 import type { SDBEvent } from "@/services/sportsdb/types";
 import { useFavorites } from "@/services/favorites";
@@ -158,7 +161,7 @@ export default function TennisMatchPage() {
 
     const { data: eventData, isLoading: eventLoading } = useEventLookup(matchId);
 
-    const groups: ScheduleGroup[] = useMemo(() => {
+    const baseGroups: ScheduleGroup[] = useMemo(() => {
         const liveById = new Map(
             (liveData?.livescore ?? []).map(l => [l.idEvent ?? "", l])
         );
@@ -196,6 +199,29 @@ export default function TennisMatchPage() {
         });
     }, [seasonQueries, leagueQueries, liveData, dateIso]);
 
+    const sidebarPlayerNames = useMemo(() => {
+        const names: string[] = [];
+        baseGroups.forEach(g => g.matches.forEach(m => {
+            if (m.homeTeam) names.push(m.homeTeam);
+            if (m.awayTeam) names.push(m.awayTeam);
+        }));
+        return names;
+    }, [baseGroups]);
+
+    const sidebarPhotos = usePlayerPhotos(sidebarPlayerNames, "Tennis");
+
+    const groups: ScheduleGroup[] = useMemo(
+        () => baseGroups.map(g => ({
+            ...g,
+            matches: g.matches.map(m => ({
+                ...m,
+                homeLogo: m.homeLogo ?? (m.homeTeam ? sidebarPhotos[m.homeTeam] : undefined),
+                awayLogo: m.awayLogo ?? (m.awayTeam ? sidebarPhotos[m.awayTeam] : undefined),
+            })),
+        })),
+        [baseGroups, sidebarPhotos]
+    );
+
     const competitions: CompetitionOption[] = useMemo(
         () =>
             TOP_LEAGUES.map((cfg, i) => ({
@@ -224,11 +250,21 @@ export default function TennisMatchPage() {
     };
 
     const event = (eventData?.events ?? eventData?.lookup)?.[0];
+    const players = extractTennisPlayers(event?.strEvent, event?.strLeague);
+    const homeName = event?.strHomeTeam ?? players.home;
+    const awayName = event?.strAwayTeam ?? players.away;
+    const { data: homePlayers } = usePlayerSearch(homeName, "Tennis");
+    const { data: awayPlayers } = usePlayerSearch(awayName, "Tennis");
+    const homePhoto = (homePlayers ?? [])[0]?.strCutout ?? (homePlayers ?? [])[0]?.strThumb ?? undefined;
+    const awayPhoto = (awayPlayers ?? [])[0]?.strCutout ?? (awayPlayers ?? [])[0]?.strThumb ?? undefined;
+
     const liveForMatch = (liveData?.livescore ?? []).find(l => l.idEvent === matchId);
     const liveElapsed = formatElapsed(liveForMatch?.strProgress, liveForMatch?.strStatus);
     const featured = event ? eventToFeatured(event) : null;
     if (featured) {
         featured.stage = "Теніс";
+        if (homePhoto && !featured.home.logoUrl) featured.home.logoUrl = homePhoto;
+        if (awayPhoto && !featured.away.logoUrl) featured.away.logoUrl = awayPhoto;
     }
     if (featured && liveForMatch) {
         if (liveElapsed) featured.elapsed = liveElapsed;
