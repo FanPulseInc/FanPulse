@@ -50,6 +50,43 @@ function toInt(s?: string | null): number {
     return Number.isFinite(n) ? n : 0;
 }
 
+export interface WecEntry {
+    position: number;
+    classLabel: string;
+    team: string;
+    carNumber?: string;
+    drivers: string[];
+}
+
+export function parseWecResult(strResult: string | null | undefined): WecEntry[] {
+    if (!strResult) return [];
+    const lines = strResult
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .filter(Boolean);
+    const entries: WecEntry[] = [];
+    let currentClass = "";
+    const classRe = /^(HYPERCAR|LMP1|LMP2|LMGT3|LMGTE|LMGTE PRO|LMGTE AM|GTE PRO|GTE AM|GT3|LMP)$/i;
+    const rowRe = /^(\d{1,2})\s+(.+?)\s+#(\S+)\s+(.+)$/;
+    for (const line of lines) {
+        if (classRe.test(line)) {
+            currentClass = line.toUpperCase();
+            continue;
+        }
+        const m = line.match(rowRe);
+        if (!m) continue;
+        const drivers = m[4].split(/\s*,\s*/).map(s => s.trim()).filter(Boolean);
+        entries.push({
+            position: Number(m[1]),
+            classLabel: currentClass || "",
+            team: m[2].trim(),
+            carNumber: m[3].trim(),
+            drivers,
+        });
+    }
+    return entries;
+}
+
 export function parseQuartersFromResult(
     strResult: string | null | undefined
 ): { home: number[]; away: number[] } | undefined {
@@ -293,7 +330,7 @@ export function liveToScheduleRow(ls: SDBLiveScore): Partial<ScheduleMatch> {
     const status = statusBucket(ls.strProgress, ls.strStatus);
     const showScore = status !== "upcoming" || hasScores;
     const out: Partial<ScheduleMatch> = {
-        id: ls.idEvent ?? ls.idLiveScore ?? crypto.randomUUID(),
+        id: ls.idEvent ?? ls.idLiveScore ?? `live-${ls.strHomeTeam ?? ""}-${ls.strAwayTeam ?? ""}-${ls.dateEvent ?? ""}`,
         homeTeam: ls.strHomeTeam ?? "?",
         awayTeam: ls.strAwayTeam ?? "?",
         homeTeamId: ls.idHomeTeam ?? undefined,
@@ -330,7 +367,7 @@ export function eventToScheduleRow(ev: SDBEvent): ScheduleMatch {
     if ((hasFinalScore || hasTennisFinal) && status === "upcoming") status = "past";
     const showScore = status !== "upcoming" || hasFinalScore || hasTennisFinal;
     return {
-        id: ev.idEvent ?? crypto.randomUUID(),
+        id: ev.idEvent ?? `evt-${ev.strHomeTeam ?? ""}-${ev.strAwayTeam ?? ""}-${ev.dateEvent ?? ""}-${ev.strTime ?? ""}`,
         time: hmFromTimestamp(ev.strTimestamp, ev.dateEvent, ev.strTime),
         startIso: ev.strTimestamp ?? undefined,
         homeTeam: homeName,
@@ -359,7 +396,7 @@ export function eventToCarousel(ev: SDBEvent): CarouselMatch {
         ? extractTennisPlayers(ev.strEvent, ev.strLeague)
         : {};
     return {
-        id: ev.idEvent ?? crypto.randomUUID(),
+        id: ev.idEvent ?? `car-${ev.strHomeTeam ?? ""}-${ev.strAwayTeam ?? ""}-${ev.dateEvent ?? ""}`,
         league: ev.strLeague ?? "",
         idLeague: ev.idLeague ?? undefined,
         kickoff: iso,
@@ -577,7 +614,7 @@ function bucketPosition(strPosition: string | undefined): PitchLine | null {
 function lineupPlayerToPitch(p: SDBLineupPlayer): PitchPlayer {
     const num = p.intSquadNumber ? Number(p.intSquadNumber) : NaN;
     return {
-        id: p.idPlayer ?? p.idLineup ?? crypto.randomUUID(),
+        id: p.idPlayer ?? p.idLineup ?? `lp-${p.strPlayer ?? ""}-${p.idTeam ?? ""}-${p.strPosition ?? ""}`,
         name: p.strPlayer ?? "?",
         photoUrl: p.strCutout ?? p.strPlayerThumb ?? undefined,
         role: positionAbbr(p.strPosition),
@@ -593,7 +630,9 @@ export function lineupsToFormation(
     homeLogo?: string,
     awayLogo?: string,
     homeCoach?: string,
-    awayCoach?: string
+    awayCoach?: string,
+    homeCoachPhoto?: string,
+    awayCoachPhoto?: string
 ): { top: FormationTeam; bottom: FormationTeam } | null {
     if (!lineup || lineup.length === 0) return null;
 
@@ -618,10 +657,9 @@ export function lineupsToFormation(
         return f && /^\d(-\d)+$/.test(f) ? f : undefined;
     };
 
-    const build = (home: boolean, label: string, logoUrl?: string, coachName?: string): FormationTeam => {
+    const build = (home: boolean, label: string, logoUrl?: string, coachName?: string, coachPhotoUrl?: string): FormationTeam => {
         const gks = pick(home, "goalkeeper");
         const formation = teamFormation(home);
-        // Reshape BEFORE sorting by side, so side-sort applies to the final lines.
         const reshaped = reshapeByFormation(
             pick(home, "defender"),
             pick(home, "midfielder"),
@@ -638,6 +676,7 @@ export function lineupsToFormation(
             label,
             logoUrl,
             coachName,
+            coachPhotoUrl,
             formation,
             goalkeeper: gk,
             defense: defs.map(toPlayer),
@@ -647,8 +686,8 @@ export function lineupsToFormation(
     };
 
     return {
-        top: build(true, homeLabel, homeLogo, homeCoach),
-        bottom: build(false, awayLabel, awayLogo, awayCoach),
+        top: build(true, homeLabel, homeLogo, homeCoach, homeCoachPhoto),
+        bottom: build(false, awayLabel, awayLogo, awayCoach, awayCoachPhoto),
     };
 }
 
@@ -666,7 +705,9 @@ export function predictedFormationFromPrevLineups(
     homeLogo?: string,
     awayLogo?: string,
     homeCoach?: string,
-    awayCoach?: string
+    awayCoach?: string,
+    homeCoachPhoto?: string,
+    awayCoachPhoto?: string
 ): { top: FormationTeam; bottom: FormationTeam } | null {
     const isSub = (p: SDBLineupPlayer) =>
         p.strSubstitute === "1" || p.strSubstitute?.toLowerCase() === "yes";
@@ -676,7 +717,8 @@ export function predictedFormationFromPrevLineups(
         teamId: string | undefined,
         label: string,
         logoUrl?: string,
-        coachName?: string
+        coachName?: string,
+        coachPhotoUrl?: string
     ): FormationTeam | null => {
         if (!lineup || lineup.length === 0 || !teamId) return null;
         const own = lineup.filter(p => p.idTeam === teamId && !isSub(p));
@@ -702,6 +744,7 @@ export function predictedFormationFromPrevLineups(
             label,
             logoUrl,
             coachName,
+            coachPhotoUrl,
             formation,
             goalkeeper: gk,
             defense: defs.map(lineupPlayerToPitch),
@@ -710,8 +753,8 @@ export function predictedFormationFromPrevLineups(
         };
     };
 
-    const top = buildSide(homePrevLineup, homeTeamId, homeLabel, homeLogo, homeCoach);
-    const bottom = buildSide(awayPrevLineup, awayTeamId, awayLabel, awayLogo, awayCoach);
+    const top = buildSide(homePrevLineup, homeTeamId, homeLabel, homeLogo, homeCoach, homeCoachPhoto);
+    const bottom = buildSide(awayPrevLineup, awayTeamId, awayLabel, awayLogo, awayCoach, awayCoachPhoto);
     if (!top && !bottom) return null;
     const empty = (label: string, logoUrl?: string): FormationTeam => ({
         label,
@@ -1055,15 +1098,6 @@ export interface BenchPlayer {
     minuteOn?: number;
 }
 
-// Subscribe one team's bench from the lineup endpoint, then enrich with
-// timeline "Substitution" events to show who each came on for.
-//
-// Lineup sub rows: `strSubstitute` is "Yes"/"1" and we filter by home/away.
-// Timeline sub rows: `strTimeline` is "Substitution" (sometimes "Substitute"
-// or "Sub"). TheSportsDB encodes:
-//   strPlayer  = player coming ON
-//   strAssist  = player going OFF  (reuses the "assist" field)
-// We match those against the bench roster by name.
 export function lineupToBench(
     lineup: SDBLineupPlayer[] | null | undefined,
     timeline: SDBTimelineEvent[] | null | undefined
@@ -1093,7 +1127,7 @@ export function lineupToBench(
         const sub = subsByIncoming.get(name.trim().toLowerCase());
         const num = p.intSquadNumber ? Number(p.intSquadNumber) : NaN;
         return {
-            id: p.idPlayer ?? p.idLineup ?? crypto.randomUUID(),
+            id: p.idPlayer ?? p.idLineup ?? `bench-${name}-${p.idTeam ?? ""}`,
             name,
             number: Number.isFinite(num) ? num : undefined,
             photoUrl: p.strCutout ?? p.strPlayerThumb ?? undefined,

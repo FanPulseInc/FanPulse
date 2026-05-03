@@ -167,6 +167,18 @@ export default function FootballPage() {
         if (target && target !== dateIso) setDateIso(target);
     };
 
+    const leagueParam = searchParams.get("league");
+    useEffect(() => {
+        if (!leagueParam) return;
+        const idx = TOP_LEAGUES.findIndex(l => l.id === leagueParam);
+        if (idx < 0) return;
+        const events: SDBEvent[] =
+            seasonQueries[idx].data?.schedule ?? seasonQueries[idx].data?.events ?? [];
+        if (events.length === 0) return;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        onPickCompetitionAction(leagueParam);
+    }, [leagueParam, seasonQueries]);
+
     // Carousel: 5 earliest upcoming matches from ANY of the top leagues,
     // looking forward from today.
     const carouselMatches = useMemo(() => {

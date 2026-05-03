@@ -207,6 +207,105 @@ export function useTeamPreviousEvents(teamId: string | undefined) {
     });
 }
 
+export interface SDBEventResult {
+    idResult?: string;
+    idEvent?: string;
+    intRank?: string;
+    intPosition?: string;
+    strResult?: string;
+    strPlayer?: string;
+    idPlayer?: string;
+    strTeam?: string;
+    idTeam?: string;
+    strTime?: string;
+    strInterval?: string;
+    intLap?: string;
+    intLaps?: string;
+    intPoints?: string;
+    strStatus?: string;
+    strCountry?: string;
+    strNationality?: string;
+    strThumb?: string | null;
+    strCutout?: string | null;
+    strTeamBadge?: string | null;
+}
+
+export interface ScrapedRaceRow {
+    position: number;
+    name: string;
+    team?: string;
+    teamBadge?: string;
+    photoUrl?: string;
+    equipmentUrl?: string;
+    country?: string;
+    interval?: string;
+}
+
+export function useScrapedRaceResults(eventId: string | undefined) {
+    return useQuery({
+        queryKey: ["race-results-scrape", eventId],
+        queryFn: async () => {
+            const res = await fetch(`/api/race-results/${eventId}`);
+            if (!res.ok) return { results: [] as ScrapedRaceRow[] };
+            return (await res.json()) as { results: ScrapedRaceRow[] };
+        },
+        enabled: !!eventId && /^\d+$/.test(eventId),
+        staleTime: 5 * 60_000,
+        refetchInterval: 60_000,
+    });
+}
+
+export function useEventResults(eventId: string | undefined) {
+    return useQuery({
+        queryKey: ["sdb", "event-results", eventId],
+        queryFn: () => sdbGet<{ results?: SDBEventResult[] | null; lookup?: SDBEventResult[] | null }>(`lookup/event_results/${eventId}`),
+        enabled: !!eventId,
+        refetchInterval: 60_000,
+        staleTime: 30_000,
+    });
+}
+
+export function useLeagueTeams(leagueId: string | undefined) {
+    return useQuery({
+        queryKey: ["sdb", "league-teams", leagueId],
+        queryFn: () => sdbGet<SDBTeamsResponse>(`list/teams/${leagueId}`),
+        enabled: !!leagueId,
+        staleTime: 60 * 60_000,
+    });
+}
+
+export function useLeagueDrivers(leagueId: string | undefined): { name: string; team: string; photoUrl?: string; nationality?: string }[] {
+    const { data: teamsData } = useLeagueTeams(leagueId);
+    const teams = teamsData?.teams ?? teamsData?.lookup ?? [];
+    const teamIds = teams.map(t => t.idTeam).filter((id): id is string => !!id);
+    const rosterQueries = useQueries({
+        queries: teamIds.map(id => ({
+            queryKey: ["sdb", "team-players", id],
+            queryFn: () => sdbGet<SDBTeamPlayersResponse>(`list/players/${id}`),
+            enabled: !!id,
+            staleTime: 60 * 60_000,
+        })),
+    });
+    const drivers: { name: string; team: string; photoUrl?: string; nationality?: string }[] = [];
+    rosterQueries.forEach((q, i) => {
+        const list = q.data?.player ?? q.data?.list ?? [];
+        const teamName = teams[i]?.strTeam ?? "";
+        list.forEach(p => {
+            const pos = (p.strPosition ?? "").toLowerCase();
+            if (pos.includes("manager") || pos.includes("coach") || pos.includes("director") || pos.includes("president") || pos.includes("staff") || pos.includes("engineer") || pos.includes("trainer") || pos.includes("owner")) return;
+            const name = (p.strPlayer ?? "").trim();
+            if (!name) return;
+            drivers.push({
+                name,
+                team: teamName,
+                photoUrl: p.strCutout ?? p.strThumb ?? undefined,
+                nationality: p.strNationality ?? undefined,
+            });
+        });
+    });
+    return drivers;
+}
+
 export function useTeamPlayers(teamId: string | undefined) {
     return useQuery({
         queryKey: ["sdb", "team-players", teamId],
@@ -214,6 +313,57 @@ export function useTeamPlayers(teamId: string | undefined) {
         enabled: !!teamId,
         staleTime: 60 * 60_000,
     });
+}
+
+export interface SDBSearchedPlayer {
+    idPlayer?: string;
+    strPlayer?: string;
+    strSport?: string;
+    strThumb?: string | null;
+    strCutout?: string | null;
+    strRender?: string | null;
+    strNationality?: string | null;
+}
+
+async function searchPlayersV1(name: string): Promise<SDBSearchedPlayer[]> {
+    const res = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`);
+    if (!res.ok) return [];
+    const data = (await res.json()) as { player?: SDBSearchedPlayer[] | null };
+    return data.player ?? [];
+}
+
+export function usePlayerSearch(name: string | undefined, sport?: string) {
+    return useQuery({
+        queryKey: ["sdb", "player-search", name, sport],
+        queryFn: async () => {
+            const all = await searchPlayersV1(name ?? "");
+            if (!sport) return all;
+            return all.filter(p => (p.strSport ?? "").toLowerCase() === sport.toLowerCase());
+        },
+        enabled: !!name && name.length >= 2,
+        staleTime: 60 * 60_000,
+    });
+}
+
+export function usePlayerPhotos(names: (string | undefined)[], sport?: string): Record<string, string | undefined> {
+    const unique = Array.from(new Set(names.filter((n): n is string => !!n && n.length >= 2)));
+    const queries = useQueries({
+        queries: unique.map(name => ({
+            queryKey: ["sdb", "player-search", name, sport],
+            queryFn: async () => {
+                const all = await searchPlayersV1(name);
+                return sport ? all.filter(p => (p.strSport ?? "").toLowerCase() === sport.toLowerCase()) : all;
+            },
+            enabled: name.length >= 2,
+            staleTime: 60 * 60_000,
+        })),
+    });
+    const map: Record<string, string | undefined> = {};
+    queries.forEach((q, i) => {
+        const first = q.data?.[0];
+        map[unique[i]] = first?.strCutout ?? first?.strThumb ?? undefined;
+    });
+    return map;
 }
 
 // Team details (for logos, manager name, etc.)

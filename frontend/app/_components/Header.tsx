@@ -1,16 +1,82 @@
 'use client'
 import Link from "next/link";
-import { useState } from "react";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { ICONS } from "../svg";
 import { useUserStore } from "@/store/useUserStore";
 import { useRouter } from "next/navigation";
-import { useGetApiCategoryRoots } from "@/services/api/generated";
+import { useLeagueLookups } from "@/services/sportsdb/hooks";
 
 const navItems = [
     { icon: ICONS.HOME, label: "ГОЛОВНА", href: "/" },
     { icon: ICONS.SPORT, label: "СПОРТ", href: "/sport" },
     { icon: ICONS.ESPORT, label: "КІБЕРСПОРТ", href: "/esports" },
     { icon: ICONS.FORUM, label: "ФОРУМ", href: "/forum" },
+];
+
+interface SportEntry {
+    key: string;
+    label: string;
+    icon: React.ReactNode;
+    href: string;
+    leagues: { id: string; name: string }[];
+}
+
+const SPORT_MENU: SportEntry[] = [
+    {
+        key: "football",
+        label: "Футбол",
+        icon: ICONS.FOOTBALL,
+        href: "/football",
+        leagues: [
+            { id: "4328", name: "Premier League" },
+            { id: "4335", name: "La Liga" },
+            { id: "4331", name: "Bundesliga" },
+            { id: "4332", name: "Serie A" },
+            { id: "4334", name: "Ligue 1" },
+            { id: "4480", name: "UEFA Champions League" },
+            { id: "4481", name: "UEFA Europa League" },
+            { id: "5071", name: "UEFA Conference League" },
+        ],
+    },
+    {
+        key: "basketball",
+        label: "Баскетбол",
+        icon: ICONS.BASCETBALL,
+        href: "/basketball",
+        leagues: [{ id: "4387", name: "NBA" }],
+    },
+    {
+        key: "tennis",
+        label: "Теніс",
+        icon: ICONS.TENIS,
+        href: "/tennis",
+        leagues: [
+            { id: "4464", name: "ATP Tour" },
+            { id: "4517", name: "WTA Tour" },
+            { id: "4581", name: "Laver Cup" },
+        ],
+    },
+    {
+        key: "american-football",
+        label: "Американський футбол",
+        icon: ICONS.RUGBY,
+        href: "/american-football",
+        leagues: [{ id: "4391", name: "NFL" }],
+    },
+    {
+        key: "motorsport",
+        label: "Мотоспорт",
+        icon: ICONS.MOTO,
+        href: "/motorsport",
+        leagues: [
+            { id: "4370", name: "Formula 1" },
+            { id: "4486", name: "Formula 2" },
+            { id: "4371", name: "Formula E" },
+            { id: "4413", name: "WEC" },
+            { id: "4409", name: "WRC" },
+        ],
+    },
 ];
 
 
@@ -21,7 +87,37 @@ const Header = () => {
     const { user } = useUserStore()
     const router = useRouter()
     const [isSportOpen, setIsSportOpen] = useState(false);
-    const { data: categories } = useGetApiCategoryRoots();
+    const [hoveredSport, setHoveredSport] = useState<string>(SPORT_MENU[0].key);
+    const activeSport = SPORT_MENU.find(s => s.key === hoveredSport) ?? SPORT_MENU[0];
+    const sportMenuRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!isSportOpen) return;
+        const handlePointer = (e: MouseEvent) => {
+            const target = e.target as Node | null;
+            if (sportMenuRef.current && target && !sportMenuRef.current.contains(target)) {
+                setIsSportOpen(false);
+            }
+        };
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setIsSportOpen(false);
+        };
+        document.addEventListener("mousedown", handlePointer);
+        document.addEventListener("keydown", handleEscape);
+        return () => {
+            document.removeEventListener("mousedown", handlePointer);
+            document.removeEventListener("keydown", handleEscape);
+        };
+    }, [isSportOpen]);
+    const activeBadgeQueries = useLeagueLookups(activeSport.leagues.map(l => l.id));
+    const badgeFor = (idx: number): string | undefined =>
+        activeBadgeQueries[idx]?.data?.lookup?.[0]?.strBadge ?? undefined;
+
+    const goToSport = (entry: SportEntry, leagueId?: string) => {
+        const url = leagueId ? `${entry.href}?league=${leagueId}` : entry.href;
+        router.push(url);
+        setIsSportOpen(false);
+    };
 
 
     return (
@@ -85,7 +181,7 @@ const Header = () => {
                         {navItems.map((item, index) => {
                             if (item.label === "СПОРТ") {
                                 return (
-                                    <div key={index} className="relative">
+                                    <div key={index} className="relative" ref={sportMenuRef}>
                                         <button
                                             onClick={() => setIsSportOpen(!isSportOpen)}
                                             className="flex items-center justify-center gap-2 p-2.5 rounded-[10px] hover:bg-brand-red/5 transition-colors group cursor-pointer"
@@ -103,98 +199,67 @@ const Header = () => {
 
                                         <div
                                             className={`absolute top-[60px] lg:top-[75px] left-0 z-50 w-[min(760px,calc(100vw-2rem))] h-auto
-                                                        pt-6 pl-6 pr-6 pb-8 lg:pt-8 lg:pl-12 lg:pr-8 lg:pb-10
                                                         bg-[#ffffff] border-[2px] border-[#af292a] rounded-[20px]
-                                                        shadow-2xl transition-all duration-300 ease-in-out origin-top ${
+                                                        shadow-2xl transition-all duration-300 ease-in-out origin-top overflow-hidden ${
                                                 isSportOpen
                                                     ? "opacity-100 scale-y-100 pointer-events-auto"
                                                     : "opacity-0 scale-y-0 pointer-events-none"
                                             }`}
                                         >
-                                            <div className="flex flex-col gap-6">
-                                                <button
-                                                    key="football"
-                                                    onClick={() => {
-                                                        router.push("/football");
-                                                        setIsSportOpen(false);
-                                                    }}
-                                                    className="flex items-center gap-2 group cursor-pointer w-full"
-                                                >
-                                                    <div className="w-8 h-8 flex items-center justify-center">
-                                                        {ICONS.FOOTBALL}
-                                                    </div>
-                                                    <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
-                                                        Футбол
-                                                    </span>
-                                                </button>
-                                                <button
-                                                    key="basketball"
-                                                    onClick={() => {
-                                                        router.push("/basketball");
-                                                        setIsSportOpen(false);
-                                                    }}
-                                                    className="flex items-center gap-2 group cursor-pointer w-full"
-                                                >
-                                                    <div className="w-8 h-8 flex items-center justify-center">
-                                                        {ICONS.BASCETBALL}
-                                                    </div>
-                                                    <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
-                                                        Баскетбол
-                                                    </span>
-                                                </button>
-                                                <button
-                                                    key="tennis"
-                                                    onClick={() => {
-                                                        router.push("/tennis");
-                                                        setIsSportOpen(false);
-                                                    }}
-                                                    className="flex items-center gap-2 group cursor-pointer w-full"
-                                                >
-                                                    <div className="w-8 h-8 flex items-center justify-center">
-                                                        {ICONS.TENIS}
-                                                    </div>
-                                                    <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
-                                                        Теніс
-                                                    </span>
-                                                </button>
-                                                <button
-                                                    key="american-football"
-                                                    onClick={() => {
-                                                        router.push("/american-football");
-                                                        setIsSportOpen(false);
-                                                    }}
-                                                    className="flex items-center gap-2 group cursor-pointer w-full"
-                                                >
-                                                    <div className="w-8 h-8 flex items-center justify-center">
-                                                        {ICONS.RUGBY}
-                                                    </div>
-                                                    <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
-                                                        Американський футбол
-                                                    </span>
-                                                </button>
-                                                {categories
-                                                    ?.filter((cat) => {
-                                                        const n = cat.name?.toLowerCase() ?? "";
-                                                        return n !== "футбол" && n !== "football" && n !== "баскетбол" && n !== "basketball" && n !== "теніс" && n !== "tennis" && n !== "американський футбол" && n !== "american football";
-                                                    })
-                                                    .map((cat) => (
+                                            <div className="grid grid-cols-1 sm:grid-cols-[260px_1fr]">
+                                                <div className="flex flex-col gap-1 p-4 sm:p-6 sm:border-r border-gray-200 bg-[#fafafa]">
+                                                    {SPORT_MENU.map(s => (
                                                         <button
-                                                            key={cat.id}
-                                                            onClick={() => {
-                                                                router.push(`/sport/${cat.id}`);
-                                                                setIsSportOpen(false);
-                                                            }}
-                                                            className="flex items-center gap-1 group cursor-pointer w-full"
+                                                            key={s.key}
+                                                            onClick={() => goToSport(s)}
+                                                            onMouseEnter={() => setHoveredSport(s.key)}
+                                                            onFocus={() => setHoveredSport(s.key)}
+                                                            className={`flex items-center gap-2 px-3 py-2 rounded-[10px] text-left cursor-pointer transition-colors ${
+                                                                hoveredSport === s.key
+                                                                    ? "bg-[#af292a]/10"
+                                                                    : "hover:bg-[#af292a]/5"
+                                                            }`}
                                                         >
-                                                            <div className="w-8 h-8 flex items-center justify-center">
-                                                                {/* Тут можна додати мапінг іконок, наприклад: {getIcon(cat.name)} */}
-                                                                {ICONS.SPORT}
+                                                            <div className="w-7 h-7 flex items-center justify-center shrink-0">
+                                                                {s.icon}
                                                             </div>
-                                                            <span className="text-[18px] font-bold text-[#212121] leading-none group-hover:text-[#af292a] transition-colors">
-                                                                {cat.name}
+                                                            <span className={`text-[15px] font-bold leading-tight transition-colors ${
+                                                                hoveredSport === s.key ? "text-[#af292a]" : "text-[#212121]"
+                                                            }`}>
+                                                                {s.label}
                                                             </span>
                                                         </button>
                                                     ))}
+                                                </div>
+                                                <div className="flex flex-col gap-1 p-4 sm:p-6">
+                                                    <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1">
+                                                        Топ ліги
+                                                    </span>
+                                                    {activeSport.leagues.map((l, i) => {
+                                                        const badge = badgeFor(i);
+                                                        return (
+                                                            <button
+                                                                key={l.id}
+                                                                onClick={() => goToSport(activeSport, l.id)}
+                                                                className="flex items-center gap-3 px-3 py-2 rounded-[8px] text-[14px] font-medium text-[#212121] hover:bg-[#af292a]/5 hover:text-[#af292a] transition-colors cursor-pointer"
+                                                            >
+                                                                {badge ? (
+                                                                    <Image
+                                                                        src={badge}
+                                                                        alt=""
+                                                                        width={28}
+                                                                        height={28}
+                                                                        unoptimized
+                                                                        className="w-7 h-7 object-contain shrink-0"
+                                                                    />
+                                                                ) : (
+                                                                    <span className="w-7 h-7 rounded-full bg-gray-200 shrink-0" />
+                                                                )}
+                                                                <span className="truncate">{l.name}</span>
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

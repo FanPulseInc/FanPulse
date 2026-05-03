@@ -4,32 +4,28 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SportContainer } from "../_components/_shared/SportContainer";
 import ScheduleColumn, {
     type ScheduleGroup,
+    type ScheduleMatch,
     type CompetitionOption,
 } from "../_components/_shared/ScheduleColumn";
-import MatchCarousel from "../_components/_shared/MatchCarousel";
+import MotorsportCarousel from "../_components/_motorsport/MotorsportCarousel";
 import {
     useLiveScores,
     useLeagueSeasons,
     useLeagueLookups,
-    usePreviousLeagueEvents,
-    usePlayerPhotos,
 } from "@/services/sportsdb/hooks";
-import {
-    liveToScheduleRow,
-    eventToScheduleRow,
-    eventToCarousel,
-    localDateIsoOf,
-    formatElapsed,
-} from "@/services/sportsdb/adapters";
+import { localDateIsoOf, parseSdbUtc } from "@/services/sportsdb/adapters";
+import { countryToFlagUrl } from "@/services/sportsdb/flags";
 import type { SDBEvent } from "@/services/sportsdb/types";
 
 const TOP_LEAGUES: { id: string; name: string }[] = [
-    { id: "4464", name: "ATP World Tour" },
-    { id: "4517", name: "WTA Tour" },
-    { id: "4581", name: "Laver Cup" },
+    { id: "4370", name: "Formula 1" },
+    { id: "4486", name: "Formula 2" },
+    { id: "4371", name: "Formula E" },
+    { id: "4413", name: "WEC" },
+    { id: "4409", name: "WRC" },
 ];
 
-function currentTennisSeason(now = new Date()): string {
+function currentMotorsportSeason(now = new Date()): string {
     return String(now.getFullYear());
 }
 
@@ -56,7 +52,53 @@ function formatDateLabel(iso: string): string {
     return `${d}.${m}.${y.slice(2)}`;
 }
 
-export default function TennisPage() {
+function hmFromTimestamp(ev: SDBEvent): string {
+    const d = parseSdbUtc(ev.strTimestamp);
+    if (d) {
+        const hh = String(d.getHours()).padStart(2, "0");
+        const mm = String(d.getMinutes()).padStart(2, "0");
+        return `${hh}:${mm}`;
+    }
+    if (ev.strTime && /\d{2}:\d{2}/.test(ev.strTime)) return ev.strTime.slice(0, 5);
+    return "12:00";
+}
+
+function parseStageLabel(strEvent: string | undefined): string {
+    if (!strEvent) return "Гран-При";
+    const lower = strEvent.toLowerCase();
+    if (lower.includes("free practice 3") || lower.includes("practice 3") || lower.includes("fp3")) return "Практика 3";
+    if (lower.includes("free practice 2") || lower.includes("practice 2") || lower.includes("fp2")) return "Практика 2";
+    if (lower.includes("free practice 1") || lower.includes("practice 1") || lower.includes("fp1")) return "Практика 1";
+    if (lower.includes("sprint qualifying") || lower.includes("sprint shootout")) return "Спринт-кваліфікація";
+    if (lower.includes("sprint race") || lower.includes("sprint")) return "Спринт";
+    if (lower.includes("qualifying") || lower.includes("quali")) return "Кваліфікація";
+    if (lower.includes("race") || lower.includes("grand prix") || lower.includes("rally")) return "Гонка";
+    return "Гран-При";
+}
+
+function trackOf(ev: SDBEvent): string | undefined {
+    const v = (ev.strVenue ?? ev.strCity ?? "").trim();
+    return v.length > 0 ? v : undefined;
+}
+
+function eventToScheduleMatch(ev: SDBEvent): ScheduleMatch {
+    const flag = countryToFlagUrl(ev.strCountry, 80);
+    return {
+        id: ev.idEvent ?? crypto.randomUUID(),
+        time: hmFromTimestamp(ev),
+        startIso: ev.strTimestamp ?? undefined,
+        homeTeam: "",
+        awayTeam: "",
+        competitionName: ev.strLeague ?? "",
+        competitionBadge: ev.strLeagueBadge ?? undefined,
+        countryFlag: flag || undefined,
+        trackName: trackOf(ev),
+        stageLabel: parseStageLabel(ev.strEvent ?? undefined),
+        status: "upcoming",
+    };
+}
+
+export default function MotorsportPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialDate = searchParams.get("date") || todayIso();
@@ -67,27 +109,19 @@ export default function TennisPage() {
         if (current === dateIso) return;
         const next = new URLSearchParams(searchParams.toString());
         next.set("date", dateIso);
-        router.replace(`/tennis?${next.toString()}`, { scroll: false });
+        router.replace(`/motorsport?${next.toString()}`, { scroll: false });
     }, [dateIso, router, searchParams]);
 
-    const season = currentTennisSeason(new Date(dateIso + "T00:00:00"));
+    const season = currentMotorsportSeason(new Date(dateIso + "T00:00:00"));
 
     const leagueIds = TOP_LEAGUES.map(l => l.id);
     const seasonQueries = useLeagueSeasons(leagueIds, season);
     const leagueQueries = useLeagueLookups(leagueIds);
-    const { data: liveData } = useLiveScores("tennis");
-    const { data: previousData } = usePreviousLeagueEvents(leagueIds[0]);
+    useLiveScores("motorsport");
 
     const anyLoading = seasonQueries.some(q => q.isLoading);
 
-    const baseGroups: ScheduleGroup[] = useMemo(() => {
-        const liveById = new Map(
-            (liveData?.livescore ?? []).map(l => [l.idEvent ?? "", l])
-        );
-        const previousById = new Map(
-            (previousData?.events ?? previousData?.lookup ?? []).map(e => [e.idEvent ?? "", e])
-        );
-
+    const groups: ScheduleGroup[] = useMemo(() => {
         return TOP_LEAGUES.map((cfg, i) => {
             const seasonResp = seasonQueries[i].data;
             const leagueResp = leagueQueries[i].data;
@@ -97,32 +131,11 @@ export default function TennisPage() {
                 seasonResp?.schedule ?? seasonResp?.events ?? [];
 
             const forDay = events.filter(ev => localDateIsoOf(ev) === dateIso);
-
+            const sharedTrack = forDay.map(trackOf).find((t): t is string => !!t);
             const rows = forDay.map(ev => {
-                const missingScore =
-                    ev.intHomeScore == null || ev.intHomeScore === "" ||
-                    ev.intAwayScore == null || ev.intAwayScore === "";
-                const prev = ev.idEvent ? previousById.get(ev.idEvent) : undefined;
-                const merged: SDBEvent =
-                    missingScore && prev
-                        ? {
-                              ...ev,
-                              intHomeScore: prev.intHomeScore ?? ev.intHomeScore,
-                              intAwayScore: prev.intAwayScore ?? ev.intAwayScore,
-                              strResult: prev.strResult ?? ev.strResult,
-                          }
-                        : ev;
-                const base = eventToScheduleRow(merged);
-                const live = ev.idEvent ? liveById.get(ev.idEvent) : undefined;
-                return live ? { ...base, ...liveToScheduleRow(live) } : base;
-            });
-
-            rows.sort((a, b) => {
-                const order: Record<string, number> = { live: 0, upcoming: 1, past: 2 };
-                const ra = order[a.status ?? "upcoming"] ?? 1;
-                const rb = order[b.status ?? "upcoming"] ?? 1;
-                if (ra !== rb) return ra - rb;
-                return (a.time ?? "").localeCompare(b.time ?? "");
+                const m = eventToScheduleMatch(ev);
+                if (!m.trackName && sharedTrack) m.trackName = sharedTrack;
+                return m;
             });
 
             return {
@@ -133,30 +146,7 @@ export default function TennisPage() {
                 matches: rows,
             };
         });
-    }, [seasonQueries, leagueQueries, liveData, previousData, dateIso]);
-
-    const allPlayerNames = useMemo(() => {
-        const names: string[] = [];
-        baseGroups.forEach(g => g.matches.forEach(m => {
-            if (m.homeTeam) names.push(m.homeTeam);
-            if (m.awayTeam) names.push(m.awayTeam);
-        }));
-        return names;
-    }, [baseGroups]);
-
-    const photoMap = usePlayerPhotos(allPlayerNames, "Tennis");
-
-    const groups: ScheduleGroup[] = useMemo(
-        () => baseGroups.map(g => ({
-            ...g,
-            matches: g.matches.map(m => ({
-                ...m,
-                homeLogo: m.homeLogo ?? (m.homeTeam ? photoMap[m.homeTeam] : undefined),
-                awayLogo: m.awayLogo ?? (m.awayTeam ? photoMap[m.awayTeam] : undefined),
-            })),
-        })),
-        [baseGroups, photoMap]
-    );
+    }, [seasonQueries, leagueQueries, dateIso]);
 
     const competitions: CompetitionOption[] = useMemo(
         () =>
@@ -197,64 +187,29 @@ export default function TennisPage() {
         onPickCompetitionAction(leagueParam);
     }, [leagueParam, seasonQueries]);
 
-    const carouselMatches = useMemo(() => {
+    const carouselItems = useMemo(() => {
         const today = todayIso();
-        const all: SDBEvent[] = seasonQueries.flatMap(
-            q => q.data?.schedule ?? q.data?.events ?? []
-        );
-        const upcoming = all
-            .filter(ev => {
-                if (!ev.dateEvent) return false;
-                if (ev.dateEvent < today) return false;
-                const status = (ev.strStatus ?? "").toLowerCase();
-                return !status.includes("finish") && !status.includes("ft");
-            })
-            .sort((a, b) => (a.strTimestamp ?? "").localeCompare(b.strTimestamp ?? ""))
-            .slice(0, 5);
         const badgeByLeague = new Map<string, string>();
         leagueQueries.forEach((q, i) => {
             const b = q.data?.lookup?.[0]?.strBadge;
             if (b) badgeByLeague.set(leagueIds[i], b);
         });
-        const liveById = new Map(
-            (liveData?.livescore ?? []).map(l => [l.idEvent ?? "", l])
+        const all: SDBEvent[] = seasonQueries.flatMap(
+            q => q.data?.schedule ?? q.data?.events ?? []
         );
-        return upcoming.map(ev => {
-            const base = eventToCarousel(ev);
-            const badge = base.idLeague ? badgeByLeague.get(base.idLeague) : undefined;
-            const live = ev.idEvent ? liveById.get(ev.idEvent) : undefined;
-            const statusStr = (live?.strStatus ?? ev.strStatus ?? "").toLowerCase();
-            const finished =
-                statusStr === "ft" ||
-                statusStr.includes("finish") ||
-                statusStr === "final";
-            const liveNow =
-                !finished &&
-                !!(live?.strProgress && live.strProgress !== "0");
-            return {
-                ...base,
-                leagueBadge: badge ?? base.leagueBadge,
-                status: (finished ? "finished" : liveNow ? "live" : "scheduled") as "scheduled" | "live" | "finished",
-                elapsed: liveNow
-                    ? formatElapsed(live?.strProgress, live?.strStatus)
-                    : undefined,
-                home: {
-                    ...base.home,
-                    score:
-                        (liveNow || finished) && live?.intHomeScore != null
-                            ? Number(live.intHomeScore)
-                            : undefined,
-                },
-                away: {
-                    ...base.away,
-                    score:
-                        (liveNow || finished) && live?.intAwayScore != null
-                            ? Number(live.intAwayScore)
-                            : undefined,
-                },
-            };
-        });
-    }, [seasonQueries, leagueQueries, leagueIds, liveData]);
+        const upcoming = all
+            .filter(ev => ev.dateEvent && ev.dateEvent >= today)
+            .filter(ev => !!(ev.strPoster ?? ev.strThumb))
+            .sort((a, b) => (a.strTimestamp ?? "").localeCompare(b.strTimestamp ?? ""))
+            .slice(0, 5);
+        return upcoming.map(ev => ({
+            id: ev.idEvent ?? "",
+            league: ev.strLeague ?? "",
+            leagueBadge: (ev.idLeague ? badgeByLeague.get(ev.idLeague) : undefined) ?? ev.strLeagueBadge ?? undefined,
+            posterUrl: ev.strPoster ?? ev.strThumb ?? undefined,
+            raceName: ev.strEvent ?? undefined,
+        }));
+    }, [seasonQueries, leagueQueries, leagueIds]);
 
     return (
         <SportContainer>
@@ -262,7 +217,7 @@ export default function TennisPage() {
                 <div className="flex flex-col gap-2 w-full lg:w-auto">
                     {anyLoading && (
                         <div className="w-full lg:w-[560px] text-center text-gray-500 text-sm py-2">
-                            Завантаження матчів ({season})...
+                            Завантаження перегонів ({season})...
                         </div>
                     )}
                     <ScheduleColumn
@@ -274,7 +229,7 @@ export default function TennisPage() {
                         onPickDateAction={(iso) => setDateIso(iso)}
                         competitions={competitions}
                         onPickCompetitionAction={onPickCompetitionAction}
-                        basePath="/tennis"
+                        basePath="/motorsport"
                     />
                 </div>
 
@@ -283,11 +238,11 @@ export default function TennisPage() {
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
                             Завантаження анонсів...
                         </div>
-                    ) : carouselMatches.length > 0 ? (
-                        <MatchCarousel matches={carouselMatches} />
+                    ) : carouselItems.length > 0 ? (
+                        <MotorsportCarousel items={carouselItems} />
                     ) : (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Немає найближчих матчів
+                            Немає найближчих перегонів
                         </div>
                     )}
                 </div>
