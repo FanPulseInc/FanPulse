@@ -43,6 +43,19 @@ type GridSeries = {
   } | null;
 };
 
+const mockMaps = ["DUST II", "MIRAGE", "INFERNO", "TBA", "TBA", "TBA", "TBA"];
+const mockPlayers = ["s1mple", "b1t", "iM", "Aleksib", "jL"];
+
+const mockStats = [
+  ["WIN", "19%", "14%"],
+  ["KILLS PER ROUND", "1.11", "1.17"],
+  ["TEAM RATING", "1.17", "1.11"],
+  ["KAST", "72%", "77%"],
+  ["MATCH WIN RATE", "13%", "11%"],
+  ["FIRST KILL", "11%", "11%"],
+  ["WIN PISTOL", "17%", "11%"],
+];
+
 export default function Cs2MatchPage() {
   const params = useParams();
   const seriesId = params.seriesId as string;
@@ -79,14 +92,26 @@ export default function Cs2MatchPage() {
     load();
   }, [seriesId]);
 
-  if (loading) return <PageState text="Завантаження..." />;
-  if (!match) return <PageState text="Матч не знайдено" />;
+  if (loading) {
+    return (
+      <div className="flex min-h-[500px] items-center justify-center bg-[#e9e9e9] text-sm font-black text-[#111111]">
+        Завантаження...
+      </div>
+    );
+  }
 
-  const teamAName = match.teams?.[0]?.baseInfo?.name ?? "TBA";
-  const teamBName = match.teams?.[1]?.baseInfo?.name ?? "TBA";
+  if (!match) {
+    return (
+      <div className="flex min-h-[500px] items-center justify-center bg-[#e9e9e9] text-sm font-black text-[#111111]">
+        Матч не знайдено
+      </div>
+    );
+  }
 
-  const tournamentName = match.tournament?.name ?? "Tournament";
-  const gameName = match.title?.name ?? "Counter-Strike";
+  const teamAName = match.teams?.[0]?.baseInfo?.name ?? "Natus Vincere";
+  const teamBName = match.teams?.[1]?.baseInfo?.name ?? "Team Spirit";
+
+  const tournamentName = match.tournament?.name ?? "ProLeague";
   const formatName = match.format?.nameShortened ?? match.format?.name ?? "BO3";
 
   const teamAState = match.state?.teams?.[0];
@@ -95,289 +120,392 @@ export default function Cs2MatchPage() {
   const scoreA = teamAState?.score ?? 0;
   const scoreB = teamBState?.score ?? 0;
 
-  const killsA = teamAState?.kills ?? "-";
-  const killsB = teamBState?.kills ?? "-";
+  const killsA = teamAState?.kills ?? 58;
+  const killsB = teamBState?.kills ?? 51;
 
-  const deathsA = teamAState?.deaths ?? "-";
-  const deathsB = teamBState?.deaths ?? "-";
+  const deathsA = teamAState?.deaths ?? 51;
+  const deathsB = teamBState?.deaths ?? 58;
 
-  const isLive = match.state?.started === true && match.state?.finished === false;
+  const isLive =
+    match.state?.started === true && match.state?.finished === false;
+
   const isFinished = match.state?.finished === true;
 
-  const statusLabel = isLive
-    ? "LIVE"
-    : isFinished
-      ? "Завершено"
-      : "Майбутній";
+  const statusLabel = isLive ? "LIVE" : isFinished ? "FINISHED" : "UPCOMING";
 
   const startTime = match.startTimeScheduled
     ? new Date(match.startTimeScheduled).toLocaleString("uk-UA", {
-      day: "2-digit",
-      month: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-    : "TBA";
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "23:14";
 
   return (
-    <main className="min-h-[500px] bg-[#f3f3f3] px-5 py-6">
-      <div className="mx-auto max-w-[780px] space-y-5">
-        <section className="overflow-hidden rounded-xl bg-brand-red text-white shadow-[0_12px_30px_rgba(0,0,0,0.18)]">
-          <div className="px-7 py-6">
-            <div className="text-center">
-
-
-              <h1 className="mt-2 text-[18px] font-black leading-tight">
-                {tournamentName}
-              </h1>
+    <main className="min-h-[500px] w-full bg-[#e9e9e9] px-4 py-4 text-[#111111]">
+      <div className="mx-auto flex w-full max-w-[760px] flex-col gap-3">
+        <section className="overflow-hidden rounded-[22px] bg-[#bf262b] text-white shadow-[0_8px_20px_rgba(0,0,0,0.22)]">
+          <div className="px-5 pb-5 pt-5 md:px-7 md:pb-6">
+            <div className="mx-auto max-w-[620px] text-center text-[14px] font-black uppercase leading-tight tracking-[0.12em] opacity-90 md:text-[17px]">
+              {tournamentName}
             </div>
 
-            <div className="mt-8 flex p-8 justify-center items-center gap-5">
-              <TeamCard name={teamAName} winner={teamAState?.won} />
-
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-6 font-black tracking-tighter text-white">
-                  {/* Число А */}
-                  <span className="text-[120px] leading-none drop-shadow-2xl">
-                    {scoreA}
-                  </span>
-
-                  {/* Стилизованный разделитель */}
-                  <div className="flex flex-col gap-2 opacity-30">
-                    <div className="h-3 w-3 rounded-full bg-current" />
-                    <div className="h-3 w-3 rounded-full bg-current" />
-                  </div>
-
-                  {/* Число B */}
-                  <span className="text-[120px] leading-none drop-shadow-2xl">
-                    {scoreB}
-                  </span>
+            <div className="mt-6 grid grid-cols-[1fr_120px_1fr] items-center gap-3 md:grid-cols-[1fr_170px_1fr] md:gap-5">
+              <div className="flex min-w-0 flex-col items-center text-center">
+                <div className="flex h-[88px] w-[108px] items-center justify-center rounded-[18px] bg-white shadow-[0_6px_14px_rgba(0,0,0,0.2)] md:h-[112px] md:w-[136px]">
+                  <Image
+                    src="/icons/question_mark.png"
+                    alt=""
+                    width={54}
+                    height={54}
+                    unoptimized
+                    className="object-contain md:h-[66px] md:w-[66px]"
+                  />
                 </div>
 
-                {/* Статус LIVE / Finished */}
-                <div
-                  className={`mx-auto mt-6 w-fit rounded-full px-6 py-2 text-[13px] font-black uppercase tracking-widest shadow-lg transition-all ${isLive
-                      ? "bg-red-600 text-white animate-pulse"
-                      : "bg-white/10 text-white/90 backdrop-blur-md"
-                    }`}
-                >
-                  {statusLabel}
-                </div>
-
-                <div className="mt-4 text-[14px] font-bold text-white/50 uppercase tracking-widest">
-                  {formatName} <span className="mx-2 text-white/20">|</span> {startTime}
+                <div className="mt-3 line-clamp-2 min-h-[38px] max-w-[150px] px-1 text-center text-[14px] font-black leading-[1.15] md:max-w-[190px] md:text-[17px]">
+                  {teamAName}
                 </div>
               </div>
 
+              <div className="flex flex-col items-center text-center">
+                <div className="text-[42px] font-black leading-none tracking-[-0.08em] md:text-[58px]">
+                  {scoreA}-{scoreB}
+                </div>
 
-              <TeamCard name={teamBName} winner={teamBState?.won} />
-            </div>
-          </div>
+                <div className="mt-3 rounded-full bg-white px-5 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-[#bf262b] shadow-md md:text-[13px]">
+                  {statusLabel}
+                </div>
 
-          <div className="bg-[#202020] px-7 py-4">
-            <div className="grid grid-cols-2 text-center text-[12px] font-bold text-white/80">
-              <div>Series ID</div>
+                <div className="mt-3 text-[12px] font-black uppercase tracking-[0.12em] text-white/75 md:text-[14px]">
+                  {formatName}
+                </div>
+              </div>
 
-              <div>Status</div>
-            </div>
+              <div className="flex min-w-0 flex-col items-center text-center">
+                <div className="flex h-[88px] w-[108px] items-center justify-center rounded-[18px] bg-white shadow-[0_6px_14px_rgba(0,0,0,0.2)] md:h-[112px] md:w-[136px]">
+                  <Image
+                    src="/icons/question_mark.png"
+                    alt=""
+                    width={54}
+                    height={54}
+                    unoptimized
+                    className="object-contain md:h-[66px] md:w-[66px]"
+                  />
+                </div>
 
-            <div className="mt-2 grid grid-cols-2 text-center text-[13px] font-black">
-              <div>{match.id}</div>
-
-              <div>{statusLabel}</div>
+                <div className="mt-3 line-clamp-2 min-h-[38px] max-w-[150px] px-1 text-center text-[14px] font-black leading-[1.15] md:max-w-[190px] md:text-[17px]">
+                  {teamBName}
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="grid grid-cols-2 gap-5">
-          <StatsCard
-            teamName={teamAName}
-            score={scoreA}
-            kills={killsA}
-            deaths={deathsA}
-            players={teamAState?.players}
-          />
+        <section className="overflow-hidden rounded-[14px] bg-[#111111] text-white shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
+          <div className="flex h-[48px] items-center justify-between px-4 md:h-[54px] md:px-5">
+            <div className="flex items-center gap-2">
+              <div className="rounded-[8px] bg-[#ed1c24] px-3 py-1.5 text-[12px] font-black md:text-[13px]">
+                MAP 1
+              </div>
 
-          <StatsCard
-            teamName={teamBName}
-            score={scoreB}
-            kills={killsB}
-            deaths={deathsB}
-            players={teamBState?.players}
-          />
+              <div className="rounded-[8px] bg-white/15 px-3 py-1.5 text-[12px] font-black md:text-[13px]">
+                {formatName}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-[12px] font-black md:text-[13px]">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#ed1c24]" />
+              {startTime}
+            </div>
+          </div>
         </section>
 
-        <section className="rounded-[22px] bg-white p-5 shadow-sm">
+        <section className="overflow-hidden rounded-[16px] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.13)]">
+          <div className="bg-[#111111] py-3 text-center text-[14px] font-black uppercase tracking-[0.14em] text-white md:text-[15px]">
+            Map pool
+          </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-3 text-[13px]">
-            <InfoRow label="Tournament" value={tournamentName} />
-            <InfoRow label="Game" value={gameName} />
-            <InfoRow label="Format" value={formatName} />
-            <InfoRow label="Scheduled" value={startTime} />
+          <div className="flex flex-col">
+            {mockMaps.map((map, index) => (
+              <div
+                key={`${map}-${index}`}
+                className="flex h-[38px] items-center justify-center border-t border-[#eeeeee] text-[13px] font-black uppercase text-[#ed1c24] md:h-[44px] md:text-[15px]"
+              >
+                {map}
+              </div>
+            ))}
+          </div>
+        </section>
 
+        <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+          <section className="flex min-w-0 flex-col gap-2">
+            <div className="flex h-[48px] items-center gap-3 rounded-[14px] bg-[#bf262b] px-4 text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+              <span className="h-8 w-8 shrink-0 rounded-full bg-white" />
+              <span className="line-clamp-1 text-[15px] font-black">
+                {teamAName}
+              </span>
+            </div>
+
+            <div className="rounded-[16px] bg-white px-3 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
+              <div className="flex items-start justify-between gap-2">
+                {mockPlayers.map((name, index) => (
+                  <div
+                    key={index}
+                    className="flex min-w-0 flex-1 flex-col items-center text-center"
+                  >
+                    <div className="flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-full border-[3px] border-[#bf262b] bg-[#2b3c44] md:h-[56px] md:w-[56px]">
+                      <Image
+                        src="/icons/question_mark.png"
+                        alt=""
+                        width={24}
+                        height={24}
+                        unoptimized
+                      />
+                    </div>
+
+                    <div className="mt-1 max-w-full truncate text-[11px] font-black md:text-[12px]">
+                      {name}
+                    </div>
+
+                    <div className="text-[9px] font-bold text-[#888888]">
+                      Україна
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 overflow-hidden rounded-[12px] bg-[#111111] text-white">
+                <div className="flex">
+                  {mockPlayers.map((_, index) => {
+                    const player = teamAState?.players?.[index];
+
+                    const kills =
+                      player?.kills ??
+                      Math.max(0, Math.round(killsA / 5) + index - 2);
+
+                    const deaths =
+                      player?.deaths ??
+                      Math.max(0, Math.round(deathsA / 5) + 2 - index);
+
+                    return (
+                      <div
+                        key={index}
+                        className="flex flex-1 flex-col border-l border-[#333333] px-1.5 py-2.5 text-center first:border-l-0"
+                      >
+                        <div className="flex justify-around text-[12px] font-black md:text-[13px]">
+                          <span>{kills}</span>
+                          <span>2</span>
+                          <span>{deaths}</span>
+                        </div>
+
+                        <div className="mt-1 flex justify-around text-[8px] font-bold text-[#999999]">
+                          <span>K</span>
+                          <span>A</span>
+                          <span>D</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="flex min-w-0 flex-col gap-2">
+            <div className="flex h-[48px] items-center gap-3 rounded-[14px] bg-[#bf262b] px-4 text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+              <span className="h-8 w-8 shrink-0 rounded-full bg-white" />
+              <span className="line-clamp-1 text-[15px] font-black">
+                {teamBName}
+              </span>
+            </div>
+
+            <div className="rounded-[16px] bg-white px-3 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
+              <div className="flex items-start justify-between gap-2">
+                {mockPlayers.map((name, index) => (
+                  <div
+                    key={index}
+                    className="flex min-w-0 flex-1 flex-col items-center text-center"
+                  >
+                    <div className="flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-full border-[3px] border-[#bf262b] bg-[#2b3c44] md:h-[56px] md:w-[56px]">
+                      <Image
+                        src="/icons/question_mark.png"
+                        alt=""
+                        width={24}
+                        height={24}
+                        unoptimized
+                      />
+                    </div>
+
+                    <div className="mt-1 max-w-full truncate text-[11px] font-black md:text-[12px]">
+                      {name}
+                    </div>
+
+                    <div className="text-[9px] font-bold text-[#888888]">
+                      Україна
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 overflow-hidden rounded-[12px] bg-[#111111] text-white">
+                <div className="flex">
+                  {mockPlayers.map((_, index) => {
+                    const player = teamBState?.players?.[index];
+
+                    const kills =
+                      player?.kills ??
+                      Math.max(0, Math.round(killsB / 5) + index - 2);
+
+                    const deaths =
+                      player?.deaths ??
+                      Math.max(0, Math.round(deathsB / 5) + 2 - index);
+
+                    return (
+                      <div
+                        key={index}
+                        className="flex flex-1 flex-col border-l border-[#333333] px-1.5 py-2.5 text-center first:border-l-0"
+                      >
+                        <div className="flex justify-around text-[12px] font-black md:text-[13px]">
+                          <span>{kills}</span>
+                          <span>2</span>
+                          <span>{deaths}</span>
+                        </div>
+
+                        <div className="mt-1 flex justify-around text-[8px] font-bold text-[#999999]">
+                          <span>K</span>
+                          <span>A</span>
+                          <span>D</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section className="overflow-hidden rounded-[16px] bg-white px-4 pb-5 pt-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)] md:px-5">
+          <div className="mb-4 text-center text-[15px] font-black uppercase tracking-[0.14em] md:text-[17px]">
+            Статистика
+          </div>
+
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="flex w-[78px] shrink-0 flex-col items-center text-center md:w-[95px]">
+              <div className="flex h-[110px] w-[68px] items-center justify-center overflow-hidden rounded-[12px] bg-[#111111] md:h-[130px] md:w-[80px]">
+                <Image
+                  src="/icons/question_mark.png"
+                  alt=""
+                  width={34}
+                  height={34}
+                  unoptimized
+                />
+              </div>
+
+              <div className="mt-2 line-clamp-2 max-w-full text-[10px] font-black leading-tight md:text-[12px]">
+                {teamAName}
+              </div>
+            </div>
+
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              {mockStats.map(([label, left, right], index) => (
+                <div
+                  key={label}
+                  className="grid grid-cols-[48px_1fr_48px] items-center gap-2 text-center md:grid-cols-[60px_1fr_60px]"
+                >
+                  <div className="text-[14px] font-black text-[#ed1c24] md:text-[16px]">
+                    {index === 0 ? scoreA : left}
+                  </div>
+
+                  <div className="min-w-0 text-[10px] font-black uppercase leading-tight text-[#111111] md:text-[12px]">
+                    {label}
+                  </div>
+
+                  <div className="text-[14px] font-black text-[#ed1c24] md:text-[16px]">
+                    {index === 0 ? scoreB : right}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex w-[78px] shrink-0 flex-col items-center text-center md:w-[95px]">
+              <div className="flex h-[110px] w-[68px] items-center justify-center overflow-hidden rounded-[12px] bg-[#111111] md:h-[130px] md:w-[80px]">
+                <Image
+                  src="/icons/question_mark.png"
+                  alt=""
+                  width={34}
+                  height={34}
+                  unoptimized
+                />
+              </div>
+
+              <div className="mt-2 line-clamp-2 max-w-full text-[10px] font-black leading-tight md:text-[12px]">
+                {teamBName}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-[16px] bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)] md:p-5">
+          <div className="mb-4 text-center text-[15px] font-black text-[#bf262b] md:text-[17px]">
+            Matches, past 3 months
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="min-w-0">
+              <div className="mb-3 flex items-center gap-2 text-[13px] font-black text-[#ed1c24]">
+                <span className="h-4 w-4 shrink-0 rounded-full bg-[#f1d4d4]" />
+                <span className="line-clamp-1">{teamAName}</span>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 text-[12px] font-bold"
+                  >
+                    <span className="min-w-0 flex-1 truncate text-[#666666]">
+                      Команда {index + 1}
+                    </span>
+                    <span className="shrink-0 font-black text-[#111111]">
+                      8:0
+                    </span>
+                    <span className="shrink-0 rounded-full bg-[#bf262b] px-2.5 py-1 text-[9px] font-black text-white">
+                      BO3
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="min-w-0">
+              <div className="mb-3 flex items-center gap-2 text-[13px] font-black text-[#ed1c24]">
+                <span className="h-4 w-4 shrink-0 rounded-full bg-[#f1d4d4]" />
+                <span className="line-clamp-1">{teamBName}</span>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 text-[12px] font-bold"
+                  >
+                    <span className="min-w-0 flex-1 truncate text-[#666666]">
+                      Команда {index + 1}
+                    </span>
+                    <span className="shrink-0 font-black text-[#111111]">
+                      8:0
+                    </span>
+                    <span className="shrink-0 rounded-full bg-[#bf262b] px-2.5 py-1 text-[9px] font-black text-white">
+                      BO3
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       </div>
     </main>
-  );
-}
-
-function PageState({ text }: { text: string }) {
-  return (
-    <div className="flex min-h-[500px] items-center justify-center bg-[#f3f3f3] text-sm font-bold text-[#202020]">
-      {text}
-    </div>
-  );
-}
-
-function TeamCard({
-  name,
-  winner,
-}: {
-  name: string;
-  winner?: boolean;
-}) {
-  return (
-    <div className="flex flex-col items-center text-center">
-      <div className="flex h-[78px] w-[100px] items-center justify-center overflow-hidden rounded-xl bg-white/20 ring-2 ring-white/25">
-        <Image
-          src="/icons/question_mark.png"
-          alt=""
-          width={34}
-          height={34}
-          unoptimized
-          className="object-contain"
-        />
-      </div>
-
-      <div className="mt-4 max-w-[180px] text-[16px] font-black leading-tight">
-        {name}
-      </div>
-
-      {winner !== undefined && (
-        <div className="mt-2 rounded-full bg-black/25 px-3 py-1 text-[10px] font-black uppercase">
-          {winner ? "Winner" : "Team"}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function StatsCard({
-  teamName,
-  score,
-  kills,
-  deaths,
-  players,
-}: {
-  teamName: string;
-  score: number;
-  kills: number | string;
-  deaths: number | string;
-  players?: Array<{
-    kills: number;
-    deaths: number;
-  }>;
-}) {
-  return (
-    <section className="rounded-[22px] bg-white p-5 shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-300">
-          <Image
-            src="/icons/question_mark.png"
-            alt=""
-            width={18}
-            height={18}
-            unoptimized
-          />
-        </div>
-
-        <div className="min-w-0">
-          <div className="truncate text-[14px] font-black text-[#202020]">
-            {teamName}
-          </div>
-          <div className="text-[11px] font-bold text-gray-400">Team stats</div>
-        </div>
-      </div>
-
-      <div className="mt-5 grid grid-cols-3 gap-2">
-        <MiniStat label="Score" value={score} />
-        <MiniStat label="Kills" value={kills} />
-        <MiniStat label="Deaths" value={deaths} />
-      </div>
-
-      <div className="mt-5">
-        <div className="mb-2 text-[11px] font-black uppercase text-gray-400">
-          Players
-        </div>
-
-        <div className="grid grid-cols-5 gap-2">
-          {Array.from({ length: 5 }).map((_, index) => {
-            const player = players?.[index];
-
-            return (
-              <div
-                key={index}
-                className="rounded-[12px] bg-[#202020] px-2 py-3 text-center text-white"
-              >
-                <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-full bg-gray-300">
-                  <Image
-                    src="/icons/question_mark.png"
-                    alt=""
-                    width={14}
-                    height={14}
-                    unoptimized
-                  />
-                </div>
-
-                <div className="mt-2 text-[9px] font-bold text-white/60">
-                  P{index + 1}
-                </div>
-
-                <div className="mt-2 grid grid-cols-2 text-[9px] font-black">
-                  <span>{player?.kills ?? "-"}</span>
-                  <span>{player?.deaths ?? "-"}</span>
-                </div>
-
-                <div className="mt-1 grid grid-cols-2 text-[7px] text-white/40">
-                  <span>K</span>
-                  <span>D</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function MiniStat({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
-  return (
-    <div className="rounded-[14px] bg-[#f1f1f1] px-3 py-3 text-center">
-      <div className="text-[18px] font-black text-brand-red">{value}</div>
-      <div className="mt-1 text-[10px] font-bold uppercase text-gray-500">
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[14px] bg-[#f3f3f3] px-4 py-3">
-      <div className="text-[10px] font-black uppercase tracking-wide text-gray-400">
-        {label}
-      </div>
-      <div className="mt-1 truncate text-[13px] font-bold text-[#202020]">
-        {value}
-      </div>
-    </div>
   );
 }

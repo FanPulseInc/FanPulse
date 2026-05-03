@@ -80,9 +80,9 @@ function mapToGroups(
         status === "live"
           ? "LIVE"
           : date.toLocaleTimeString("uk-UA", {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
       startIso: s.startTimeScheduled,
       homeTeam: s.teams?.[0]?.baseInfo?.name ?? "TBD",
       awayTeam: s.teams?.[1]?.baseInfo?.name ?? "TBD",
@@ -155,12 +155,12 @@ export default function Cs2Layout({ children }: { children: ReactNode }) {
       </div>
 
       <div className="flex-1 min-w-0 p-5">
-        <div className="w-full min-h-[500px] bg-white rounded-[20px] border border-gray-200 shadow-sm">
+        <div className="w-full min-h-[500px] overflow-hidden rounded-[20px] bg-zinc-200 border border-gray-200 shadow-sm">
           {children}
         </div>
       </div>
 
-      <div className="shrink-0 m-3 max-w-[280px] max-h-[1000px]">
+      <div className="shrink-0 m-3 mt-6 max-w-[280px] max-h-[1000px]">
         <img
           src="/banners/cs2_promo.gif"
           alt="cs2"

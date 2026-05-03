@@ -17,6 +17,13 @@ export type GridSeriesDetails = {
       id?: string;
       name: string;
     };
+    players?: {
+      id: string;
+      handle?: string | null;
+      firstName?: string | null;
+      lastName?: string | null;
+      nationality?: string | null;
+    }[];
   }[];
   tournament: {
     id: string;
@@ -69,6 +76,14 @@ const CS2_SERIES_DETAILS_QUERY = `
         baseInfo {
           id
           name
+        }
+
+        players {
+          id
+          handle
+          firstName
+          lastName
+          nationality
         }
       }
 
