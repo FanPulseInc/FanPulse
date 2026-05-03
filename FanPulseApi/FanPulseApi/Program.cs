@@ -1,30 +1,31 @@
 
 using FanPulseApi.Data;
+using FanPulseApi.DTO;
+using FanPulseApi.DTO.User.Validator;
 using FanPulseApi.Exceptions;
 using FanPulseApi.Middlewares;
 using FanPulseApi.Models;
 using FanPulseApi.Repositories;
-using FanPulseApi.Services;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging.Abstractions;
-using FanPulseApi.Services.Comment;
-using FanPulseApi.Validators;
-using FanPulseApi.Services.Post;
-using FanPulseApi.DTO;
-using FanPulseApi.DTO.User.Validator;
 using FanPulseApi.Repositories.Category;
 using FanPulseApi.Repositories.Comment;
 using FanPulseApi.Repositories.Likes;
-using FanPulseApi.Repositories.User;
-using FanPulseApi.Services.Category;
-using FanPulseApi.Services.User;
-using FanPulseApi.Validators.Specification;
 using FanPulseApi.Repositories.Report;
+using FanPulseApi.Repositories.User;
+using FanPulseApi.Services;
 using FanPulseApi.Services.Auth;
+using FanPulseApi.Services.Category;
+using FanPulseApi.Services.Comment;
+using FanPulseApi.Services.Email;
 using FanPulseApi.Services.Like;
+using FanPulseApi.Services.Post;
 using FanPulseApi.Services.Report;
+using FanPulseApi.Services.User;
+using FanPulseApi.Validators;
+using FanPulseApi.Validators.Specification;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
+using Resend;
 
 namespace FanPulseApi
 {
@@ -58,7 +59,18 @@ namespace FanPulseApi
             builder.Services.AddSingleton<ISpecification<string>,ProfanityFilterSpec>();
             builder.Services.AddSingleton<ISpecification<OwnerCheckRequest>, IsOwnerSpec>();
 
-            
+            builder.Services.AddOptions();
+            builder.Services.AddHttpClient<ResendClient>();
+
+            builder.Services.Configure<ResendClientOptions>(options =>
+            {
+                options.ApiToken = builder.Configuration["Resend:ApiKey"]!;
+            });
+
+            builder.Services.AddTransient<IResend, ResendClient>();
+            builder.Services.AddScoped<IEmailSender, ResendEmailSender>();
+
+
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {

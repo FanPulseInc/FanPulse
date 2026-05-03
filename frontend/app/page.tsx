@@ -84,7 +84,7 @@ export default function Page() {
               </div>
 
               <div className="flex gap-4 mb-4 justify-between px-6 min-h-[40px]">
-                {[<img src={"icons/Lol.png"} />, <img src={"icons/cs2.png"} />, <img src={"icons/dota2.png"} />].map(
+                {[<img src={"icons/cs2.jpg"} />, <img src={"icons/dota2.png"} />].map(
                   (icon, i) => (
                     <div
                       key={i}
@@ -135,7 +135,7 @@ export default function Page() {
               </div>
 
               <div className="flex justify-center gap-3 mb-4 min-h-[40px]">
-                {[<img src={"icons/Lol.png"} />, <img src={"icons/cs2.png"} />, <img src={"icons/dota2.png"} />].map(
+                {[<img src={"icons/cs2.jpg"} />, <img src={"icons/dota2.png"} />].map(
                   (icon, i) => (
                     <div
                       key={i}

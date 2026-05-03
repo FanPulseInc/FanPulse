@@ -238,6 +238,12 @@ namespace FanPulseApi.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset?>("EmailVerificationTokenExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("EmailVerificationTokenHash")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsBanned")
                         .HasColumnType("boolean");
 
@@ -312,7 +318,7 @@ namespace FanPulseApi.Migrations
                         .HasForeignKey("PostId");
 
                     b.HasOne("FanPulseApi.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -394,6 +400,8 @@ namespace FanPulseApi.Migrations
 
             modelBuilder.Entity("FanPulseApi.Models.User", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Likes");
 
                     b.Navigation("Posts");
