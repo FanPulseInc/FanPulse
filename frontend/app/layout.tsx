@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css"
 import { UserInitializer } from "./_components/UserInitializer";
+import { LangProvider } from "@/services/i18n/context";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -34,12 +35,14 @@ export default function RootGlobalLayout({ children
                 <Suspense fallback={<div>Loading...</div>}>
 
                     <QueryProvider>
-                        <UserInitializer>
-                            <Header />
-                            <Auth />
-                            {children}
-                            <Footer />
-                        </UserInitializer>
+                        <LangProvider>
+                            <UserInitializer>
+                                <Header />
+                                <Auth />
+                                {children}
+                                <Footer />
+                            </UserInitializer>
+                        </LangProvider>
                     </QueryProvider>
 
                 </Suspense>

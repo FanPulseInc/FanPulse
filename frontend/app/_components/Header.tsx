@@ -6,6 +6,7 @@ import { ICONS } from "../svg";
 import { useUserStore } from "@/store/useUserStore";
 import { useRouter } from "next/navigation";
 import { useLeagueLookups } from "@/services/sportsdb/hooks";
+import { useT } from "@/services/i18n/context";
 
 const navItems = [
     { icon: ICONS.HOME, label: "ГОЛОВНА", href: "/" },
@@ -88,10 +89,13 @@ const Header = () => {
 
     const { user } = useUserStore()
     const router = useRouter()
+    const { lang, setLang } = useT();
     const [isSportOpen, setIsSportOpen] = useState(false);
+    const [isEsportOpen, setIsEsportOpen] = useState(false);
     const [hoveredSport, setHoveredSport] = useState<string>(SPORT_MENU[0].key);
     const activeSport = SPORT_MENU.find(s => s.key === hoveredSport) ?? SPORT_MENU[0];
     const sportMenuRef = useRef<HTMLDivElement | null>(null);
+    const esportMenuRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         if (!isSportOpen) return;
@@ -111,6 +115,25 @@ const Header = () => {
             document.removeEventListener("keydown", handleEscape);
         };
     }, [isSportOpen]);
+
+    useEffect(() => {
+        if (!isEsportOpen) return;
+        const handlePointer = (e: MouseEvent) => {
+            const target = e.target as Node | null;
+            if (esportMenuRef.current && target && !esportMenuRef.current.contains(target)) {
+                setIsEsportOpen(false);
+            }
+        };
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setIsEsportOpen(false);
+        };
+        document.addEventListener("mousedown", handlePointer);
+        document.addEventListener("keydown", handleEscape);
+        return () => {
+            document.removeEventListener("mousedown", handlePointer);
+            document.removeEventListener("keydown", handleEscape);
+        };
+    }, [isEsportOpen]);
     const activeBadgeQueries = useLeagueLookups(activeSport.leagues.map(l => l.id));
     const badgeFor = (idx: number): string | undefined =>
         activeBadgeQueries[idx]?.data?.lookup?.[0]?.strBadge ?? undefined;
@@ -146,8 +169,13 @@ const Header = () => {
 
                 <div className="flex items-center gap-2 sm:gap-4 lg:gap-[25px]">
 
-                    <button className="hidden sm:flex h-[44px] lg:h-[50px] min-w-[80px] lg:min-w-[100px] items-center justify-center gap-2 px-4 lg:px-6 rounded-[50px] border-2 border-brand-red text-brand-red text-body-l font-medium cursor-pointer hover:bg-brand-red/5 transition-colors">
-                        Мова
+                    <button
+                        type="button"
+                        onClick={() => setLang(lang === "uk" ? "en" : "uk")}
+                        className="hidden sm:flex h-[44px] lg:h-[50px] min-w-[80px] lg:min-w-[100px] items-center justify-center gap-2 px-4 lg:px-6 rounded-[50px] border-2 border-brand-red text-brand-red text-body-l font-medium cursor-pointer hover:bg-brand-red/5 transition-colors"
+                        aria-label="Switch language"
+                    >
+                        {lang === "uk" ? "UA" : "EN"}
                         {ICONS.ArrowDown}
                     </button>
 
@@ -280,7 +308,7 @@ const Header = () => {
                             }
                             if (item.label === "КІБЕРСПОРТ") {
                                 return (
-                                    <div key={index} className="relative">
+                                    <div key={index} className="relative" ref={esportMenuRef}>
                                         <button
                                             onClick={() => setIsEsportOpen(!isEsportOpen)}
                                             className="flex items-center justify-center gap-2 p-2.5 rounded-[10px] hover:bg-brand-red/5 transition-colors group cursor-pointer"
