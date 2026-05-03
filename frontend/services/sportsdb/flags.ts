@@ -170,7 +170,16 @@ export function countryToFlag(country: string | undefined): string {
     const iso = NAME_TO_ISO[key];
     if (!iso) return "";
     if (iso.startsWith("GB-")) return subdivisionEmoji(iso);
-    // Kosovo has no official ISO code / emoji — fall through to empty.
     if (iso === "XK") return "";
     return isoToEmoji(iso);
+}
+
+export function countryToFlagUrl(country: string | undefined, size: number = 80): string | undefined {
+    if (!country) return undefined;
+    const key = country.trim().toLowerCase();
+    const iso = NAME_TO_ISO[key];
+    if (!iso) return undefined;
+    const cdnIso = iso.startsWith("GB-") ? "GB" : iso;
+    if (cdnIso === "XK") return undefined;
+    return `https://flagcdn.com/w${size}/${cdnIso.toLowerCase()}.png`;
 }

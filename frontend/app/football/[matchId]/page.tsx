@@ -23,6 +23,7 @@ import {
     useEventTimeline,
     useEventTimelines,
     useTeamPreviousEvents,
+    useTeamPlayers,
 } from "@/services/sportsdb/hooks";
 import {
     liveToScheduleRow,
@@ -184,14 +185,35 @@ export default function FootballMatchPage() {
         }
     }
 
-    // Real lineup (match has started / completed).
+    const { data: homeRoster } = useTeamPlayers(event?.idHomeTeam);
+    const { data: awayRoster } = useTeamPlayers(event?.idAwayTeam);
+    const findManager = (roster: typeof homeRoster) => {
+        const list = roster?.player ?? roster?.list ?? [];
+        const isHead = (pos: string | undefined) => {
+            const p = (pos ?? "").toLowerCase();
+            return (p.includes("manager") || p.includes("head coach"))
+                && !p.includes("assistant");
+        };
+        return list.find(p => isHead(p.strPosition));
+    };
+    const homeManager = findManager(homeRoster);
+    const awayManager = findManager(awayRoster);
+    const homeCoachName = homeManager?.strPlayer;
+    const awayCoachName = awayManager?.strPlayer;
+    const homeCoachPhoto = homeManager?.strCutout ?? homeManager?.strThumb ?? undefined;
+    const awayCoachPhoto = awayManager?.strCutout ?? awayManager?.strThumb ?? undefined;
+
     const actualLineup = lineupData?.lineup ?? lineupData?.lookup ?? null;
     const formation = lineupsToFormation(
         actualLineup,
         event?.strHomeTeam ?? "Команда 1",
         event?.strAwayTeam ?? "Команда 2",
         event?.strHomeTeamBadge ?? undefined,
-        event?.strAwayTeamBadge ?? undefined
+        event?.strAwayTeamBadge ?? undefined,
+        homeCoachName,
+        awayCoachName,
+        homeCoachPhoto ?? undefined,
+        awayCoachPhoto ?? undefined
     );
 
     // If no actual lineup yet, fall back to a prediction built from each
@@ -269,7 +291,11 @@ export default function FootballMatchPage() {
               event?.strHomeTeam ?? "Команда 1",
               event?.strAwayTeam ?? "Команда 2",
               event?.strHomeTeamBadge ?? undefined,
-              event?.strAwayTeamBadge ?? undefined
+              event?.strAwayTeamBadge ?? undefined,
+              homeCoachName,
+              awayCoachName,
+              homeCoachPhoto ?? undefined,
+              awayCoachPhoto ?? undefined
           )
         : null;
 

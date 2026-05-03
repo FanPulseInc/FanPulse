@@ -135,7 +135,7 @@ function rosterToBoxScorePlayers(
         .filter(p => !!p.strPlayer && !isStaff(p.strPosition))
         .slice(0, 15)
         .map(p => ({
-            id: p.idPlayer ?? `${p.strPlayer ?? "p"}-${Math.random()}`,
+            id: p.idPlayer ?? `${p.strPlayer ?? "p"}-${p.strPosition ?? ""}-${p.idTeam ?? ""}`,
             name: p.strPlayer ?? "?",
             position: p.strPosition ?? undefined,
             photoUrl: p.strCutout ?? p.strThumb ?? undefined,

@@ -45,6 +45,11 @@ export interface SDBEvent {
     dateEvent?: string;
     strTime?: string;
     strPostponed?: string;
+    strLeagueBadge?: string | null;
+    strCountry?: string;
+    strCity?: string;
+    intRound?: string | null;
+    strPoster?: string | null;
 }
 
 export interface SDBTeam {
