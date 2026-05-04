@@ -1,5 +1,19 @@
 import { gridGraphql, gridLiveGraphql } from "./client";
 
+export type GridPlayer = {
+  id?: string;
+  handle?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  nationality?: string | null;
+};
+
+export type GridTeamDetails = {
+  id: string;
+  name: string;
+  players?: GridPlayer[];
+};
+
 export type GridSeriesDetails = {
   id: string;
   startTimeScheduled: string;
@@ -17,13 +31,7 @@ export type GridSeriesDetails = {
       id?: string;
       name: string;
     };
-    players?: {
-      id: string;
-      handle?: string | null;
-      firstName?: string | null;
-      lastName?: string | null;
-      nationality?: string | null;
-    }[];
+    players?: GridPlayer[];
   }[];
   tournament: {
     id: string;
@@ -43,16 +51,32 @@ export type GridSeriesState = {
     players: {
       kills: number;
       deaths: number;
+      assists?: number;
     }[];
   }[];
 };
 
 type SeriesDetailsResponse = {
-  series: GridSeriesDetails | null;
+  series: Omit<GridSeriesDetails, "teams"> & {
+    teams: {
+      baseInfo: {
+        id?: string;
+        name: string;
+      };
+    }[];
+  } | null;
 };
 
 type SeriesStateResponse = {
   seriesState: GridSeriesState | null;
+};
+
+type TeamDetailsResponse = {
+  team: {
+    id: string;
+    name: string;
+    players?: GridPlayer[];
+  } | null;
 };
 
 const CS2_SERIES_DETAILS_QUERY = `
@@ -76,14 +100,6 @@ const CS2_SERIES_DETAILS_QUERY = `
         baseInfo {
           id
           name
-        }
-
-        players {
-          id
-          handle
-          firstName
-          lastName
-          nationality
         }
       }
 
@@ -117,6 +133,23 @@ const CS2_SERIES_STATE_QUERY = `
   }
 `;
 
+const CS2_TEAM_DETAILS_QUERY = `
+  query Cs2TeamDetails($id: ID!) {
+    team(id: $id) {
+      id
+      name
+
+      players {
+        id
+        handle
+        firstName
+        lastName
+        nationality
+      }
+    }
+  }
+`;
+
 export async function getCs2SeriesDetails(id: string) {
   const [detailsResult, stateResult] = await Promise.allSettled([
     gridGraphql<SeriesDetailsResponse>(CS2_SERIES_DETAILS_QUERY, { id }),
@@ -131,8 +164,41 @@ export async function getCs2SeriesDetails(id: string) {
 
   if (!details) return null;
 
+  const teamsWithPlayers = await Promise.all(
+    details.teams.map(async (team) => {
+      const teamId = team.baseInfo.id;
+
+      if (!teamId) {
+        return {
+          ...team,
+          players: [],
+        };
+      }
+
+      try {
+        const teamResult = await gridGraphql<TeamDetailsResponse>(
+          CS2_TEAM_DETAILS_QUERY,
+          { id: teamId }
+        );
+
+        return {
+          ...team,
+          players: teamResult.team?.players ?? [],
+        };
+      } catch (error) {
+        console.error("GRID team players error:", error);
+
+        return {
+          ...team,
+          players: [],
+        };
+      }
+    })
+  );
+
   return {
     ...details,
+    teams: teamsWithPlayers,
     state,
   };
 }

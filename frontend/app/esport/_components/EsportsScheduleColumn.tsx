@@ -60,24 +60,52 @@ function relativeKickoff(startIso: string | undefined, now: number) {
   return `за ${Math.floor(hr / 24)} дн`;
 }
 
+function getMatchPhase(match: EsportsMatch, now: number) {
+  if (match.status === "live" || match.time === "LIVE") {
+    return "live";
+  }
+
+  if (match.status === "past") {
+    return "past";
+  }
+
+  if (match.status === "upcoming") {
+    return "upcoming";
+  }
+
+  if (match.startIso) {
+    const startTime = new Date(match.startIso).getTime();
+
+    if (!Number.isNaN(startTime)) {
+      return startTime > now ? "upcoming" : "past";
+    }
+  }
+
+  return "upcoming";
+}
+
 function applyFilter(
   matches: EsportsMatch[],
   topTab: string,
-  phaseTab: string | null
+  phaseTab: string | null,
+  now: number
 ) {
-  return matches.filter(
-    (match) =>
+  return matches.filter((match) => {
+    const realPhase = getMatchPhase(match, now);
+
+    return (
       (topTab !== "fav" || match.favorite) &&
-      (!phaseTab || match.status === phaseTab)
-  );
+      (!phaseTab || realPhase === phaseTab)
+    );
+  });
 }
 
 function TeamLine({ name, logo }: { name: string; logo?: string }) {
   const src = logo && logo !== "" ? logo : "/icons/question_mark.png";
 
   return (
-    <div className="flex items-center gap-2 min-w-0">
-      <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center shrink-0 overflow-hidden">
+    <div className="flex min-w-0 items-center gap-2">
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-300">
         <Image
           src={src}
           alt=""
@@ -88,7 +116,7 @@ function TeamLine({ name, logo }: { name: string; logo?: string }) {
         />
       </div>
 
-      <span className="text-[13px] text-[#212121] truncate">{name}</span>
+      <span className="truncate text-[13px] text-[#212121]">{name}</span>
     </div>
   );
 }
@@ -104,42 +132,43 @@ function EsportsMatchRow({
   onClick: () => void;
   now: number;
 }) {
-  const isUpcoming = match.status === "upcoming";
+  const realPhase = getMatchPhase(match, now);
+  const isUpcoming = realPhase === "upcoming";
   const countdown = isUpcoming ? relativeKickoff(match.startIso, now) : null;
 
   return (
     <div
       onClick={onClick}
-      className={`grid grid-cols-[54px_1fr_70px_28px] items-center gap-2 h-[60px] px-2 rounded-[8px] cursor-pointer transition-colors border-b border-gray-200 last:border-none ${
+      className={`grid h-[60px] cursor-pointer grid-cols-[54px_1fr_70px_28px] items-center gap-2 rounded-[8px] border-b border-gray-200 px-2 transition-colors last:border-none ${
         selected ? "bg-[#af292a]/10" : "hover:bg-white"
       }`}
     >
-      <span className="text-[#af292a] text-[14px] font-bold font-data">
-        {match.time}
+      <span className="font-data text-[14px] font-bold text-[#af292a]">
+        {realPhase === "live" ? "LIVE" : match.time}
       </span>
 
-      <div className="flex flex-col gap-[2px] min-w-0">
+      <div className="flex min-w-0 flex-col gap-[2px]">
         <TeamLine name={match.homeTeam} logo={match.homeLogo} />
         <TeamLine name={match.awayTeam} logo={match.awayLogo} />
       </div>
 
-      <div className="flex flex-col items-end justify-center min-w-0">
+      <div className="flex min-w-0 flex-col items-end justify-center">
         {isUpcoming ? (
           <>
-            <span className="text-[10px] font-bold text-[#212121] whitespace-nowrap">
+            <span className="whitespace-nowrap text-[10px] font-bold text-[#212121]">
               {match.format ?? "BO3"}
             </span>
 
-            <span className="text-[10px] font-semibold text-gray-500 whitespace-nowrap">
+            <span className="whitespace-nowrap text-[10px] font-semibold text-gray-500">
               {countdown ?? "–"}
             </span>
           </>
         ) : (
           <>
-            <span className="text-[14px] font-bold text-[#af292a] font-data leading-tight">
+            <span className="font-data text-[14px] font-bold leading-tight text-[#af292a]">
               {match.homeScore ?? "–"}
             </span>
-            <span className="text-[14px] font-bold text-[#af292a] font-data leading-tight">
+            <span className="font-data text-[14px] font-bold leading-tight text-[#af292a]">
               {match.awayScore ?? "–"}
             </span>
           </>
@@ -148,11 +177,11 @@ function EsportsMatchRow({
 
       <button
         onClick={(event) => event.stopPropagation()}
-        className={`text-xl leading-none ${
+        className={`cursor-pointer text-xl leading-none transition-colors ${
           match.favorite
             ? "text-[#af292a]"
             : "text-gray-300 hover:text-[#af292a]"
-        } transition-colors cursor-pointer`}
+        }`}
         aria-label="Favorite"
       >
         ☆
@@ -195,7 +224,7 @@ export default function EsportsScheduleColumn({
   const filteredGroups = groups
     .map((group) => ({
       ...group,
-      matches: applyFilter(group.matches, topTab, phaseTab),
+      matches: applyFilter(group.matches, topTab, phaseTab, now),
     }))
     .filter((group) => group.matches.length > 0);
 
@@ -207,13 +236,13 @@ export default function EsportsScheduleColumn({
   }
 
   return (
-    <div className="w-[560px] flex flex-col gap-[10px]">
-      <div className="w-full h-[40px] bg-[#212121] rounded-[14px] flex flex-row justify-center items-center gap-[10px] px-3">
+    <div className="flex w-[560px] flex-col gap-[10px]">
+      <div className="flex h-[40px] w-full flex-row items-center justify-center gap-[10px] rounded-[14px] bg-[#212121] px-3">
         {topTabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setTopTab(tab.id)}
-            className={`h-[26px] px-4 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+            className={`h-[26px] cursor-pointer rounded-full px-4 text-[11px] font-bold uppercase tracking-wider transition-colors ${
               topTab === tab.id
                 ? "bg-[#af292a] text-white"
                 : "text-white/80 hover:text-white"
@@ -223,11 +252,11 @@ export default function EsportsScheduleColumn({
           </button>
         ))}
 
-        <div className="ml-auto flex items-center gap-1 relative">
+        <div className="relative ml-auto flex items-center gap-1">
           <button
             onClick={onPrevDay}
             disabled={!onPrevDay}
-            className="h-[26px] w-[22px] rounded-[6px] border border-white/30 text-white text-xs flex items-center justify-center hover:bg-white/10 disabled:opacity-40 disabled:cursor-default cursor-pointer"
+            className="flex h-[26px] w-[22px] cursor-pointer items-center justify-center rounded-[6px] border border-white/30 text-xs text-white hover:bg-white/10 disabled:cursor-default disabled:opacity-40"
             aria-label="Previous day"
           >
             ‹
@@ -235,7 +264,7 @@ export default function EsportsScheduleColumn({
 
           <button
             onClick={() => setPickerOpen((value) => !value)}
-            className="h-[26px] px-3 rounded-[8px] border border-white/30 text-white text-[11px] font-bold hover:bg-white/10 cursor-pointer"
+            className="h-[26px] cursor-pointer rounded-[8px] border border-white/30 px-3 text-[11px] font-bold text-white hover:bg-white/10"
           >
             {dateLabel}
           </button>
@@ -248,14 +277,14 @@ export default function EsportsScheduleColumn({
                 onPickDate(event.target.value);
                 setPickerOpen(false);
               }}
-              className="absolute right-0 top-[30px] z-10 text-[11px] rounded-[6px] border border-gray-300 bg-white px-2 py-1 text-[#212121]"
+              className="absolute right-0 top-[30px] z-10 rounded-[6px] border border-gray-300 bg-white px-2 py-1 text-[11px] text-[#212121]"
             />
           )}
 
           <button
             onClick={onNextDay}
             disabled={!onNextDay}
-            className="h-[26px] w-[22px] rounded-[6px] border border-white/30 text-white text-xs flex items-center justify-center hover:bg-white/10 disabled:opacity-40 disabled:cursor-default cursor-pointer"
+            className="flex h-[26px] w-[22px] cursor-pointer items-center justify-center rounded-[6px] border border-white/30 text-xs text-white hover:bg-white/10 disabled:cursor-default disabled:opacity-40"
             aria-label="Next day"
           >
             ›
@@ -263,8 +292,8 @@ export default function EsportsScheduleColumn({
         </div>
       </div>
 
-      <div className="w-full bg-[#f8f8f8] rounded-[20px] pt-[20px] pr-[32px] pb-[20px] pl-[32px] flex flex-col gap-[10px] shadow-sm">
-        <div className="w-full flex items-center gap-2">
+      <div className="flex w-full flex-col gap-[10px] rounded-[20px] bg-[#f8f8f8] px-[32px] py-[20px] shadow-sm">
+        <div className="flex w-full items-center gap-2">
           {phaseTabs.map((tab) => {
             const active = phaseTab === tab.id;
 
@@ -272,7 +301,7 @@ export default function EsportsScheduleColumn({
               <button
                 key={tab.id}
                 onClick={() => handlePhaseClick(active ? null : tab.id)}
-                className={`h-[30px] px-5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+                className={`h-[30px] cursor-pointer rounded-full px-5 text-[11px] font-bold uppercase tracking-wider transition-colors ${
                   active
                     ? "bg-[#212121] text-white"
                     : "bg-[#af292a] text-white hover:opacity-90"
@@ -285,7 +314,7 @@ export default function EsportsScheduleColumn({
 
           <button
             onClick={() => handlePhaseClick(null)}
-            className={`ml-auto h-[30px] px-5 rounded-full text-[11px] font-bold uppercase tracking-wider cursor-pointer transition-colors ${
+            className={`ml-auto h-[30px] cursor-pointer rounded-full px-5 text-[11px] font-bold uppercase tracking-wider transition-colors ${
               phaseTab === null
                 ? "bg-[#212121] text-white"
                 : "bg-[#af292a] text-white hover:opacity-90"
@@ -296,14 +325,14 @@ export default function EsportsScheduleColumn({
         </div>
 
         {isEmpty ? (
-          <div className="text-center text-gray-400 text-[12px] py-8">
+          <div className="py-8 text-center text-[12px] text-gray-400">
             Немає матчів
           </div>
         ) : (
           filteredGroups.map((group) => (
             <div key={group.tournamentId} className="flex flex-col">
-              <div className="flex items-center gap-2 px-2 py-[8px] border-b-2 border-[#af292a]/30">
-                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="flex items-center gap-2 border-b-2 border-[#af292a]/30 px-2 py-[8px]">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-300">
                   <Image
                     src={group.tournamentLogo || "/icons/question_mark.png"}
                     alt=""
@@ -314,7 +343,7 @@ export default function EsportsScheduleColumn({
                   />
                 </div>
 
-                <span className="text-[13px] font-bold uppercase tracking-wider text-[#212121] truncate">
+                <span className="truncate text-[13px] font-bold uppercase tracking-wider text-[#212121]">
                   {group.tournamentName}
                 </span>
 
