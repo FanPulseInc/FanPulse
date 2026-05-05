@@ -27,6 +27,8 @@ export interface EsportsTournamentGroup {
   matches: EsportsMatch[];
 }
 
+type GameSlug = "cs2" | "dota";
+
 const topTabs = [
   { id: "all", label: "Все" },
   { id: "fav", label: "Улюблене" },
@@ -42,22 +44,24 @@ const phaseTabs = [
 function relativeKickoff(startIso: string | undefined, now: number) {
   if (!startIso) return null;
 
-  const t = new Date(startIso).getTime();
-  if (Number.isNaN(t)) return null;
+  const time = new Date(startIso).getTime();
+  if (Number.isNaN(time)) return null;
 
-  const diffMs = t - now;
+  const diffMs = time - now;
   if (diffMs <= 0) return null;
 
-  const min = Math.round(diffMs / 60_000);
+  const minutes = Math.round(diffMs / 60_000);
 
-  if (min < 60) return `за ${min} хв`;
+  if (minutes < 60) return `за ${minutes} хв`;
 
-  const hr = Math.floor(min / 60);
-  const rem = min % 60;
+  const hours = Math.floor(minutes / 60);
+  const restMinutes = minutes % 60;
 
-  if (hr < 24) return rem > 0 ? `за ${hr}г ${rem}хв` : `за ${hr}г`;
+  if (hours < 24) {
+    return restMinutes > 0 ? `за ${hours}г ${restMinutes}хв` : `за ${hours}г`;
+  }
 
-  return `за ${Math.floor(hr / 24)} дн`;
+  return `за ${Math.floor(hours / 24)} дн`;
 }
 
 function getMatchPhase(match: EsportsMatch, now: number) {
@@ -84,24 +88,24 @@ function getMatchPhase(match: EsportsMatch, now: number) {
   return "upcoming";
 }
 
-function applyFilter(
+function filterMatches(
   matches: EsportsMatch[],
   topTab: string,
   phaseTab: string | null,
   now: number
 ) {
   return matches.filter((match) => {
-    const realPhase = getMatchPhase(match, now);
+    const phase = getMatchPhase(match, now);
 
     return (
       (topTab !== "fav" || match.favorite) &&
-      (!phaseTab || realPhase === phaseTab)
+      (!phaseTab || phase === phaseTab)
     );
   });
 }
 
 function TeamLine({ name, logo }: { name: string; logo?: string }) {
-  const src = logo && logo !== "" ? logo : "/icons/question_mark.png";
+  const src = logo?.trim() ? logo : "/icons/question_mark.png";
 
   return (
     <div className="flex min-w-0 items-center gap-2">
@@ -132,8 +136,8 @@ function EsportsMatchRow({
   onClick: () => void;
   now: number;
 }) {
-  const realPhase = getMatchPhase(match, now);
-  const isUpcoming = realPhase === "upcoming";
+  const phase = getMatchPhase(match, now);
+  const isUpcoming = phase === "upcoming";
   const countdown = isUpcoming ? relativeKickoff(match.startIso, now) : null;
 
   return (
@@ -144,7 +148,7 @@ function EsportsMatchRow({
       }`}
     >
       <span className="font-data text-[14px] font-bold text-[#af292a]">
-        {realPhase === "live" ? "LIVE" : match.time}
+        {phase === "live" ? "LIVE" : match.time}
       </span>
 
       <div className="flex min-w-0 flex-col gap-[2px]">
@@ -199,6 +203,7 @@ export default function EsportsScheduleColumn({
   onPickDate,
   dateIso,
   onPhaseChange,
+  gameSlug = "cs2",
 }: {
   groups?: EsportsTournamentGroup[];
   dateLabel?: string;
@@ -208,6 +213,7 @@ export default function EsportsScheduleColumn({
   onPickDate?: (iso: string) => void;
   dateIso?: string;
   onPhaseChange?: (phase: string | null) => void;
+  gameSlug?: GameSlug;
 }) {
   const router = useRouter();
 
@@ -224,7 +230,7 @@ export default function EsportsScheduleColumn({
   const filteredGroups = groups
     .map((group) => ({
       ...group,
-      matches: applyFilter(group.matches, topTab, phaseTab, now),
+      matches: filterMatches(group.matches, topTab, phaseTab, now),
     }))
     .filter((group) => group.matches.length > 0);
 
@@ -363,7 +369,7 @@ export default function EsportsScheduleColumn({
                     selected={selectedMatchId === match.id}
                     onClick={() => {
                       const suffix = dateIso ? `?date=${dateIso}` : "";
-                      router.push(`/esport/cs2/${match.id}${suffix}`);
+                      router.push(`/esport/${gameSlug}/${match.id}${suffix}`);
                     }}
                   />
                 ))}
