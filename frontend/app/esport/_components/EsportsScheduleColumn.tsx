@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useT } from "@/services/i18n/context";
 
 export interface EsportsMatch {
   id: string;
@@ -27,37 +28,26 @@ export interface EsportsTournamentGroup {
   matches: EsportsMatch[];
 }
 
-const topTabs = [
-  { id: "all", label: "Все" },
-  { id: "fav", label: "Улюблене" },
-  { id: "compete", label: "Змагання" },
-];
 
-const phaseTabs = [
-  { id: "live", label: "Наживо" },
-  { id: "past", label: "Минулі" },
-  { id: "upcoming", label: "Майбутні" },
-];
-
-function relativeKickoff(startIso: string | undefined, now: number) {
+function relativeKickoff(startIso: string | undefined, now: number, tFn: (key: string, vars?: Record<string, string | number>) => string) {
   if (!startIso) return null;
 
-  const t = new Date(startIso).getTime();
-  if (Number.isNaN(t)) return null;
+  const ms = new Date(startIso).getTime();
+  if (Number.isNaN(ms)) return null;
 
-  const diffMs = t - now;
+  const diffMs = ms - now;
   if (diffMs <= 0) return null;
 
   const min = Math.round(diffMs / 60_000);
 
-  if (min < 60) return `за ${min} хв`;
+  if (min < 60) return tFn("time_in_min", { min });
 
   const hr = Math.floor(min / 60);
   const rem = min % 60;
 
-  if (hr < 24) return rem > 0 ? `за ${hr}г ${rem}хв` : `за ${hr}г`;
+  if (hr < 24) return rem > 0 ? tFn("time_in_hours_min", { hr, min: rem }) : tFn("time_in_hours", { hr });
 
-  return `за ${Math.floor(hr / 24)} дн`;
+  return tFn("time_in_days", { days: Math.floor(hr / 24) });
 }
 
 function getMatchPhase(match: EsportsMatch, now: number) {
@@ -132,9 +122,10 @@ function EsportsMatchRow({
   onClick: () => void;
   now: number;
 }) {
+  const { t: tFn } = useT();
   const realPhase = getMatchPhase(match, now);
   const isUpcoming = realPhase === "upcoming";
-  const countdown = isUpcoming ? relativeKickoff(match.startIso, now) : null;
+  const countdown = isUpcoming ? relativeKickoff(match.startIso, now, tFn) : null;
 
   return (
     <div
@@ -209,7 +200,20 @@ export default function EsportsScheduleColumn({
   dateIso?: string;
   onPhaseChange?: (phase: string | null) => void;
 }) {
+  const { t } = useT();
   const router = useRouter();
+
+  const topTabs = [
+    { id: "all", label: t("tab_all") },
+    { id: "fav", label: t("tab_favourite") },
+    { id: "compete", label: t("tab_competitions") },
+  ];
+
+  const phaseTabs = [
+    { id: "live", label: t("esport_live") },
+    { id: "past", label: t("esport_past") },
+    { id: "upcoming", label: t("esport_upcoming") },
+  ];
 
   const [topTab, setTopTab] = useState("all");
   const [phaseTab, setPhaseTab] = useState<string | null>(null);
@@ -320,13 +324,13 @@ export default function EsportsScheduleColumn({
                 : "bg-[#af292a] text-white hover:opacity-90"
             }`}
           >
-            Все
+            {t("tab_all")}
           </button>
         </div>
 
         {isEmpty ? (
           <div className="py-8 text-center text-[12px] text-gray-400">
-            Немає матчів
+            {t("no_matches")}
           </div>
         ) : (
           filteredGroups.map((group) => (

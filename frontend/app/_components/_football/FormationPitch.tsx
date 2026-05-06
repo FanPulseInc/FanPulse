@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { Icon } from "../_shared/Icon";
+import { useT } from "@/services/i18n/context";
 
 export interface PitchPlayer {
     id: string;
@@ -33,6 +34,7 @@ export interface FormationTeam {
 
 
 function TeamHeader({ team }: { team: FormationTeam }) {
+    const { t } = useT();
     return (
         <div className="w-full min-h-[67px] px-4 py-2 bg-[#af292a] rounded-[20px] flex items-center gap-3">
             <div className="w-[40px] h-[40px] flex items-center justify-center overflow-hidden shrink-0">
@@ -82,7 +84,7 @@ function TeamHeader({ team }: { team: FormationTeam }) {
                             {team.coachName}
                         </span>
                         <span className="text-white/70 text-[9px] font-bold uppercase tracking-wider">
-                            Тренер
+                            {t("coach")}
                         </span>
                     </div>
                 </div>

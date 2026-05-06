@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import type { LastFiveRow } from "@/services/sportsdb/adapters";
+import { useT } from "@/services/i18n/context";
 
 export interface LastFiveSide {
     teamName: string;
@@ -14,7 +15,9 @@ interface Props {
     title?: string; 
 }
 
-export default function LastFiveMatches({ home, away, title = "Останні 5 матчів" }: Props) {
+export default function LastFiveMatches({ home, away, title }: Props) {
+    const { t } = useT();
+    const heading = title ?? t("last_five_matches");
     if (home.rows.length === 0 && away.rows.length === 0) return null;
 
     return (
@@ -22,7 +25,7 @@ export default function LastFiveMatches({ home, away, title = "Останні 5 
             
             <div className="w-full flex justify-center">
                 <span className="text-[#af292a] font-bold text-[18px] uppercase tracking-wider">
-                    {title}
+                    {heading}
                 </span>
             </div>
             
@@ -35,6 +38,7 @@ export default function LastFiveMatches({ home, away, title = "Останні 5 
 }
 
 function TeamCard({ side }: { side: LastFiveSide }) {
+    const { t } = useT();
     return (
         <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 p-[16px] flex flex-col">
             
@@ -58,7 +62,7 @@ function TeamCard({ side }: { side: LastFiveSide }) {
 
             {side.rows.length === 0 ? (
                 <div className="text-center text-gray-400 text-xs py-4">
-                    Немає даних про попередні матчі
+                    {t("no_previous_matches")}
                 </div>
             ) : (
                 <div className="flex flex-col gap-[14px]">

@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { useT } from "@/services/i18n/context";
 
 export interface StandingRow {
     id: string;
@@ -62,31 +63,33 @@ function Row({ r }: { r: StandingRow }) {
     );
 }
 
-export default function StandingsTable({ rows, title = "Турнірна таблиця" }: Props) {
+export default function StandingsTable({ rows, title }: Props) {
+    const { t } = useT();
+    const heading = title ?? t("standings");
     return (
         <div className="w-full bg-white rounded-[14px] shadow-sm border border-gray-100 flex flex-col p-3">
             <div className="w-full text-center text-[#212121] text-[16px] font-bold py-2">
-                {title}
+                {heading}
             </div>
             <div className="grid grid-cols-[40px_44px_1fr_auto] items-center gap-3 px-[16px] py-[8px] bg-[#212121] rounded-[12px]">
                 <span />
                 <span />
                 <span className="text-[11px] font-bold uppercase tracking-wider text-white">
-                    Пілот
+                    {t("sport_pilot")}
                 </span>
                 <div className="flex items-center gap-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-white">
-                        Перемог
+                        {t("wins")}
                     </span>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-white">
-                        Бали
+                        {t("points")}
                     </span>
                 </div>
             </div>
             <div className="flex flex-col px-[16px]">
                 {rows.length === 0 ? (
                     <div className="text-center text-gray-400 text-[12px] py-6">
-                        Дані недоступні
+                        {t("no_data")}
                     </div>
                 ) : (
                     rows.map(r => <Row key={r.id} r={r} />)

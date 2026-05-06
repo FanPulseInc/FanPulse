@@ -1,25 +1,25 @@
 'use client'
-import { useState } from "react"
+import React, { useState } from "react"
+import { useT } from "@/services/i18n/context"
 
 const ResetPassword = () => {
+    const { t } = useT()
     const [email, setEmail] = useState("")
 
-    const handleSubmit = async (e: any) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
     }
 
     return (
         <div className="bg-white overflow-hidden rounded-[20px] w-[370px] min-h-[650px] flex flex-col gap-8 p-8 items-center justify-center shadow-sm">
-            
+
             <div className="w-full max-w-[340px] flex flex-col justify-center gap-6 relative">
                 <h1 className="text-h1 text-brand-black leading-tight">
-                    Відновлення<br/>пароля
+                    {t("auth_reset_title")}
                 </h1>
 
                 <p className="text-body-m text-brand-black/80 leading-relaxed">
-                    Для відновлення пароля вкажіть e-mail адресу, яку Ви використовували
-                    під час реєстрації і ми надішлемо Вам інструкцію для відновлення
-                    пароля.
+                    {t("auth_reset_description")}
                 </p>
 
                 <form
@@ -41,9 +41,8 @@ const ResetPassword = () => {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="Введіть e-mail"
+                                placeholder={t("auth_reset_email_placeholder")}
                                 className="w-full bg-transparent outline-none text-body-m text-brand-black placeholder:text-brand-black/40"
-                                aria-label="Введіть e-mail адресу"
                             />
                         </div>
                     </div>
@@ -52,7 +51,7 @@ const ResetPassword = () => {
                         type="submit"
                         className="h-[50px] w-full flex items-center justify-center bg-brand-red rounded-[20px] text-white font-bold text-body-m cursor-pointer hover:opacity-90 transition-opacity active:scale-[0.98]"
                     >
-                        Відправити
+                        {t("auth_reset_submit")}
                     </button>
                 </form>
             </div>

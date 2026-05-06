@@ -1,6 +1,10 @@
+"use client";
 import { ICONS } from "./svg";
+import { useT } from "@/services/i18n/context";
 
 export default function Page() {
+  const { t } = useT();
+
   return (
     <main className="min-h-screen">
       <div className="max-w-7xl mx-auto p-4 space-y-6">
@@ -31,15 +35,15 @@ export default function Page() {
 
               <div className="flex items-center justify-between text-sm mb-3">
                 <div className="flex gap-4 text-brand-red">
-                  <span className="cursor-pointer">Все</span>
-                  <span className="cursor-pointer">Улюблене</span>
-                  <span className="cursor-pointer">Змагання</span>
+                  <span className="cursor-pointer">{t("tab_all")}</span>
+                  <span className="cursor-pointer">{t("tab_favourite")}</span>
+                  <span className="cursor-pointer">{t("tab_competitions")}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-brand-red">
                   <button>{"<"}</button>
                   <span className="bg-white px-3 py-1 rounded-full border border-brand-red/20">
-                    Сьогодні
+                    {t("date_today")}
                   </span>
                   <button>{">"}</button>
                 </div>
@@ -69,22 +73,22 @@ export default function Page() {
 
               <div className="flex items-center justify-between text-sm mb-3">
                 <div className="flex gap-4 text-brand-red">
-                  <span>Все</span>
-                  <span>Улюблене</span>
-                  <span>Змагання</span>
+                  <span>{t("tab_all")}</span>
+                  <span>{t("tab_favourite")}</span>
+                  <span>{t("tab_competitions")}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-brand-red">
                   <button>{"<"}</button>
                   <span className="bg-white px-3 py-1 rounded-full border border-brand-red/20">
-                    Сьогодні
+                    {t("date_today")}
                   </span>
                   <button>{">"}</button>
                 </div>
               </div>
 
               <div className="flex gap-4 mb-4 justify-between px-6 min-h-[40px]">
-                {[<img src={"icons/cs2.jpg"} />, <img src={"icons/dota2.png"} />].map(
+                {[<img key="cs2" src={"icons/cs2.jpg"} />, <img key="dota2" src={"icons/dota2.png"} />].map(
                   (icon, i) => (
                     <div
                       key={i}
@@ -109,15 +113,15 @@ export default function Page() {
 
               <div className="flex items-center justify-between text-sm mb-3">
                 <div className="flex gap-4 text-brand-red">
-                  <span>Все</span>
-                  <span>Улюблене</span>
-                  <span>Змагання</span>
+                  <span>{t("tab_all")}</span>
+                  <span>{t("tab_favourite")}</span>
+                  <span>{t("tab_competitions")}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-brand-red">
                   <button>{"<"}</button>
                   <span className="bg-white px-3 py-1 rounded-full border border-brand-red/20">
-                    Сьогодні
+                    {t("date_today")}
                   </span>
                   <button>{">"}</button>
                 </div>
@@ -135,7 +139,7 @@ export default function Page() {
               </div>
 
               <div className="flex justify-center gap-3 mb-4 min-h-[40px]">
-                {[<img src={"icons/cs2.jpg"} />, <img src={"icons/dota2.png"} />].map(
+                {[<img key="cs2" src={"icons/cs2.jpg"} />, <img key="dota2" src={"icons/dota2.png"} />].map(
                   (icon, i) => (
                     <div
                       key={i}

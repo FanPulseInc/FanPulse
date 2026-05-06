@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { ICONS } from "../../svg";
 import { getCurrentUserId, isLoggedIn } from "../../_lib/auth";
+import { useT } from "@/services/i18n/context";
 import {
     usePostApiLike,
     useDeleteApiLikeId,
@@ -21,6 +22,7 @@ interface LikeButtonProps {
 }
 
 export default function LikeButton({ targetId, variant, kind, knownLikeId, onError }: LikeButtonProps) {
+    const { t } = useT();
     const queryClient = useQueryClient();
     const userId = getCurrentUserId() ?? undefined;
 
@@ -58,7 +60,7 @@ export default function LikeButton({ targetId, variant, kind, knownLikeId, onErr
         e.stopPropagation();
 
         if (!isLoggedIn() || !userId) {
-            onError?.("Увійдіть, щоб ставити лайк");
+            onError?.(t("like_login_required"));
             return;
         }
         if (busy) return;
@@ -67,7 +69,7 @@ export default function LikeButton({ targetId, variant, kind, knownLikeId, onErr
         try {
             if (hasLiked) {
                 if (!likeId) {
-                    onError?.("Оновіть сторінку, щоб скасувати лайк");
+                    onError?.(t("like_refresh"));
                     return;
                 }
                 await removeLike({ id: likeId });
@@ -86,7 +88,7 @@ export default function LikeButton({ targetId, variant, kind, knownLikeId, onErr
             const status = e.response?.status;
             const serverMsg = e.response?.data?.error ?? e.response?.data?.message;
             console.error("Like failed", status, e.response?.data, err);
-            onError?.(serverMsg ?? (status === 401 ? "Увійдіть, щоб ставити лайк" : "Не вдалося оновити лайк"));
+            onError?.(serverMsg ?? (status === 401 ? t("like_login_required") : t("like_failed")));
         } finally {
             setBusy(false);
         }
@@ -102,7 +104,7 @@ export default function LikeButton({ targetId, variant, kind, knownLikeId, onErr
             disabled={busy}
             className={`flex items-center gap-1 cursor-pointer transition-all hover:scale-110 active:scale-95 disabled:opacity-50 ${liked ? "opacity-100 drop-shadow-[0_0_4px_rgba(175,41,42,0.6)]" : "opacity-70"}`}
             aria-label={liked ? "Unlike" : "Like"}
-            title={liked ? "Скасувати лайк" : "Поставити лайк"}
+            title={liked ? t("like_remove") : t("like_add")}
         >
             <span className="w-6 h-6 flex items-center justify-center">{icon}</span>
             <span className={`text-[12px] font-bold ${textColor}`}>{count ?? 0}</span>

@@ -16,6 +16,7 @@ import {
 import { localDateIsoOf, parseSdbUtc } from "@/services/sportsdb/adapters";
 import { countryToFlagUrl } from "@/services/sportsdb/flags";
 import type { SDBEvent } from "@/services/sportsdb/types";
+import { useT } from "@/services/i18n/context";
 
 const TOP_LEAGUES: { id: string; name: string }[] = [
     { id: "4370", name: "Formula 1" },
@@ -63,17 +64,17 @@ function hmFromTimestamp(ev: SDBEvent): string {
     return "12:00";
 }
 
-function parseStageLabel(strEvent: string | undefined): string {
-    if (!strEvent) return "Гран-При";
+function parseStageKey(strEvent: string | undefined): string {
+    if (!strEvent) return "stage_grand_prix";
     const lower = strEvent.toLowerCase();
-    if (lower.includes("free practice 3") || lower.includes("practice 3") || lower.includes("fp3")) return "Практика 3";
-    if (lower.includes("free practice 2") || lower.includes("practice 2") || lower.includes("fp2")) return "Практика 2";
-    if (lower.includes("free practice 1") || lower.includes("practice 1") || lower.includes("fp1")) return "Практика 1";
-    if (lower.includes("sprint qualifying") || lower.includes("sprint shootout")) return "Спринт-кваліфікація";
-    if (lower.includes("sprint race") || lower.includes("sprint")) return "Спринт";
-    if (lower.includes("qualifying") || lower.includes("quali")) return "Кваліфікація";
-    if (lower.includes("race") || lower.includes("grand prix") || lower.includes("rally")) return "Гонка";
-    return "Гран-При";
+    if (lower.includes("free practice 3") || lower.includes("practice 3") || lower.includes("fp3")) return "stage_practice_3";
+    if (lower.includes("free practice 2") || lower.includes("practice 2") || lower.includes("fp2")) return "stage_practice_2";
+    if (lower.includes("free practice 1") || lower.includes("practice 1") || lower.includes("fp1")) return "stage_practice_1";
+    if (lower.includes("sprint qualifying") || lower.includes("sprint shootout")) return "stage_sprint_qualifying";
+    if (lower.includes("sprint race") || lower.includes("sprint")) return "stage_sprint";
+    if (lower.includes("qualifying") || lower.includes("quali")) return "stage_qualifying";
+    if (lower.includes("race") || lower.includes("grand prix") || lower.includes("rally")) return "stage_race";
+    return "stage_grand_prix";
 }
 
 function trackOf(ev: SDBEvent): string | undefined {
@@ -81,7 +82,7 @@ function trackOf(ev: SDBEvent): string | undefined {
     return v.length > 0 ? v : undefined;
 }
 
-function eventToScheduleMatch(ev: SDBEvent): ScheduleMatch {
+function eventToScheduleMatch(ev: SDBEvent, tFn: (key: string) => string): ScheduleMatch {
     const flag = countryToFlagUrl(ev.strCountry, 80);
     return {
         id: ev.idEvent ?? crypto.randomUUID(),
@@ -93,12 +94,13 @@ function eventToScheduleMatch(ev: SDBEvent): ScheduleMatch {
         competitionBadge: ev.strLeagueBadge ?? undefined,
         countryFlag: flag || undefined,
         trackName: trackOf(ev),
-        stageLabel: parseStageLabel(ev.strEvent ?? undefined),
+        stageLabel: tFn(parseStageKey(ev.strEvent ?? undefined)),
         status: "upcoming",
     };
 }
 
 export default function MotorsportPage() {
+    const { t } = useT();
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialDate = searchParams.get("date") || todayIso();
@@ -133,7 +135,7 @@ export default function MotorsportPage() {
             const forDay = events.filter(ev => localDateIsoOf(ev) === dateIso);
             const sharedTrack = forDay.map(trackOf).find((t): t is string => !!t);
             const rows = forDay.map(ev => {
-                const m = eventToScheduleMatch(ev);
+                const m = eventToScheduleMatch(ev, t);
                 if (!m.trackName && sharedTrack) m.trackName = sharedTrack;
                 return m;
             });
@@ -146,7 +148,7 @@ export default function MotorsportPage() {
                 matches: rows,
             };
         });
-    }, [seasonQueries, leagueQueries, dateIso]);
+    }, [seasonQueries, leagueQueries, dateIso, t]);
 
     const competitions: CompetitionOption[] = useMemo(
         () =>
@@ -217,7 +219,7 @@ export default function MotorsportPage() {
                 <div className="flex flex-col gap-2 w-full lg:w-auto">
                     {anyLoading && (
                         <div className="w-full lg:w-[560px] text-center text-gray-500 text-sm py-2">
-                            Завантаження перегонів ({season})...
+                            {t("loading_races")} ({season})...
                         </div>
                     )}
                     <ScheduleColumn
@@ -236,13 +238,13 @@ export default function MotorsportPage() {
                 <div className="flex-1 min-w-0">
                     {anyLoading ? (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Завантаження анонсів...
+                            {t("loading_announcements")}
                         </div>
                     ) : carouselItems.length > 0 ? (
                         <MotorsportCarousel items={carouselItems} />
                     ) : (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Немає найближчих перегонів
+                            {t("no_upcoming_races")}
                         </div>
                     )}
                 </div>

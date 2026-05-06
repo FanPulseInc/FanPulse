@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import EsportsScheduleColumn from "../_components/EsportsScheduleColumn";
+import { useT } from "@/services/i18n/context";
 
 type GridSeries = {
   id: string;
@@ -55,7 +56,22 @@ function mapToGroups(
   series: GridSeries[],
   forcedStatus?: "live" | "past" | "upcoming"
 ) {
-  const map: Record<string, any> = {};
+  type TournamentGroup = {
+    tournamentId: string;
+    tournamentName: string;
+    matches: {
+      id: string;
+      time: string;
+      startIso: string;
+      homeTeam: string;
+      awayTeam: string;
+      homeScore: number | undefined;
+      awayScore: number | undefined;
+      status: "live" | "past" | "upcoming";
+      format: string;
+    }[];
+  };
+  const map: Record<string, TournamentGroup> = {};
 
   for (const s of series) {
     const tournament = s.tournament;
@@ -97,7 +113,8 @@ function mapToGroups(
 }
 
 export default function Cs2Layout({ children }: { children: ReactNode }) {
-  const [groups, setGroups] = useState<any[]>([]);
+  const { t } = useT();
+  const [groups, setGroups] = useState<ReturnType<typeof mapToGroups>>([]);
   const [dateIso, setDateIso] = useState(() => toDateIsoLocal(new Date()));
   const [phase, setPhase] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -139,7 +156,7 @@ export default function Cs2Layout({ children }: { children: ReactNode }) {
       <div className="p-10">
         {loading ? (
           <div className="w-[560px] rounded-[20px] bg-[#f8f8f8] py-10 text-center text-sm text-gray-400">
-            Завантаження...
+            {t("loading")}
           </div>
         ) : (
           <EsportsScheduleColumn

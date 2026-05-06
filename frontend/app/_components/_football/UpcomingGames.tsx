@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "@/services/i18n/context";
 
 export interface UpcomingTeam {
     label: string;
@@ -7,10 +8,11 @@ export interface UpcomingTeam {
 }
 
 export default function UpcomingGames({ left, right }: { left: UpcomingTeam; right: UpcomingTeam }) {
+    const { t } = useT();
     return (
         <div className="w-full bg-white rounded-[20px] shadow-sm border border-gray-100 p-4 flex flex-col gap-3">
             <div className="text-center text-[#212121] font-bold text-xs uppercase tracking-wider">
-                Майбутні ігри, з місяців
+                {t("upcoming_games")}
             </div>
 
             <div className="grid grid-cols-2 gap-3">

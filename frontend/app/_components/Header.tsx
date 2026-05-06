@@ -9,15 +9,15 @@ import { useLeagueLookups } from "@/services/sportsdb/hooks";
 import { useT } from "@/services/i18n/context";
 
 const navItems = [
-    { icon: ICONS.HOME, label: "ГОЛОВНА", href: "/" },
-    { icon: ICONS.SPORT, label: "СПОРТ", href: "/sport" },
-    { icon: ICONS.ESPORT, label: "КІБЕРСПОРТ", href: "/esports" },
-    { icon: ICONS.FORUM, label: "ФОРУМ", href: "/forum" },
+    { icon: ICONS.HOME, labelKey: "nav_home", href: "/" },
+    { icon: ICONS.SPORT, labelKey: "nav_sport", href: "/sport" },
+    { icon: ICONS.ESPORT, labelKey: "nav_esport", href: "/esports" },
+    { icon: ICONS.FORUM, labelKey: "nav_forum", href: "/forum" },
 ];
 
 interface SportEntry {
     key: string;
-    label: string;
+    labelKey: string;
     icon: React.ReactNode;
     href: string;
     leagues: { id: string; name: string }[];
@@ -26,7 +26,7 @@ interface SportEntry {
 const SPORT_MENU: SportEntry[] = [
     {
         key: "football",
-        label: "Футбол",
+        labelKey: "sport_football",
         icon: ICONS.FOOTBALL,
         href: "/football",
         leagues: [
@@ -42,14 +42,14 @@ const SPORT_MENU: SportEntry[] = [
     },
     {
         key: "basketball",
-        label: "Баскетбол",
+        labelKey: "sport_basketball",
         icon: ICONS.BASCETBALL,
         href: "/basketball",
         leagues: [{ id: "4387", name: "NBA" }],
     },
     {
         key: "tennis",
-        label: "Теніс",
+        labelKey: "sport_tennis",
         icon: ICONS.TENIS,
         href: "/tennis",
         leagues: [
@@ -60,14 +60,14 @@ const SPORT_MENU: SportEntry[] = [
     },
     {
         key: "american-football",
-        label: "Американський футбол",
+        labelKey: "sport_american_football",
         icon: ICONS.RUGBY,
         href: "/american-football",
         leagues: [{ id: "4391", name: "NFL" }],
     },
     {
         key: "motorsport",
-        label: "Мотоспорт",
+        labelKey: "sport_motorsport",
         icon: ICONS.MOTO,
         href: "/motorsport",
         leagues: [
@@ -89,7 +89,7 @@ const Header = () => {
 
     const { user } = useUserStore()
     const router = useRouter()
-    const { lang, setLang } = useT();
+    const { lang, setLang, t } = useT();
     const [isSportOpen, setIsSportOpen] = useState(false);
     const [isEsportOpen, setIsEsportOpen] = useState(false);
     const [hoveredSport, setHoveredSport] = useState<string>(SPORT_MENU[0].key);
@@ -150,7 +150,7 @@ const Header = () => {
 
 
             <div className="flex h-auto lg:h-[70px] items-center justify-between gap-3 w-full flex-wrap lg:flex-nowrap">
-                <Link href="/" className="shrink-0 cursor-pointer hover:opacity-80 transition-opacity" aria-label="На головну">
+                <Link href="/" className="shrink-0 cursor-pointer hover:opacity-80 transition-opacity" aria-label={t("header_back_home")}>
                     {ICONS.ICON}
                 </Link>
 
@@ -158,7 +158,7 @@ const Header = () => {
                 <div className="order-3 lg:order-none w-full lg:w-[600px] h-[44px] lg:h-[50px] flex items-center justify-between pl-4 pr-1 bg-white rounded-[50px] border-2 border-brand-red">
                     <input
                         type="text"
-                        placeholder="Що Ви шукаєте?"
+                        placeholder={t("header_search_placeholder")}
                         className="flex-1 min-w-0 bg-transparent outline-none text-body-l text-brand-black placeholder:text-brand-black/40"
                     />
                     <button className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center bg-brand-red rounded-full cursor-pointer hover:opacity-90 transition-opacity shrink-0 [&_svg]:w-5 [&_svg]:h-5 lg:[&_svg]:w-6 lg:[&_svg]:h-6">
@@ -206,7 +206,7 @@ const Header = () => {
                             href="?auth=login"
                             className="flex h-[44px] lg:h-[50px] min-w-[80px] lg:min-w-[100px] items-center justify-center px-4 lg:px-6 bg-brand-red rounded-[50px] text-white text-body-l font-medium hover:opacity-90 transition-opacity"
                         >
-                            Увійти
+                            {t("header_login")}
                         </Link>
                     )}
 
@@ -220,7 +220,7 @@ const Header = () => {
                 <nav className="flex items-center gap-2 sm:gap-4 lg:gap-12 shrink-0">
                     <div className="flex items-center gap-1 sm:gap-3 lg:gap-[30px]">
                         {navItems.map((item, index) => {
-                            if (item.label === "СПОРТ") {
+                            if (item.labelKey === "nav_sport") {
                                 return (
                                     <div key={index} className="relative" ref={sportMenuRef}>
                                         <button
@@ -231,7 +231,7 @@ const Header = () => {
                                                 {item.icon}
                                             </div>
                                             <span className="hidden lg:inline text-body-l font-medium text-brand-red uppercase">
-                                                {item.label}
+                                                {t(item.labelKey)}
                                             </span>
                                             <div className={`${isSportOpen ? "rotate-180" : ""} transition-transform duration-200`}>
                                                 {ICONS.ArrowDown}
@@ -267,14 +267,14 @@ const Header = () => {
                                                             <span className={`text-[15px] font-bold leading-tight transition-colors ${
                                                                 hoveredSport === s.key ? "text-[#af292a]" : "text-[#212121]"
                                                             }`}>
-                                                                {s.label}
+                                                                {t(s.labelKey)}
                                                             </span>
                                                         </button>
                                                     ))}
                                                 </div>
                                                 <div className="flex flex-col gap-1 p-4 sm:p-6">
                                                     <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1">
-                                                        Топ ліги
+                                                        {t("header_top_leagues")}
                                                     </span>
                                                     {activeSport.leagues.map((l, i) => {
                                                         const badge = badgeFor(i);
@@ -306,7 +306,7 @@ const Header = () => {
                                     </div>
                                 );
                             }
-                            if (item.label === "КІБЕРСПОРТ") {
+                            if (item.labelKey === "nav_esport") {
                                 return (
                                     <div key={index} className="relative" ref={esportMenuRef}>
                                         <button
@@ -317,7 +317,7 @@ const Header = () => {
                                                 {item.icon}
                                             </div>
                                             <span className="text-body-l font-medium text-brand-red uppercase">
-                                                {item.label}
+                                                {t(item.labelKey)}
                                             </span>
                                             <div className={`${isEsportOpen ? "rotate-180" : ""} transition-transform duration-200`}>
                                                 {ICONS.ArrowDown}
@@ -382,7 +382,7 @@ const Header = () => {
                                         {item.icon}
                                     </div>
                                     <span className="hidden lg:inline text-body-l font-medium text-brand-red uppercase">
-                                        {item.label}
+                                        {t(item.labelKey)}
                                     </span>
                                 </Link>
                             );

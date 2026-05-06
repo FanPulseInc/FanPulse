@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useT } from "@/services/i18n/context"
 
 interface Props {
   isOpen: boolean
@@ -10,6 +11,7 @@ interface Props {
 
 
 export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Props) {
+  const { t } = useT()
   const [value, setValue] = useState("")
 
   if (!isOpen) return null
@@ -21,15 +23,15 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Props
       <div className="w-[400px] bg-white rounded-[20px] p-6 flex flex-col gap-4 shadow-xl">
         
         <h2 className="text-xl font-bold text-brand-red">
-          Видалення акаунта
+          {t("delete_account_title")}
         </h2>
 
         <p className="text-sm text-brand-black/70">
-          Це незворотна дія. Всі ваші дані будуть видалені.
+          {t("delete_account_warning")}
         </p>
 
         <p className="text-sm text-brand-black">
-          Введіть <span className="font-bold text-brand-red">DELETE</span> щоб підтвердити
+          {t("delete_account_confirm_prompt")} <span className="font-bold text-brand-red">DELETE</span>
         </p>
 
         <input
@@ -44,7 +46,7 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Props
             onClick={onClose}
             className="flex-1 h-[45px] rounded-[12px] border border-gray-300 hover:bg-gray-100"
           >
-            Скасувати
+            {t("cancel")}
           </button>
 
           <button
@@ -59,7 +61,7 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Props
                 : "bg-gray-300 cursor-not-allowed"
             }`}
           >
-            Видалити
+            {t("delete")}
           </button>
         </div>
       </div>
