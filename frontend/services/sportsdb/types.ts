@@ -56,8 +56,11 @@ export interface SDBTeam {
     idTeam?: string;
     strTeam?: string;
     strTeamBadge?: string | null;
+    strBadge?: string | null;       // v2 lookup uses strBadge
     strTeamLogo?: string | null;
+    strLogo?: string | null;        // v2 fallback
     strCountry?: string;
+    idLeague?: string;
     strLeague?: string;
     strStadium?: string;
     strManager?: string;

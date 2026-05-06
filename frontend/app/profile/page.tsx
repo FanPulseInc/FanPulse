@@ -10,6 +10,7 @@ import RecentActivity from "./_components/RecentActivity"
 import ChangePassword from "./_components/ChangePassword"
 import DeleteAccountModal from "./_components/DeleteAccountModal"
 import { useT } from "@/services/i18n/context"
+import { useFavoriteTeamsResolved } from "@/services/useFavoriteTeams"
 
 const Profile = () => {
     const { t } = useT()
@@ -21,6 +22,7 @@ const Profile = () => {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
 
     const { mutateAsync: deleteUser } = useDeleteApiUserId()
+    const { teams: favTeams, competitions: favCompetitions } = useFavoriteTeamsResolved()
 
     const [activeTab, setActiveTab] = useState<"main" | "activity" | "favorites" | "password">("main")
 
@@ -118,21 +120,15 @@ const Profile = () => {
 
 
 
-    const competitions = [
-        { name: "Ліга Європи УЄФА", icon: "/Vector.svg" },
-        { name: "Євроліга", icon: "/Group.svg" },
-        { name: "United21", icon: "/Vector1.svg" },
-        { name: "Formula1", icon: "/ic-round-sports-motorsports.svg" },
-        { name: "NFL Preseason", icon: "/Data-Values-Five.svg" },
-    ];
+    const competitions = favCompetitions.map((c) => ({
+        name: c.name,
+        icon: c.badge || "/icons/question_mark.png",
+    }));
 
-    const teams = [
-        { name: "FC Bayern München", icon: "/Vector.svg" },
-        { name: "Kansas City Chiefs", icon: "/Data-Values-Five.svg" },
-        { name: "G2 Ares", icon: "/Vector1.svg" },
-        { name: "Hapoel Tel-Aviv", icon: "/Group.svg" },
-        { name: "LPH Gaming", icon: "/Vector1.svg" },
-    ];
+    const teams = favTeams.map((t) => ({
+        name: t.name,
+        icon: t.badge || "/icons/question_mark.png",
+    }));
 
     const stats = [
         { label: t("profile_publications"), value: user?.countOfPosts },
@@ -140,13 +136,7 @@ const Profile = () => {
         { label: t("profile_likes_count"), value: user?.countOfLkes },
     ];
 
-    const players = [
-        { name: "Cristiano Ronaldo", icon: "/Vector.svg" },
-        { name: "Lionel Messi", icon: "/Group.svg" },
-        { name: "Kevin De Bruyne", icon: "/Vector1.svg" },
-        { name: "Erling Haaland", icon: "/Data-Values-Five.svg" },
-        { name: "Kylian Mbappé", icon: "/Vector.svg" },
-    ];
+    const players: { name: string; icon: string }[] = [];
     return (
 
         <div className="bg-[#efefef] flex flex-row justify-center p-5 min-h-screen  font-['Space_Grotesk']">

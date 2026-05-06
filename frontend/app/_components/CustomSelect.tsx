@@ -12,9 +12,11 @@ interface Props {
     options: Option[];
     placeholder?: string;
     onChange: (values: string[]) => void;
+    value?: string[];
+    maxSelected?: number;
 }
 
-const CustomSelect = ({ options, placeholder, onChange }: Props) => {
+const CustomSelect = ({ options, placeholder, onChange, value, maxSelected }: Props) => {
     const { t } = useT();
 
 
@@ -64,6 +66,12 @@ const CustomSelect = ({ options, placeholder, onChange }: Props) => {
         onChange(newValue.map((v) => v.value));
     };
 
+    const selectedValues = value
+        ? options.filter((o) => value.includes(o.value))
+        : undefined;
+
+    const atLimit = maxSelected != null && (value?.length ?? 0) >= maxSelected;
+
     return (
         <div className="flex flex-col gap-2 w-full max-w-[400px]">
             <label className="text-body-1 font-medium text-brand-black ml-4">
@@ -76,6 +84,8 @@ const CustomSelect = ({ options, placeholder, onChange }: Props) => {
                 placeholder={placeholder ?? t("select_categories_placeholder")}
                 onChange={handleChange}
                 noOptionsMessage={() => t("nothing_found")}
+                value={selectedValues}
+                isOptionDisabled={() => atLimit}
             />
         </div>
     );

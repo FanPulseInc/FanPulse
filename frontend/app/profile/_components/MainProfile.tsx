@@ -50,34 +50,46 @@ export default function MainProfile({
           {t("profile_favourite_tab")}
         </h2>
 
-        <div className="flex flex-col gap-5">
-          <h2 className="font-bold">{t("profile_competitions_tab")}</h2>
-          <div className="grid grid-cols-5 gap-4">
-            {competitions.map((item: FavoriteItem, idx: number) => (
-              <FavoriteCard key={idx} item={item} />
-            ))}
+        {competitions.length > 0 && (
+          <div className="flex flex-col gap-5">
+            <h2 className="font-bold">{t("profile_competitions_tab")}</h2>
+            <div className="grid grid-cols-5 gap-4">
+              {competitions.map((item: FavoriteItem, idx: number) => (
+                <FavoriteCard key={idx} item={item} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="flex flex-col gap-5">
-          <h2 className="font-bold text-brand-black">{t("profile_teams_tab")}</h2>
-          <div className="grid grid-cols-5 gap-4">
-            {teams.map((item: FavoriteItem, idx: number) => (
-              <FavoriteCard key={idx} item={item} />
-            ))}
+        {teams.length > 0 && (
+          <div className="flex flex-col gap-5">
+            <h2 className="font-bold text-brand-black">{t("profile_teams_tab")}</h2>
+            <div className="grid grid-cols-5 gap-4">
+              {teams.map((item: FavoriteItem, idx: number) => (
+                <FavoriteCard key={idx} item={item} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="flex flex-col gap-5">
-          <h3 className="text-[1.25rem] font-bold text-brand-black">
-            {t("profile_players_tab")}
-          </h3>
-          <div className="grid grid-cols-5 gap-4">
-            {players.map((item: FavoriteItem, idx: number) => (
-              <FavoriteCard key={idx} item={item} player />
-            ))}
+        {players.length > 0 && (
+          <div className="flex flex-col gap-5">
+            <h3 className="text-[1.25rem] font-bold text-brand-black">
+              {t("profile_players_tab")}
+            </h3>
+            <div className="grid grid-cols-5 gap-4">
+              {players.map((item: FavoriteItem, idx: number) => (
+                <FavoriteCard key={idx} item={item} player />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {competitions.length === 0 && teams.length === 0 && players.length === 0 && (
+          <div className="py-8 text-center text-[14px] text-brand-black/40 font-medium">
+            {t("no_favourites")}
+          </div>
+        )}
       </section>
     </>
   )
@@ -86,15 +98,15 @@ export default function MainProfile({
 function FavoriteCard({ item, player }: { item: FavoriteItem; player?: boolean }) {
   return (
     <div className="aspect-[4/5] shadow-lg rounded-[20px] bg-brand-red flex flex-col items-center justify-end pb-5 px-2 gap-3 relative transition-transform hover:scale-105 cursor-pointer">
-      <div className="w-10 h-10 absolute top-4 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-white">
+      <div className="w-16 h-16 absolute top-4 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
         <img
           src={item.icon}
-          alt=""
-          className={player ? "w-full h-full object-contain p-1" : "w-5 h-5 object-contain"}
+          alt={item.name}
+          className={player ? "w-full h-full object-contain p-1" : "w-12 h-12 object-contain"}
         />
       </div>
 
-      <span className="text-[0.75rem] text-white font-medium text-center leading-tight">
+      <span className="text-[0.7rem] text-white font-medium text-center leading-tight line-clamp-2">
         {item.name}
       </span>
     </div>

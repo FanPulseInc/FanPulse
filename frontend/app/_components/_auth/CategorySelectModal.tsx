@@ -67,7 +67,12 @@ export default function CategorySelectModal({
         {isLoading ? (
           <p className="text-body-s text-brand-red">{t("loading")}</p>
         ) : (
-          <CustomSelect options={categories} onChange={handleSelectChange} />
+          <CustomSelect
+            options={categories}
+            onChange={handleSelectChange}
+            value={selectedCategory}
+            maxSelected={2}
+          />
         )}
 
         {error && (
