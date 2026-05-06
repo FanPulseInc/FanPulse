@@ -1,6 +1,7 @@
 "use client";
 import RecentActivity from "./RecentActivity"
 import { useT } from "@/services/i18n/context"
+import type { UserResponse } from "@/services/api/model/userResponse"
 
 interface StatItem { label: string; value: string | number }
 interface FavoriteItem { icon: string; name: string }
@@ -12,7 +13,7 @@ export default function MainProfile({
   teams,
   players,
 }: {
-  user?: object;
+  user?: UserResponse;
   stats: StatItem[];
   competitions: FavoriteItem[];
   teams: FavoriteItem[];

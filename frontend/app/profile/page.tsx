@@ -131,9 +131,9 @@ const Profile = () => {
     }));
 
     const stats = [
-        { label: t("profile_publications"), value: user?.countOfPosts },
-        { label: t("profile_comments_count"), value: user?.countOfComments },
-        { label: t("profile_likes_count"), value: user?.countOfLkes },
+        { label: t("profile_publications"), value: user?.countOfPosts ?? 0 },
+        { label: t("profile_comments_count"), value: user?.countOfComments ?? 0 },
+        { label: t("profile_likes_count"), value: user?.countOfLkes ?? 0 },
     ];
 
     const players: { name: string; icon: string }[] = [];
@@ -307,7 +307,7 @@ const Profile = () => {
             <main className="flex-1 border-[2px] rounded-[20px] border-brand-red max-w-[900px] p-10 flex flex-col gap-12 text-brand-black h-[calc(100vh-40px)] sticky top-5 overflow-y-auto custom-scrollbar">
                 {activeTab === "main" && (
                     <MainProfile
-                        user={user}
+                        user={user ?? undefined}
                         stats={stats}
                         competitions={competitions}
                         teams={teams}
@@ -316,7 +316,7 @@ const Profile = () => {
                 )}
 
                 {activeTab === "activity" && (
-                    <RecentActivity user={user} />
+                    <RecentActivity user={user ?? undefined} />
                 )}
 
                 {activeTab === "password" && (

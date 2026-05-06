@@ -1,17 +1,12 @@
 "use client";
 import { useT } from "@/services/i18n/context"
-
-interface ActivityItem {
-  type?: string;
-  title?: string;
-  createdAt?: string;
-}
+import type { UserActivityDto } from "@/services/api/model/userActivityDto"
 
 interface UserWithActivity {
-  recentActivities?: ActivityItem[];
+  recentActivities?: UserActivityDto[] | null;
 }
 
-export default function RecentActivity({ user }: { user?: UserWithActivity }) {
+export default function RecentActivity({ user }: { user?: UserWithActivity | null }) {
   const { t } = useT()
 
   const typeMap: Record<string, string> = {
@@ -68,7 +63,7 @@ export default function RecentActivity({ user }: { user?: UserWithActivity }) {
             </span>
           </div>
         ) : (
-          user.recentActivities.map((item: ActivityItem, index: number) => (
+          user.recentActivities.map((item: UserActivityDto, index: number) => (
             <div
               key={index}
               className="w-full min-h-[70px] bg-gray-50 border-2 border-brand-red rounded-[20px] flex flex-row items-center px-6 gap-4 hover:bg-brand-red/5 transition-colors cursor-pointer group"

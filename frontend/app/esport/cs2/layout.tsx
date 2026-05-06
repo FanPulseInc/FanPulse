@@ -163,10 +163,10 @@ export default function Cs2Layout({ children }: { children: ReactNode }) {
             groups={groups}
             dateIso={dateIso}
             dateLabel={dateLabel}
-            onPhaseChange={setPhase}
-            onPrevDay={() => setDateIso((value) => shiftDate(value, -1))}
-            onNextDay={() => setDateIso((value) => shiftDate(value, 1))}
-            onPickDate={(iso) => setDateIso(iso)}
+            onPhaseChangeAction={setPhase}
+            onPrevDayAction={() => setDateIso((value) => shiftDate(value, -1))}
+            onNextDayAction={() => setDateIso((value) => shiftDate(value, 1))}
+            onPickDateAction={(iso) => setDateIso(iso)}
             gameSlug="cs2"
           />
         )}

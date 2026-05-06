@@ -38,12 +38,12 @@ function relativeKickoff(startIso: string | undefined, now: number, tFn: (key: s
   const diffMs = ms - now;
   if (diffMs <= 0) return null;
 
-  const minutes = Math.round(diffMs / 60_000);
+  const min = Math.round(diffMs / 60_000);
 
   if (min < 60) return tFn("time_in_min", { min });
 
-  const hours = Math.floor(minutes / 60);
-  const restMinutes = minutes % 60;
+  const hr = Math.floor(min / 60);
+  const rem = min % 60;
 
   if (hr < 24) return rem > 0 ? tFn("time_in_hours_min", { hr, min: rem }) : tFn("time_in_hours", { hr });
 
@@ -135,7 +135,7 @@ function EsportsMatchRow({
       }`}
     >
       <span className="font-data text-[14px] font-bold text-[#af292a]">
-        {phase === "live" ? "LIVE" : match.time}
+        {realPhase === "live" ? "LIVE" : match.time}
       </span>
 
       <div className="flex min-w-0 flex-col gap-[2px]">
@@ -185,22 +185,22 @@ export default function EsportsScheduleColumn({
   groups = [],
   dateLabel = "29.04.26",
   selectedMatchId,
-  onPrevDay,
-  onNextDay,
-  onPickDate,
+  onPrevDayAction,
+  onNextDayAction,
+  onPickDateAction,
   dateIso,
-  onPhaseChange,
+  onPhaseChangeAction,
   gameSlug = "cs2",
 }: {
   groups?: EsportsTournamentGroup[];
   dateLabel?: string;
   selectedMatchId?: string;
-  onPrevDay?: () => void;
-  onNextDay?: () => void;
-  onPickDate?: (iso: string) => void;
+  onPrevDayAction?: () => void;
+  onNextDayAction?: () => void;
+  onPickDateAction?: (iso: string) => void;
   dateIso?: string;
-  onPhaseChange?: (phase: string | null) => void;
-  gameSlug?: GameSlug;
+  onPhaseChangeAction?: (phase: string | null) => void;
+  gameSlug?: string;
 }) {
   const { t } = useT();
   const router = useRouter();
@@ -238,7 +238,7 @@ export default function EsportsScheduleColumn({
 
   function handlePhaseClick(next: string | null) {
     setPhaseTab(next);
-    onPhaseChange?.(next);
+    onPhaseChangeAction?.(next);
   }
 
   return (
@@ -260,8 +260,8 @@ export default function EsportsScheduleColumn({
 
         <div className="relative ml-auto flex items-center gap-1">
           <button
-            onClick={onPrevDay}
-            disabled={!onPrevDay}
+            onClick={onPrevDayAction}
+            disabled={!onPrevDayAction}
             className="flex h-[26px] w-[22px] cursor-pointer items-center justify-center rounded-[6px] border border-white/30 text-xs text-white hover:bg-white/10 disabled:cursor-default disabled:opacity-40"
             aria-label="Previous day"
           >
@@ -275,12 +275,12 @@ export default function EsportsScheduleColumn({
             {dateLabel}
           </button>
 
-          {pickerOpen && onPickDate && (
+          {pickerOpen && onPickDateAction && (
             <input
               type="date"
               defaultValue={dateIso}
               onChange={(event) => {
-                onPickDate(event.target.value);
+                onPickDateAction(event.target.value);
                 setPickerOpen(false);
               }}
               className="absolute right-0 top-[30px] z-10 rounded-[6px] border border-gray-300 bg-white px-2 py-1 text-[11px] text-[#212121]"
@@ -288,8 +288,8 @@ export default function EsportsScheduleColumn({
           )}
 
           <button
-            onClick={onNextDay}
-            disabled={!onNextDay}
+            onClick={onNextDayAction}
+            disabled={!onNextDayAction}
             className="flex h-[26px] w-[22px] cursor-pointer items-center justify-center rounded-[6px] border border-white/30 text-xs text-white hover:bg-white/10 disabled:cursor-default disabled:opacity-40"
             aria-label="Next day"
           >

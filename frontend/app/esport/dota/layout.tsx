@@ -63,7 +63,22 @@ function mapToGroups(
   series: GridDotaSeries[],
   forcedStatus?: "live" | "past" | "upcoming"
 ) {
-  const map: Record<string, any> = {};
+  type TournamentGroup = {
+    tournamentId: string;
+    tournamentName: string;
+    matches: {
+      id: string;
+      time: string;
+      startIso: string;
+      homeTeam: string;
+      awayTeam: string;
+      homeScore: number | undefined;
+      awayScore: number | undefined;
+      status: "live" | "past" | "upcoming";
+      format: string;
+    }[];
+  };
+  const map: Record<string, TournamentGroup> = {};
 
   for (const s of series) {
     const tournament = s.tournament;
@@ -105,7 +120,7 @@ function mapToGroups(
 }
 
 export default function DotaLayout({ children }: { children: ReactNode }) {
-  const [groups, setGroups] = useState<any[]>([]);
+  const [groups, setGroups] = useState<ReturnType<typeof mapToGroups>>([]);
   const [dateIso, setDateIso] = useState(() => toDateIsoLocal(new Date()));
   const [phase, setPhase] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -159,10 +174,10 @@ export default function DotaLayout({ children }: { children: ReactNode }) {
             groups={groups}
             dateIso={dateIso}
             dateLabel={dateLabel}
-            onPhaseChange={setPhase}
-            onPrevDay={() => setDateIso((v) => shiftDate(v, -1))}
-            onNextDay={() => setDateIso((v) => shiftDate(v, 1))}
-            onPickDate={(iso) => setDateIso(iso)}
+            onPhaseChangeAction={setPhase}
+            onPrevDayAction={() => setDateIso((v) => shiftDate(v, -1))}
+            onNextDayAction={() => setDateIso((v) => shiftDate(v, 1))}
+            onPickDateAction={(iso) => setDateIso(iso)}
             gameSlug="dota"
           />
         )}
