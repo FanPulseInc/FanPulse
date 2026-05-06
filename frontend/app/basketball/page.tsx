@@ -20,6 +20,7 @@ import {
     formatElapsed,
 } from "@/services/sportsdb/adapters";
 import type { SDBEvent } from "@/services/sportsdb/types";
+import { useT } from "@/services/i18n/context";
 
 const TOP_LEAGUES: { id: string; name: string }[] = [
     { id: "4387", name: "NBA" },
@@ -55,6 +56,7 @@ function formatDateLabel(iso: string): string {
 }
 
 export default function BasketballPage() {
+    const { t } = useT();
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialDate = searchParams.get("date") || todayIso();
@@ -198,7 +200,7 @@ export default function BasketballPage() {
                 <div className="flex flex-col gap-2 w-full lg:w-auto">
                     {anyLoading && (
                         <div className="w-full lg:w-[560px] text-center text-gray-500 text-sm py-2">
-                            Завантаження матчів ({season})...
+                            {t("loading_matches")} ({season})...
                         </div>
                     )}
                     <ScheduleColumn
@@ -216,13 +218,13 @@ export default function BasketballPage() {
                 <div className="flex-1 min-w-0">
                     {anyLoading ? (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Завантаження анонсів...
+                            {t("loading_announcements")}
                         </div>
                     ) : carouselMatches.length > 0 ? (
                         <MatchCarousel matches={carouselMatches} />
                     ) : (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Немає найближчих матчів
+                            {t("no_upcoming_matches")}
                         </div>
                     )}
                 </div>

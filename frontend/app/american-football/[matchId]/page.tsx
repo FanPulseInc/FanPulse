@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import { useT } from "@/services/i18n/context";
 import { SportContainer } from "../../_components/_shared/SportContainer";
 import ScheduleColumn, {
     type ScheduleGroup,
@@ -197,6 +198,7 @@ function formatDateLabel(iso: string): string {
 }
 
 export default function AmericanFootballMatchPage() {
+    const { t } = useT();
     const params = useParams();
     const searchParams = useSearchParams();
     const matchId = params.matchId as string;
@@ -258,7 +260,7 @@ export default function AmericanFootballMatchPage() {
     const liveElapsed = formatElapsed(liveForMatch?.strProgress, liveForMatch?.strStatus);
     const featured = event ? eventToFeatured(event) : null;
     if (featured) {
-        featured.stage = "Американський футбол";
+        featured.stage = t("sport_american_football");
     }
     if (featured && liveForMatch) {
         if (liveElapsed) featured.elapsed = liveElapsed;
@@ -323,17 +325,17 @@ export default function AmericanFootballMatchPage() {
                             onClick={() => setDateIso(d => shiftSeasonIso(d, -1))}
                             className="h-[30px] px-3 rounded-full bg-[#212121] text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider hover:bg-black transition-colors cursor-pointer whitespace-nowrap"
                         >
-                            ‹ Минулий сезон
+                            {t("prev_season")}
                         </button>
                         <span className="text-[12px] sm:text-[13px] font-bold uppercase tracking-wider text-[#212121]">
-                            Сезон {season}
+                            {t("season")} {season}
                         </span>
                         <button
                             type="button"
                             onClick={() => setDateIso(d => shiftSeasonIso(d, +1))}
                             className="h-[30px] px-3 rounded-full bg-[#212121] text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider hover:bg-black transition-colors cursor-pointer whitespace-nowrap"
                         >
-                            Наступний сезон ›
+                            {t("next_season")}
                         </button>
                     </div>
                     <ScheduleColumn
@@ -352,13 +354,13 @@ export default function AmericanFootballMatchPage() {
                 <div className="flex-1 min-w-0 flex flex-col gap-4">
                     {eventLoading && (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Завантаження матчу...
+                            {t("loading_match")}
                         </div>
                     )}
 
                     {!eventLoading && !event && (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Матч не знайдено
+                            {t("match_not_found")}
                         </div>
                     )}
 
@@ -389,7 +391,7 @@ export default function AmericanFootballMatchPage() {
                                         ? "text-[#af292a]"
                                         : "text-gray-400 hover:text-[#af292a]"
                                 }`}
-                                title="Додати команду в улюблені"
+                                title={t("favourite_team")}
                             >
                                 <span>{isTeamFav(event.idHomeTeam ?? undefined) ? "★" : "☆"}</span>
                                 <span className="truncate max-w-[160px]">{event.strHomeTeam}</span>
@@ -401,10 +403,10 @@ export default function AmericanFootballMatchPage() {
                                 className={`text-[13px] font-bold flex items-center gap-1 cursor-pointer transition-colors ${
                                     isMatchFav(matchId) ? "text-[#af292a]" : "text-gray-400 hover:text-[#af292a]"
                                 }`}
-                                title="Додати матч в улюблені"
+                                title={t("favourite_match")}
                             >
                                 <span className="text-lg">{isMatchFav(matchId) ? "★" : "☆"}</span>
-                                <span className="text-[11px] uppercase tracking-wider">Матч</span>
+                                <span className="text-[11px] uppercase tracking-wider">{t("match_details")}</span>
                             </button>
 
                             <button
@@ -415,7 +417,7 @@ export default function AmericanFootballMatchPage() {
                                         ? "text-[#af292a]"
                                         : "text-gray-400 hover:text-[#af292a]"
                                 }`}
-                                title="Додати команду в улюблені"
+                                title={t("favourite_team")}
                             >
                                 <span className="truncate max-w-[160px]">{event.strAwayTeam}</span>
                                 <span>{isTeamFav(event.idAwayTeam ?? undefined) ? "★" : "☆"}</span>
@@ -466,7 +468,7 @@ export default function AmericanFootballMatchPage() {
                                     isMatchFav(matchId) ? "text-[#af292a]" : "text-white/40 hover:text-[#af292a]"
                                 }`}
                                 aria-label="Favourite match"
-                                title={isMatchFav(matchId) ? "Прибрати з улюблених" : "Додати матч в улюблені"}
+                                title={isMatchFav(matchId) ? t("unfavourite_match") : t("favourite_match")}
                             >
                                 {isMatchFav(matchId) ? "★" : "☆"}
                             </button>
@@ -476,29 +478,29 @@ export default function AmericanFootballMatchPage() {
                     {event && (
                         <ScoringTimeline
                             plays={scoringPlays}
-                            homeName={event.strHomeTeam ?? "Команда 1"}
-                            awayName={event.strAwayTeam ?? "Команда 2"}
+                            homeName={event.strHomeTeam ?? t("team_one")}
+                            awayName={event.strAwayTeam ?? t("team_two")}
                         />
                     )}
 
                     {event && (
                         <>
-                            <StatsTable rows={offenseStats} labels={NFL_OFFENSE_LABELS} title="Атака" />
-                            <StatsTable rows={passStats} labels={NFL_PASS_LABELS} title="Пас" />
-                            <StatsTable rows={rushStats} labels={NFL_RUSH_LABELS} title="Виноси м'яча" />
-                            <StatsTable rows={otherStats} labels={NFL_OTHER_LABELS} title="Інше" />
+                            <StatsTable rows={offenseStats} labels={NFL_OFFENSE_LABELS} title={t("attack")} />
+                            <StatsTable rows={passStats} labels={NFL_PASS_LABELS} title={t("passing")} />
+                            <StatsTable rows={rushStats} labels={NFL_RUSH_LABELS} title={t("rushing")} />
+                            <StatsTable rows={otherStats} labels={NFL_OTHER_LABELS} title={t("other")} />
                         </>
                     )}
 
                     {event && (homeLastFive.length > 0 || awayLastFive.length > 0) && (
                         <LastFiveMatches
                             home={{
-                                teamName: event.strHomeTeam ?? "Команда 1",
+                                teamName: event.strHomeTeam ?? t("team_one"),
                                 teamLogo: event.strHomeTeamBadge ?? undefined,
                                 rows: homeLastFive,
                             }}
                             away={{
-                                teamName: event.strAwayTeam ?? "Команда 2",
+                                teamName: event.strAwayTeam ?? t("team_two"),
                                 teamLogo: event.strAwayTeamBadge ?? undefined,
                                 rows: awayLastFive,
                             }}

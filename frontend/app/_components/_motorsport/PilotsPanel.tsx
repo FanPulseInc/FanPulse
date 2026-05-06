@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { useT } from "@/services/i18n/context";
 
 export interface Pilot {
     id: string;
@@ -26,7 +27,8 @@ function Pill({ children }: { children: React.ReactNode }) {
 }
 
 function Row({ p }: { p: Pilot }) {
-    const isLeader = p.intervalToLeader === "Лідер";
+    const { t } = useT();
+    const isLeader = p.intervalToLeader === "Лідер" || p.intervalToLeader === "Leader" || p.position === 1;
     return (
         <div className="grid grid-cols-[40px_44px_1fr_auto] items-center gap-3 py-[10px] border-b border-gray-100 last:border-none">
             <div className="w-8 h-8 rounded-full bg-[#212121] text-white text-[12px] font-bold flex items-center justify-center">
@@ -58,7 +60,7 @@ function Row({ p }: { p: Pilot }) {
             </div>
             <div className="flex items-center gap-2">
                 {isLeader ? (
-                    <Pill>{p.timeOrLap || "Лідер"}</Pill>
+                    <Pill>{p.timeOrLap || t("leader")}</Pill>
                 ) : (
                     p.intervalToLeader && <Pill>{p.intervalToLeader}</Pill>
                 )}
@@ -67,7 +69,8 @@ function Row({ p }: { p: Pilot }) {
     );
 }
 
-export default function PilotsPanel({ pilots, title = "Звітність", isLive }: Props) {
+export default function PilotsPanel({ pilots, isLive }: Props) {
+    const { t } = useT();
     return (
         <div className="w-full flex flex-col gap-2">
             <div className="w-full bg-white rounded-[14px] shadow-sm border border-gray-100 flex flex-col p-3">
@@ -75,16 +78,16 @@ export default function PilotsPanel({ pilots, title = "Звітність", isLi
                     <span />
                     <span />
                     <span className="text-[11px] font-bold uppercase tracking-wider text-white">
-                        Пілот
+                        {t("sport_pilot")}
                     </span>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-white">
-                        Відрив
+                        {t("gap")}
                     </span>
                 </div>
                 <div className="flex flex-col px-[16px]">
                     {pilots.length === 0 ? (
                         <div className="text-center text-gray-400 text-[12px] py-6">
-                            Дані недоступні
+                            {t("no_data")}
                         </div>
                     ) : (
                         pilots.map(p => <Row key={p.id} p={p} />)

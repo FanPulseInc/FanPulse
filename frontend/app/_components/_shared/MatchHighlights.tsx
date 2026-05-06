@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { useT } from "@/services/i18n/context";
 
 
 function extractYoutubeId(url: string): string | null {
@@ -30,10 +31,13 @@ export default function MatchHighlights({
     homeName?: string;
     awayName?: string;
 }) {
+    const { t } = useT();
     const id = extractYoutubeId(videoUrl);
     if (!id) return null;
     const thumb = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
     const titleParts = [homeName, awayName].filter(Boolean).join(" – ");
+    const reviewLabel = t("review_label");
+    const reviewTitle = `${reviewLabel.charAt(0).toUpperCase()}${reviewLabel.slice(1)}`;
 
     return (
         <a
@@ -41,12 +45,12 @@ export default function MatchHighlights({
             target="_blank"
             rel="noopener noreferrer"
             className="group relative block w-full max-w-full aspect-video sm:aspect-auto sm:h-[160px] rounded-[20px] overflow-hidden bg-[#212121] shadow-sm border border-gray-100"
-            aria-label="Огляд матчу"
+            aria-label={reviewTitle}
         >
             
             <Image
                 src={thumb}
-                alt={titleParts ? `${titleParts} — огляд` : "Огляд матчу"}
+                alt={titleParts ? `${titleParts} — ${reviewLabel}` : reviewTitle}
                 fill
                 unoptimized
                 sizes="600px"
@@ -58,7 +62,7 @@ export default function MatchHighlights({
 
             
             <span className="absolute top-3 left-3 bg-[#af292a] text-white text-[10px] font-bold uppercase tracking-wider px-3 py-[4px] rounded-full">
-                Огляд
+                {reviewLabel}
             </span>
 
             
@@ -73,7 +77,7 @@ export default function MatchHighlights({
             
             <div className="absolute bottom-0 left-0 right-0 px-4 py-3 flex items-end justify-between gap-3">
                 <span className="text-white font-bold text-[13px] uppercase tracking-wider truncate">
-                    {titleParts || "Огляд матчу"}
+                    {titleParts || reviewTitle}
                 </span>
                 <span className="text-white/80 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
                     YouTube ↗

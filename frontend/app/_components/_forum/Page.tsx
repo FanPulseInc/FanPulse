@@ -12,19 +12,19 @@ import {
     getGetApiLikeCountTargetIdQueryKey,
 } from "@/services/api/generated";
 import type { PostResponce } from "@/services/api/model";
-
-const navFilters = [
-    { id: "latest", label: "Найновіші" },
-    { id: "popular", label: "Найпопулярніші" },
-    { id: "recommended", label: "Рекомендовані" },
-];
-
-const ALL_CATEGORIES = "Всі категорії";
+import { useT } from "@/services/i18n/context";
 
 export default function ForumPage() {
+    const { t } = useT();
     const [activeFilter, setActiveFilter] = useState("latest");
-    const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES);
+    const [selectedCategory, setSelectedCategory] = useState("__all__");
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+
+    const navFilters = [
+        { id: "latest", label: t("forum_latest") },
+        { id: "popular", label: t("forum_popular") },
+        { id: "recommended", label: t("forum_recommended") },
+    ];
 
     const { data: postsData, isLoading: postsLoading } = useGetApiPost({ page: 0, count: 20 });
     const rawPosts: PostResponce[] = Array.isArray(postsData)
@@ -34,15 +34,10 @@ export default function ForumPage() {
             ?? [];
     const { data: categories } = useGetApiCategoryRoots();
 
-    // Filter by category first
-    const filteredPosts = selectedCategory === ALL_CATEGORIES
+    const filteredPosts = selectedCategory === "__all__"
         ? rawPosts
         : rawPosts.filter(p => p.category?.name === selectedCategory);
 
-    // Live like counts per post. /api/Post doesn't include likes, so we fetch
-    // /api/Like/count/{id} in parallel and use that to sort by popularity.
-    // Results are cached under the same query key ThreadRow uses, so no extra
-    // network calls happen when rows mount.
     const likeCountQueries = useQueries({
         queries: filteredPosts.map(p => ({
             queryKey: getGetApiLikeCountTargetIdQueryKey(p.id!),
@@ -62,13 +57,12 @@ export default function ForumPage() {
         if (activeFilter === "latest") {
             const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
             const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-            return bTime - aTime; // newest first
+            return bTime - aTime;
         }
         if (activeFilter === "popular") {
             const aLikes = (a.id && likeCountById.get(a.id)) || 0;
             const bLikes = (b.id && likeCountById.get(b.id)) || 0;
             if (bLikes !== aLikes) return bLikes - aLikes;
-            // Tie-breaker: newer first
             const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
             const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
             return bTime - aTime;
@@ -76,12 +70,14 @@ export default function ForumPage() {
         return 0;
     });
 
+    const displayCategory = selectedCategory === "__all__" ? t("forum_all_categories") : selectedCategory;
+
     return (
         <ForumContainer>
             <div className="flex flex-col">
                 <div className="w-[1039px] h-[60px] bg-[#af292a] rounded-[20px] flex items-center justify-center relative z-20">
                     <Link href="/forum/create" className="absolute left-[16px] top-1/2 -translate-y-1/2 w-[154px] h-[34px] bg-[#212121] rounded-[13px] flex flex-row justify-center items-center gap-[4px] text-white font-bold text-sm hover:bg-black transition-all cursor-pointer">
-                        Створити пост +
+                        {t("forum_create_post_plus")}
                     </Link>
 
                     <button
@@ -89,13 +85,13 @@ export default function ForumPage() {
                         className="flex items-center gap-2 cursor-pointer"
                     >
                         <h1 className="text-white font-bold text-xl uppercase tracking-wider">
-                            {selectedCategory}
+                            {displayCategory}
                         </h1>
                         {isCategoryOpen ? ICONS.ArrowUpWhite : ICONS.ArrowDownWhite}
                     </button>
 
                     <button className="absolute right-[16px] top-[26px] w-[198px] h-[66px] bg-[#212121] rounded-[20px] flex flex-row justify-center items-center gap-[10px] text-white font-bold text-sm shadow-lg hover:bg-black transition-all">
-                        Правила форуму
+                        {t("forum_rules")}
                     </button>
                 </div>
 
@@ -110,14 +106,14 @@ export default function ForumPage() {
                         <button
                             key="all"
                             onClick={() => {
-                                setSelectedCategory(ALL_CATEGORIES);
+                                setSelectedCategory("__all__");
                                 setIsCategoryOpen(false);
                             }}
                             className={`w-full text-center font-bold text-lg transition-colors cursor-pointer ${
-                                selectedCategory === ALL_CATEGORIES ? "text-[#af292a]" : "hover:text-[#af292a]"
+                                selectedCategory === "__all__" ? "text-[#af292a]" : "hover:text-[#af292a]"
                             }`}
                         >
-                            {ALL_CATEGORIES}
+                            {t("forum_all_categories")}
                         </button>
                         {categories?.map((cat) => (
                             <button
@@ -158,20 +154,20 @@ export default function ForumPage() {
                         </div>
                     </div>
                         {postsLoading && (
-                            <div className="text-center text-gray-500 py-4">Завантаження...</div>
+                            <div className="text-center text-gray-500 py-4">{t("loading")}</div>
                         )}
                         {posts?.map((post) => (
                             <ThreadRow
                                 key={post.id}
                                 id={post.id!}
                                 title={post.title}
-                                author={post.user?.name ?? "Анонім"}
+                                author={post.user?.name ?? t("forum_anonymous")}
                                 date={post.createdAt}
                                 likesCount={post.likes?.length ?? 0}
                             />
                         ))}
                         {!postsLoading && (!posts || posts.length === 0) && (
-                            <div className="text-center text-gray-500 py-4">Немає постів</div>
+                            <div className="text-center text-gray-500 py-4">{t("forum_no_posts")}</div>
                         )}
                 </div>
             </div>

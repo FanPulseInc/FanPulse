@@ -5,6 +5,7 @@ import Toast from "../Toast";
 import LikeButton from "./LikeButton";
 import type { Comment as ApiComment } from "@/services/api/model";
 import { usePostApiComment, getGetApiPostIdQueryKey } from "@/services/api/generated";
+import { useT } from "@/services/i18n/context";
 
 function formatDate(dateStr?: string) {
     if (!dateStr) return "";
@@ -24,6 +25,7 @@ interface CommentNodeProps {
 }
 
 export default function CommentNode({ comment, depth, postId, postAuthorId }: CommentNodeProps) {
+    const { t } = useT();
     const replies = comment.children ?? [];
     const [isReplying, setIsReplying] = useState(false);
     const [replyText, setReplyText] = useState("");
@@ -52,7 +54,7 @@ export default function CommentNode({ comment, depth, postId, postAuthorId }: Co
             await addComment({ data: payload });
             setReplyText("");
             setIsReplying(false);
-            setToast({ message: "Коментар додано", type: "success" });
+            setToast({ message: t("comment_added"), type: "success" });
             await queryClient.invalidateQueries({ queryKey: getGetApiPostIdQueryKey(postId) });
         } catch (err) {
             const e = err as { response?: { status?: number; data?: { error?: string; message?: string } } };
@@ -60,13 +62,13 @@ export default function CommentNode({ comment, depth, postId, postAuthorId }: Co
             const serverMsg = e.response?.data?.error ?? e.response?.data?.message;
             console.error("Reply failed", status, e.response?.data, err);
 
-            let message = "Не вдалося надіслати коментар";
+            let message = t("comment_failed");
             if (serverMsg && /forbidden words/i.test(serverMsg)) {
-                message = "Коментар містить заборонені слова";
+                message = t("comment_banned_words");
             } else if (serverMsg) {
                 message = serverMsg;
             } else if (status === 401) {
-                message = "Увійдіть, щоб коментувати";
+                message = t("comment_login_required");
             }
             setToast({ message, type: "error" });
         }
@@ -84,10 +86,10 @@ export default function CommentNode({ comment, depth, postId, postAuthorId }: Co
             <div className="flex flex-col bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-visible">
                 <div className="bg-[#212121] h-[37px] px-4 flex justify-between items-center rounded-[20px] relative">
                     <span className="text-white text-[11px] font-bold flex items-center gap-2">
-                        <span className="ml-2">{comment.user?.name ?? "Анонім"}</span>
+                        <span className="ml-2">{comment.user?.name ?? t("forum_anonymous")}</span>
                         {isAuthor && (
                             <span className="bg-[#af292a] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-[2px] rounded-full">
-                                Автор
+                                {t("comment_author")}
                             </span>
                         )}
                     </span>
@@ -105,7 +107,7 @@ export default function CommentNode({ comment, depth, postId, postAuthorId }: Co
                             onClick={() => setIsReplying(v => !v)}
                             className="h-[28px] px-4 bg-[#212121] text-white rounded-full text-[11px] font-bold hover:opacity-90 active:scale-95 transition-all cursor-pointer"
                         >
-                            Коментувати
+                            {t("comment_reply")}
                         </button>
                         {comment.id && (
                             <LikeButton
@@ -123,7 +125,7 @@ export default function CommentNode({ comment, depth, postId, postAuthorId }: Co
                         <textarea
                             value={replyText}
                             onChange={e => setReplyText(e.target.value)}
-                            placeholder="Ввести текст"
+                            placeholder={t("comment_placeholder")}
                             rows={2}
                             className="w-full rounded-[12px] border-2 border-[#af292a] p-3 text-sm outline-none resize-none"
                         />
@@ -132,14 +134,14 @@ export default function CommentNode({ comment, depth, postId, postAuthorId }: Co
                                 onClick={() => { setIsReplying(false); setReplyText(""); }}
                                 className="h-[32px] px-4 rounded-full text-[11px] font-bold border border-gray-300 hover:bg-gray-100 transition cursor-pointer"
                             >
-                                Скасувати
+                                {t("cancel")}
                             </button>
                             <button
                                 onClick={onSubmitReply}
                                 disabled={isPending || !replyText.trim()}
                                 className="h-[32px] px-5 bg-[#212121] text-white rounded-full text-[11px] font-bold hover:opacity-90 active:scale-95 transition disabled:opacity-50 cursor-pointer"
                             >
-                                {isPending ? "..." : "Відправити"}
+                                {isPending ? "..." : t("comment_submit")}
                             </button>
                         </div>
                     </div>

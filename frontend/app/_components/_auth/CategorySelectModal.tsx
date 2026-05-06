@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useGetApiCategory } from "@/services/api/generated"
+import { useT } from "@/services/i18n/context"
 import CustomSelect from "../CustomSelect"
 
 interface CategorySelectModalProps {
@@ -15,6 +16,7 @@ export default function CategorySelectModal({
   onClose,
   isPending = false,
 }: CategorySelectModalProps) {
+  const { t } = useT()
   const [selectedCategory, setSelectedCategory] = useState<string[]>([])
   const [error, setError] = useState("")
 
@@ -29,7 +31,7 @@ export default function CategorySelectModal({
   const handleSelectChange = (selectedIds: string[]) => {
     if (selectedIds.length > 2) {
       setSelectedCategory(selectedIds.slice(0, 2))
-      setError("Можна вибрати не більше 2 категорій")
+      setError(t("auth_max_categories"))
       return
     }
 
@@ -39,7 +41,7 @@ export default function CategorySelectModal({
 
   const handleSubmit = async () => {
     if (selectedCategory.length !== 2) {
-      setError("Оберіть рівно 2 категорії")
+      setError(t("auth_exact_categories"))
       return
     }
 
@@ -56,14 +58,14 @@ export default function CategorySelectModal({
         className="w-[370px] bg-white rounded-[20px] p-8 flex flex-col gap-5 shadow-xl"
       >
         <div className="flex flex-col gap-1">
-          <h2 className="text-h1 text-brand-black">Оберіть категорії</h2>
+          <h2 className="text-h1 text-brand-black">{t("auth_choose_categories")}</h2>
           <p className="text-body-s text-brand-black/60">
-            Для завершення реєстрації оберіть рівно 2 улюблені категорії
+            {t("auth_choose_categories_desc")}
           </p>
         </div>
 
         {isLoading ? (
-          <p className="text-body-s text-brand-red">Завантаження...</p>
+          <p className="text-body-s text-brand-red">{t("loading")}</p>
         ) : (
           <CustomSelect options={categories} onChange={handleSelectChange} />
         )}
@@ -79,7 +81,7 @@ export default function CategorySelectModal({
             disabled={isPending}
             className="h-[50px] flex-1 border-2 border-brand-red text-brand-red rounded-[12px] font-semibold hover:bg-brand-red/5 transition-all cursor-pointer disabled:opacity-50"
           >
-            Назад
+            {t("auth_back")}
           </button>
 
           <button
@@ -88,7 +90,7 @@ export default function CategorySelectModal({
             disabled={isPending || selectedCategory.length !== 2}
             className="h-[50px] flex-1 bg-brand-red text-white rounded-[12px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isPending ? "Збереження..." : "Продовжити"}
+            {isPending ? t("auth_saving") : t("auth_continue")}
           </button>
         </div>
       </div>

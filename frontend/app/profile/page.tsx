@@ -9,8 +9,10 @@ import MainProfile from "./_components/MainProfile"
 import RecentActivity from "./_components/RecentActivity"
 import ChangePassword from "./_components/ChangePassword"
 import DeleteAccountModal from "./_components/DeleteAccountModal"
+import { useT } from "@/services/i18n/context"
 
 const Profile = () => {
+    const { t } = useT()
     const { user, isLoading, setUser } = useUserStore()
 
     const [nameEditing, setNameEditing] = useState(false)
@@ -28,7 +30,7 @@ const Profile = () => {
     } | null>(null)
     const { mutateAsync: rename } = usePutApiUserId()
 
-    if (isLoading) return <div className="p-10 text-brand-red">Завантаження...</div>
+    if (isLoading) return <div className="p-10 text-brand-red">{t("loading")}</div>
 
     const uploadAvatar = async (file: File) => {
         const res = await fetch("/api/upload/avatar", {
@@ -92,14 +94,14 @@ const Profile = () => {
             })
 
             setToast({
-                message: "Фото акаунта оновлено",
+                message: t("profile_photo_updated"),
                 type: "success",
             })
         } catch (e) {
             console.error(e)
 
             setToast({
-                message: "Помилка при зміні фото",
+                message: t("profile_photo_error"),
                 type: "error",
             })
         }
@@ -133,9 +135,9 @@ const Profile = () => {
     ];
 
     const stats = [
-        { label: "Публікації", value: user?.countOfPosts },
-        { label: "Коментарі", value: user?.countOfComments },
-        { label: "Вподобайки", value: user?.countOfLkes },
+        { label: t("profile_publications"), value: user?.countOfPosts },
+        { label: t("profile_comments_count"), value: user?.countOfComments },
+        { label: t("profile_likes_count"), value: user?.countOfLkes },
     ];
 
     const players = [
@@ -179,7 +181,7 @@ const Profile = () => {
                         </label>
 
                         <label className="text-sm text-brand-red cursor-pointer hover:underline">
-                            Змінити фото акаунта
+                            {t("profile_change_photo")}
                             <input
                                 type="file"
                                 accept="image/*"
@@ -224,14 +226,14 @@ const Profile = () => {
                                                     await rename({ id: user?.id ?? "", data: payload })
 
                                                     setToast({
-                                                        message: "Імʼя успішно змінено",
+                                                        message: t("profile_name_updated"),
                                                         type: "success",
                                                     })
                                                 } catch (e) {
                                                     console.error(e)
 
                                                     setToast({
-                                                        message: "Помилка при зміні імені",
+                                                        message: t("profile_name_error"),
                                                         type: "error",
                                                     })
                                                 }
@@ -261,11 +263,11 @@ const Profile = () => {
 
                     <section className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-[12px] text-brand-red font-medium ml-4 uppercase">Дата народження</label>
+                            <label className="text-[12px] text-brand-red font-medium ml-4 uppercase">{t("profile_birthday")}</label>
                             <div className="w-full h-[50px] rounded-[20px] bg-gray-50 border-2 border-brand-red flex items-center px-6">
                                 <input
                                     className="w-full bg-transparent outline-none font-bold text-brand-red opacity-50 cursor-not-allowed"
-                                    value="ДД.ММ.РРРР"
+                                    value={t("birthday_placeholder")}
                                     disabled
                                     type="text"
                                 />
@@ -277,13 +279,13 @@ const Profile = () => {
                                 onClick={() => setActiveTab("main")}
                                 className="w-full h-[50px] rounded-[20px] border-2 border-brand-red flex items-center px-6 text-brand-red font-bold hover:bg-brand-red/5 transition-colors cursor-pointer"
                             >
-                                Улюблене
+                                {t("profile_favourite_tab")}
                             </button>
                             <button
                                 onClick={() => setActiveTab("activity")}
                                 className="w-full h-[50px] rounded-[20px] border-2 border-brand-red flex items-center px-6 text-brand-red font-bold hover:bg-brand-red/5 transition-colors cursor-pointer"
                             >
-                                Активність
+                                {t("profile_activity_tab")}
                             </button>
 
 
@@ -292,19 +294,19 @@ const Profile = () => {
                                 onClick={() => setActiveTab("password")}
                                 className="w-full h-[50px] rounded-[20px] border-2 border-brand-red flex items-center px-6 text-brand-red font-bold hover:bg-brand-red/5 transition-colors cursor-pointer"
                             >
-                                Змінити пароль
+                                {t("profile_change_password")}
                             </button>
                         </div>
 
                         <div className="flex flex-col gap-2 mt-4">
                             <button onClick={handleLogout} className="w-full h-[50px] rounded-[20px] bg-brand-red text-white font-bold hover:opacity-90 transition-opacity cursor-pointer">
-                                Вийти
+                                {t("profile_logout")}
                             </button>
                             <button
                                 onClick={() => setIsDeleteOpen(true)}
                                 className="text-sm text-brand-red/50 font-medium hover:text-brand-red transition-colors cursor-pointer mt-2"
                             >
-                                Видалити акаунт
+                                {t("profile_delete_account")}
                             </button>
                         </div>
                     </section>

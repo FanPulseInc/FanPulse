@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { useT } from "@/services/i18n/context";
 import { ForumContainer } from "../../_components/_forum/ForumContainer";
 import CommentNode from "../../_components/_forum/CommentNode";
 import LikeButton from "../../_components/_forum/LikeButton";
@@ -24,6 +25,7 @@ function formatDate(dateStr?: string) {
 }
 
 export default function ThreadDetailPage() {
+    const { t } = useT();
     const params = useParams();
     const postId = params.id as string;
 
@@ -50,7 +52,7 @@ export default function ThreadDetailPage() {
             });
             setCommentText("");
             setIsCommenting(false);
-            setToast({ message: "Коментар додано", type: "success" });
+            setToast({ message: t("comment_added"), type: "success" });
             await queryClient.invalidateQueries({ queryKey: getGetApiPostIdQueryKey(postId) });
         } catch (err) {
             const e = err as { response?: { status?: number; data?: { error?: string; message?: string } } };
@@ -58,13 +60,13 @@ export default function ThreadDetailPage() {
             const serverMsg = e.response?.data?.error ?? e.response?.data?.message;
             console.error("Comment failed", status, e.response?.data, err);
 
-            let message = "Не вдалося надіслати коментар";
+            let message = t("comment_failed");
             if (serverMsg && /forbidden words/i.test(serverMsg)) {
-                message = "Коментар містить заборонені слова";
+                message = t("comment_banned_words");
             } else if (serverMsg) {
                 message = serverMsg;
             } else if (status === 401) {
-                message = "Увійдіть, щоб коментувати";
+                message = t("comment_login_required");
             }
             setToast({ message, type: "error" });
         }
@@ -73,7 +75,7 @@ export default function ThreadDetailPage() {
     if (isLoading) {
         return (
             <ForumContainer>
-                <div className="text-center text-gray-500 py-10">Завантаження...</div>
+                <div className="text-center text-gray-500 py-10">{t("loading")}</div>
             </ForumContainer>
         );
     }
@@ -81,7 +83,7 @@ export default function ThreadDetailPage() {
     if (!post) {
         return (
             <ForumContainer>
-                <div className="text-center text-gray-500 py-10">Пост не знайдено</div>
+                <div className="text-center text-gray-500 py-10">{t("post_not_found")}</div>
             </ForumContainer>
         );
     }
@@ -137,13 +139,13 @@ export default function ThreadDetailPage() {
                                 onClick={() => setIsCommenting(v => !v)}
                                 className="w-[165px] h-[31px] bg-[#212121] text-white rounded-[20px] text-[13px] font-bold hover:opacity-90 active:scale-95 transition-all cursor-pointer"
                             >
-                                Коментувати
+                                {t("comment_reply")}
                             </button>
                             <div className="bg-[#212121] text-white px-8 py-2 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2">
-                                <span>{post.user?.name ?? "Анонім"}</span>
+                                <span>{post.user?.name ?? t("forum_anonymous")}</span>
                                 {isCurrentUserAuthor && (
                                     <span className="bg-[#af292a] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-[2px] rounded-full">
-                                        Автор
+                                        {t("comment_author")}
                                     </span>
                                 )}
                             </div>
@@ -154,7 +156,7 @@ export default function ThreadDetailPage() {
                                 <textarea
                                     value={commentText}
                                     onChange={e => setCommentText(e.target.value)}
-                                    placeholder="Ввести текст"
+                                    placeholder={t("comment_placeholder")}
                                     rows={3}
                                     className="w-full rounded-[12px] border-2 border-[#af292a] p-3 text-sm outline-none resize-none"
                                 />
@@ -163,14 +165,14 @@ export default function ThreadDetailPage() {
                                         onClick={() => { setIsCommenting(false); setCommentText(""); }}
                                         className="h-[36px] px-5 rounded-full text-[12px] font-bold border border-gray-300 hover:bg-gray-100 transition cursor-pointer"
                                     >
-                                        Скасувати
+                                        {t("cancel")}
                                     </button>
                                     <button
                                         onClick={onSubmit}
                                         disabled={isPending || !commentText.trim()}
                                         className="h-[36px] px-6 bg-[#212121] text-white rounded-full text-[12px] font-bold hover:opacity-90 active:scale-95 transition disabled:opacity-50 cursor-pointer"
                                     >
-                                        {isPending ? "Надсилання..." : "Відправити"}
+                                        {isPending ? t("sending") : t("comment_submit")}
                                     </button>
                                 </div>
                             </div>

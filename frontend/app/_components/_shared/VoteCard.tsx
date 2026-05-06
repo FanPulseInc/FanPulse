@@ -1,5 +1,6 @@
 "use client";
 import { useMatchVotes, type VoteChoice } from "@/services/votes";
+import { useT } from "@/services/i18n/context";
 
 
 export default function VoteCard({
@@ -12,6 +13,7 @@ export default function VoteCard({
     awayInitial: string;
 }) {
     const { voteFor, cast } = useMatchVotes();
+    const { t } = useT();
     const current = voteFor(matchId);
 
     const options: { key: VoteChoice; label: string }[] = [
@@ -25,10 +27,10 @@ export default function VoteCard({
             <div className="flex items-center justify-between">
                 <div>
                     <div className="text-[14px] font-bold text-[#212121] leading-tight">
-                        {current ? "Думка вболівальників" : "Хто переможе?"}
+                        {current ? t("vote_fan_opinion") : t("vote_who_wins")}
                     </div>
                     <div className="text-[11px] text-[#212121]/60">
-                        {current ? "Натисни ще раз, щоб забрати голос" : "Віддай свій голос!"}
+                        {current ? t("vote_retract") : t("vote_cast")}
                     </div>
                 </div>
                 <span className="text-[22px]" role="img" aria-label="trophy">🏆</span>
@@ -49,7 +51,7 @@ export default function VoteCard({
                             type="button"
                             onClick={(e) => { e.stopPropagation(); cast(matchId, opt.key); }}
                             className="h-[42px] rounded-full text-[14px] font-bold transition-colors cursor-pointer bg-white text-[#212121] hover:bg-white/80"
-                            title="Проголосувати"
+                            title={t("vote_cast")}
                         >
                             {opt.label}
                         </button>
@@ -98,6 +100,7 @@ function VoteResults({
     current: VoteChoice;
     onRetract: (e: React.MouseEvent) => void;
 }) {
+    const { t } = useT();
     const split = pseudoSplit(matchId, current);
     const pct: Record<VoteChoice, number> = {
         home: split.home,
@@ -116,7 +119,7 @@ function VoteResults({
                         type="button"
                         onClick={onRetract}
                         className="group w-full text-left cursor-pointer"
-                        title={active ? "Натисни, щоб забрати голос" : ""}
+                        title={active ? t("vote_retract") : ""}
                     >
                         <div className="flex items-center gap-2 text-[12px] font-bold text-[#212121] mb-[2px]">
                             <span className={`inline-flex items-center justify-center w-[22px] h-[22px] rounded-full text-[11px] ${
@@ -125,7 +128,7 @@ function VoteResults({
                                 {opt.label}
                             </span>
                             <span className="flex-1">
-                                {opt.key === "home" ? "Перемога" : opt.key === "draw" ? "Нічия" : "Перемога"}
+                                {opt.key === "draw" ? t("vote_draw") : t("vote_win")}
                             </span>
                             <span className="font-data">{value}%</span>
                         </div>

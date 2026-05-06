@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import { useT } from "@/services/i18n/context";
 import { SportContainer } from "../../_components/_shared/SportContainer";
 import ScheduleColumn, {
     type ScheduleGroup,
@@ -143,6 +144,7 @@ function rosterToBoxScorePlayers(
 }
 
 export default function BasketballMatchPage() {
+    const { t } = useT();
     const params = useParams();
     const searchParams = useSearchParams();
     const matchId = params.matchId as string;
@@ -204,7 +206,7 @@ export default function BasketballMatchPage() {
     const liveElapsed = formatElapsed(liveForMatch?.strProgress, liveForMatch?.strStatus);
     const featured = event ? eventToFeatured(event) : null;
     if (featured) {
-        featured.stage = "Баскетбол";
+        featured.stage = t("sport_basketball");
     }
     if (featured && liveForMatch) {
         if (liveElapsed) featured.elapsed = liveElapsed;
@@ -268,13 +270,13 @@ export default function BasketballMatchPage() {
                 <div className="flex-1 min-w-0 flex flex-col gap-4">
                     {eventLoading && (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Завантаження матчу...
+                            {t("loading_match")}
                         </div>
                     )}
 
                     {!eventLoading && !event && (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Матч не знайдено
+                            {t("match_not_found")}
                         </div>
                     )}
 
@@ -305,7 +307,7 @@ export default function BasketballMatchPage() {
                                         ? "text-[#af292a]"
                                         : "text-gray-400 hover:text-[#af292a]"
                                 }`}
-                                title="Додати команду в улюблені"
+                                title={t("favourite_team")}
                             >
                                 <span>{isTeamFav(event.idHomeTeam ?? undefined) ? "★" : "☆"}</span>
                                 <span className="truncate max-w-[160px]">{event.strHomeTeam}</span>
@@ -317,10 +319,10 @@ export default function BasketballMatchPage() {
                                 className={`text-[13px] font-bold flex items-center gap-1 cursor-pointer transition-colors ${
                                     isMatchFav(matchId) ? "text-[#af292a]" : "text-gray-400 hover:text-[#af292a]"
                                 }`}
-                                title="Додати матч в улюблені"
+                                title={t("favourite_match")}
                             >
                                 <span className="text-lg">{isMatchFav(matchId) ? "★" : "☆"}</span>
-                                <span className="text-[11px] uppercase tracking-wider">Матч</span>
+                                <span className="text-[11px] uppercase tracking-wider">{t("match_details")}</span>
                             </button>
 
                             <button
@@ -331,7 +333,7 @@ export default function BasketballMatchPage() {
                                         ? "text-[#af292a]"
                                         : "text-gray-400 hover:text-[#af292a]"
                                 }`}
-                                title="Додати команду в улюблені"
+                                title={t("favourite_team")}
                             >
                                 <span className="truncate max-w-[160px]">{event.strAwayTeam}</span>
                                 <span>{isTeamFav(event.idAwayTeam ?? undefined) ? "★" : "☆"}</span>
@@ -382,7 +384,7 @@ export default function BasketballMatchPage() {
                                     isMatchFav(matchId) ? "text-[#af292a]" : "text-white/40 hover:text-[#af292a]"
                                 }`}
                                 aria-label="Favourite match"
-                                title={isMatchFav(matchId) ? "Прибрати з улюблених" : "Додати матч в улюблені"}
+                                title={isMatchFav(matchId) ? t("unfavourite_match") : t("favourite_match")}
                             >
                                 {isMatchFav(matchId) ? "★" : "☆"}
                             </button>
@@ -393,14 +395,14 @@ export default function BasketballMatchPage() {
                         <div className="flex flex-col gap-3">
                             <BoxScorePanel
                                 team={{
-                                    teamName: event.strHomeTeam ?? "Команда 1",
+                                    teamName: event.strHomeTeam ?? t("team_one"),
                                     teamLogo: event.strHomeTeamBadge ?? undefined,
                                     players: homePlayers,
                                 }}
                             />
                             <BoxScorePanel
                                 team={{
-                                    teamName: event.strAwayTeam ?? "Команда 2",
+                                    teamName: event.strAwayTeam ?? t("team_two"),
                                     teamLogo: event.strAwayTeamBadge ?? undefined,
                                     players: awayPlayers,
                                 }}
@@ -413,12 +415,12 @@ export default function BasketballMatchPage() {
                     {event && (homeLastFive.length > 0 || awayLastFive.length > 0) && (
                         <LastFiveMatches
                             home={{
-                                teamName: event.strHomeTeam ?? "Команда 1",
+                                teamName: event.strHomeTeam ?? t("team_one"),
                                 teamLogo: event.strHomeTeamBadge ?? undefined,
                                 rows: homeLastFive,
                             }}
                             away={{
-                                teamName: event.strAwayTeam ?? "Команда 2",
+                                teamName: event.strAwayTeam ?? t("team_two"),
                                 teamLogo: event.strAwayTeamBadge ?? undefined,
                                 rows: awayLastFive,
                             }}

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useT } from "@/services/i18n/context";
 
 type GridSeries = {
   id: string;
@@ -57,6 +58,7 @@ const mockStats = [
 ];
 
 export default function Cs2MatchPage() {
+  const { t } = useT();
   const params = useParams();
   const seriesId = params.seriesId as string;
 
@@ -95,7 +97,7 @@ export default function Cs2MatchPage() {
   if (loading) {
     return (
       <div className="flex min-h-[500px] items-center justify-center bg-[#e9e9e9] text-sm font-black text-[#111111]">
-        Завантаження...
+        {t("loading")}
       </div>
     );
   }
@@ -103,7 +105,7 @@ export default function Cs2MatchPage() {
   if (!match) {
     return (
       <div className="flex min-h-[500px] items-center justify-center bg-[#e9e9e9] text-sm font-black text-[#111111]">
-        Матч не знайдено
+        {t("match_not_found")}
       </div>
     );
   }
@@ -387,7 +389,7 @@ export default function Cs2MatchPage() {
 
         <section className="overflow-hidden rounded-[16px] bg-white px-4 pb-5 pt-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)] md:px-5">
           <div className="mb-4 text-center text-[15px] font-black uppercase tracking-[0.14em] md:text-[17px]">
-            Статистика
+            {t("statistics")}
           </div>
 
           <div className="flex items-center gap-3 md:gap-4">
@@ -465,7 +467,7 @@ export default function Cs2MatchPage() {
                     className="flex items-center gap-2 text-[12px] font-bold"
                   >
                     <span className="min-w-0 flex-1 truncate text-[#666666]">
-                      Команда {index + 1}
+                      {t("team")} {index + 1}
                     </span>
                     <span className="shrink-0 font-black text-[#111111]">
                       8:0
@@ -491,7 +493,7 @@ export default function Cs2MatchPage() {
                     className="flex items-center gap-2 text-[12px] font-bold"
                   >
                     <span className="min-w-0 flex-1 truncate text-[#666666]">
-                      Команда {index + 1}
+                      {t("team")} {index + 1}
                     </span>
                     <span className="shrink-0 font-black text-[#111111]">
                       8:0

@@ -1,6 +1,7 @@
 "use client";
 
 import Select, { MultiValue, StylesConfig } from "react-select";
+import { useT } from "@/services/i18n/context";
 
 interface Option {
     value: string;
@@ -13,7 +14,8 @@ interface Props {
     onChange: (values: string[]) => void;
 }
 
-const CustomSelect = ({ options, placeholder = "Оберіть категорії...", onChange }: Props) => {
+const CustomSelect = ({ options, placeholder, onChange }: Props) => {
+    const { t } = useT();
 
 
     const customStyles: StylesConfig<Option, true> = {
@@ -65,15 +67,15 @@ const CustomSelect = ({ options, placeholder = "Оберіть категорі�
     return (
         <div className="flex flex-col gap-2 w-full max-w-[400px]">
             <label className="text-body-1 font-medium text-brand-black ml-4">
-                Оберіть категорію
+                {t("select_category")}
             </label>
             <Select
                 isMulti
                 options={options}
                 styles={customStyles}
-                placeholder={placeholder}
+                placeholder={placeholder ?? t("select_categories_placeholder")}
                 onChange={handleChange}
-                noOptionsMessage={() => "Нічого не знайдено"}
+                noOptionsMessage={() => t("nothing_found")}
             />
         </div>
     );

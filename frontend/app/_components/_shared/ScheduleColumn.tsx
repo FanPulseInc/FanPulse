@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Icon } from "./Icon";
 import { useFavorites } from "@/services/favorites";
+import { useT } from "@/services/i18n/context";
 
 export interface ScheduleMatch {
     id: string;
@@ -58,22 +59,26 @@ function parseQuarterElapsed(elapsed: string | undefined): { quarter: string; cl
     return { quarter, clock: cMatch ? cMatch[1] : undefined };
 }
 
-function relativeKickoff(startIso: string | undefined, now: number): string | null {
+function relativeKickoff(
+    startIso: string | undefined,
+    now: number,
+    t: (key: string, vars?: Record<string, string | number>) => string
+): string | null {
     if (!startIso) return null;
     const iso = /[zZ]|[+-]\d{2}:?\d{2}$/.test(startIso) ? startIso : `${startIso}Z`;
-    const t = new Date(iso).getTime();
-    if (Number.isNaN(t)) return null;
-    const diffMs = t - now;
+    const ts = new Date(iso).getTime();
+    if (Number.isNaN(ts)) return null;
+    const diffMs = ts - now;
     if (diffMs <= 0) return null;
     const min = Math.round(diffMs / 60_000);
-    if (min < 60) return `за ${min} хв`;
+    if (min < 60) return t("relative_in_min", { min });
     const hr = Math.floor(min / 60);
     if (hr < 24) {
         const rem = min % 60;
-        return rem > 0 ? `за ${hr}г ${rem}хв` : `за ${hr}г`;
+        return rem > 0 ? t("relative_in_h_m", { h: hr, m: rem }) : t("relative_in_h", { h: hr });
     }
     const days = Math.floor(hr / 24);
-    return `за ${days} дн`;
+    return t("relative_in_d", { d: days });
 }
 
 export interface ScheduleGroup {
@@ -91,15 +96,15 @@ export interface CompetitionOption {
 }
 
 const topTabs = [
-    { id: "all", label: "Все" },
-    { id: "fav", label: "Улюблене" },
-    { id: "compete", label: "Змагання" },
+    { id: "all", labelKey: "tab_all" },
+    { id: "fav", labelKey: "tab_favourite" },
+    { id: "compete", labelKey: "tab_competitions" },
 ];
 
 const phaseTabs = [
-    { id: "live", label: "Наживо" },
-    { id: "past", label: "Минулі" },
-    { id: "upcoming", label: "Майбутні" },
+    { id: "live", labelKey: "tab_live" },
+    { id: "past", labelKey: "tab_past" },
+    { id: "upcoming", labelKey: "tab_upcoming" },
 ];
 
 function applyFilter(
@@ -126,6 +131,7 @@ function MatchRow({
     now: number;
 }) {
     const { toggleMatch, toggleTeam, isMatchFav, isTeamFav } = useFavorites();
+    const { t } = useT();
     const starred =
         isMatchFav(m.id) || isTeamFav(m.homeTeamId) || isTeamFav(m.awayTeamId);
     const homeTeamFav = isTeamFav(m.homeTeamId);
@@ -187,7 +193,7 @@ function MatchRow({
                     onClick={(e) => { e.stopPropagation(); toggleMatch(m.id); }}
                     className={`text-xl leading-none ${starred ? "text-[#af292a]" : "text-gray-300 hover:text-[#af292a]"} transition-colors cursor-pointer`}
                     aria-label="Favorite match"
-                    title={starred ? "Прибрати з улюблених" : "Додати матч в улюблені"}
+                    title={starred ? t("unfavourite_match") : t("favourite_match")}
                 >
                     {starred ? "★" : "☆"}
                 </button>
@@ -197,7 +203,7 @@ function MatchRow({
 
     const isUpcoming = m.status === "upcoming";
     const isPast = m.status === "past";
-    const countdown = isUpcoming ? relativeKickoff(m.startIso, now) : null;
+    const countdown = isUpcoming ? relativeKickoff(m.startIso, now, t) : null;
     const timeLabel = isPast && m.startIso
         ? (() => {
               const iso = /[zZ]|[+-]\d{2}:?\d{2}$/.test(m.startIso!) ? m.startIso! : `${m.startIso!}Z`;
@@ -268,7 +274,7 @@ function MatchRow({
                         onClick={(e) => { e.stopPropagation(); toggleTeam(m.homeTeamId); }}
                         className={`shrink-0 rounded-full transition ${homeTeamFav ? "ring-2 ring-[#af292a]" : "hover:ring-1 hover:ring-[#af292a]/40"}`}
                         aria-label={`Favourite ${m.homeTeam}`}
-                        title={homeTeamFav ? "Прибрати з улюблених" : "Додати команду в улюблені"}
+                        title={homeTeamFav ? t("unfavourite_team") : t("favourite_team")}
                     >
                         {m.homeLogo ? (
                             <Image
@@ -296,7 +302,7 @@ function MatchRow({
                         onClick={(e) => { e.stopPropagation(); toggleTeam(m.awayTeamId); }}
                         className={`shrink-0 rounded-full transition ${awayTeamFav ? "ring-2 ring-[#af292a]" : "hover:ring-1 hover:ring-[#af292a]/40"}`}
                         aria-label={`Favourite ${m.awayTeam}`}
-                        title={awayTeamFav ? "Прибрати з улюблених" : "Додати команду в улюблені"}
+                        title={awayTeamFav ? t("unfavourite_team") : t("favourite_team")}
                     >
                         {m.awayLogo ? (
                             <Image
@@ -372,7 +378,7 @@ function MatchRow({
                 onClick={(e) => { e.stopPropagation(); toggleMatch(m.id); }}
                 className={`text-xl leading-none ${starred ? "text-[#af292a]" : "text-gray-300 hover:text-[#af292a]"} transition-colors cursor-pointer`}
                 aria-label="Favorite match"
-                title={starred ? "Прибрати з улюблених" : "Додати матч в улюблені"}
+                title={starred ? t("unfavourite_match") : t("favourite_match")}
             >
                 {starred ? "★" : "☆"}
             </button>
@@ -411,6 +417,7 @@ export default function ScheduleColumn({
 }) {
     const router = useRouter();
     const { isMatchFavOrTeam } = useFavorites();
+    const { t } = useT();
     const [topTab, setTopTab] = useState("all");
     const [phaseTab, setPhaseTab] = useState<string | null>(null);
     const [pickedCompetition, setPickedCompetition] = useState<string | null>(null);
@@ -440,15 +447,15 @@ export default function ScheduleColumn({
         <div className="w-full lg:w-[560px] flex flex-col gap-[10px]">
             
             <div className="w-full min-h-[40px] bg-[#212121] rounded-[14px] flex flex-row flex-wrap justify-center items-center gap-2 px-3 py-1">
-                {topTabs.filter(t => showCompetitionsTab || t.id !== "compete").map(t => (
+                {topTabs.filter(tab => showCompetitionsTab || tab.id !== "compete").map(tab => (
                     <button
-                        key={t.id}
-                        onClick={() => setTopTab(t.id)}
+                        key={tab.id}
+                        onClick={() => setTopTab(tab.id)}
                         className={`h-[26px] px-3 sm:px-4 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                            topTab === t.id ? "bg-[#af292a] text-white" : "text-white/80 hover:text-white"
+                            topTab === tab.id ? "bg-[#af292a] text-white" : "text-white/80 hover:text-white"
                         }`}
                     >
-                        {t.label}
+                        {t(tab.labelKey)}
                     </button>
                 ))}
                 
@@ -497,7 +504,7 @@ export default function ScheduleColumn({
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between">
                             <span className="text-[11px] font-bold uppercase tracking-wider text-[#212121]">
-                                Вибери змагання
+                                {t("choose_competition")}
                             </span>
                             {pickedCompetition && (
                                 <button
@@ -505,7 +512,7 @@ export default function ScheduleColumn({
                                     onClick={() => setPickedCompetition(null)}
                                     className="text-[10px] font-bold uppercase tracking-wider text-[#af292a] hover:underline cursor-pointer"
                                 >
-                                    Скинути
+                                    {t("reset")}
                                 </button>
                             )}
                         </div>
@@ -556,17 +563,17 @@ export default function ScheduleColumn({
                 )}
                 
                 <div className="w-full flex items-center flex-wrap gap-2">
-                    {phaseTabs.map(t => (
+                    {phaseTabs.map(tab => (
                         <button
-                            key={t.id}
-                            onClick={() => setPhaseTab(phaseTab === t.id ? null : t.id)}
+                            key={tab.id}
+                            onClick={() => setPhaseTab(phaseTab === tab.id ? null : tab.id)}
                             className={`h-[30px] px-3 sm:px-5 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
-                                phaseTab === t.id
+                                phaseTab === tab.id
                                     ? "bg-[#212121] text-white"
                                     : "bg-[#af292a] text-white hover:opacity-90"
                             }`}
                         >
-                            {t.label}
+                            {t(tab.labelKey)}
                         </button>
                     ))}
                     <button
@@ -575,12 +582,12 @@ export default function ScheduleColumn({
                             phaseTab === null ? "bg-[#212121] text-white" : "bg-[#af292a] text-white hover:opacity-90"
                         }`}
                     >
-                        Все
+                        {t("tab_all")}
                     </button>
                 </div>
 
                 {isEmpty && (
-                    <div className="text-center text-gray-400 text-[12px] py-8">Немає матчів</div>
+                    <div className="text-center text-gray-400 text-[12px] py-8">{t("no_matches")}</div>
                 )}
 
                 

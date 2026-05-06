@@ -1,4 +1,5 @@
 "use client";
+import { useT } from "@/services/i18n/context";
 
 export interface ScoringPlay {
     quarter: 1 | 2 | 3 | 4 | 5;
@@ -36,19 +37,21 @@ function PlayCell({ play }: { play: ScoringPlay }) {
     );
 }
 
-export default function ScoringTimeline({ plays, title = "Атака" }: Props) {
+export default function ScoringTimeline({ plays, title }: Props) {
+    const { t } = useT();
+    const displayTitle = title ?? t("attack");
     if (!plays || plays.length === 0) {
         return (
             <div className="w-full p-[20px] bg-[#f8f8f8] rounded-[20px] flex flex-col gap-[10px]">
                 <div className="w-full flex justify-center mb-[4px]">
                     <div className="min-w-[220px] h-[42px] px-8 bg-[#af292a] rounded-[10px] flex items-center justify-center">
                         <span className="text-white font-bold text-[16px] uppercase tracking-wider">
-                            {title}
+                            {displayTitle}
                         </span>
                     </div>
                 </div>
                 <div className="text-center text-gray-400 text-sm py-6">
-                    Поки що немає набраних очок
+                    {t("no_scoring")}
                 </div>
             </div>
         );
@@ -68,7 +71,7 @@ export default function ScoringTimeline({ plays, title = "Атака" }: Props) 
             <div className="w-full flex justify-center mb-[4px]">
                 <div className="min-w-[220px] h-[42px] px-8 bg-[#af292a] rounded-[10px] flex items-center justify-center">
                     <span className="text-white font-bold text-[16px] uppercase tracking-wider">
-                        {title}
+                        {displayTitle}
                     </span>
                 </div>
             </div>

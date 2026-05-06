@@ -4,8 +4,10 @@ import { usePatchApiUserIdChangePassword } from "@/services/api/generated"
 import { useUserStore } from "@/store/useUserStore"
 import { useState } from "react"
 import Toast from "../../_components/Toast"
+import { useT } from "@/services/i18n/context"
 
 export default function ChangePassword() {
+  const { t } = useT()
   const user = useUserStore((s) => s.user)
 
   const [currentPassword, setCurrentPassword] = useState("")
@@ -26,27 +28,27 @@ export default function ChangePassword() {
 
     
     if (!currentPassword.trim()) {
-      setError("Введіть поточний пароль")
+      setError(t("password_current_required"))
       return
     }
 
     if (!newPassword.trim()) {
-      setError("Введіть новий пароль")
+      setError(t("password_new_required"))
       return
     }
 
     if (newPassword.length < 6) {
-      setError("Новий пароль має містити мінімум 6 символів")
+      setError(t("password_min_length"))
       return
     }
 
     if (newPassword !== confirmPassword) {
-      setError("Нові паролі не співпадають")
+      setError(t("password_mismatch"))
       return
     }
 
     if (!user?.id) {
-      setError("Користувача не знайдено")
+      setError(t("password_user_not_found"))
       return
     }
 
@@ -66,19 +68,21 @@ export default function ChangePassword() {
 
      
       setToast({
-        message: "Пароль успішно змінено",
+        message: t("password_changed"),
         type: "success",
       })
-    } catch (err: any) {
-      const errorData = err?.response?.data
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: unknown }; message?: string };
+      const errorData = e?.response?.data
 
+      const ed = errorData as { detail?: string; error?: string; message?: string } | null;
       const message =
         typeof errorData === "string"
           ? errorData
-          : errorData?.detail ||
-            errorData?.error ||
-            errorData?.message ||
-            "Не вдалося змінити пароль"
+          : ed?.detail ||
+            ed?.error ||
+            ed?.message ||
+            t("password_change_failed")
 
       setToast({
         message,
@@ -91,7 +95,7 @@ export default function ChangePassword() {
     <>
       <section className="w-full flex flex-col gap-6">
         <h2 className="text-[1.5rem] font-bold uppercase leading-none">
-          Змінити пароль
+          {t("profile_change_password")}
         </h2>
 
         <div className="max-w-[420px] flex flex-col gap-4">
@@ -99,7 +103,7 @@ export default function ChangePassword() {
             type="password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
-            placeholder="Поточний пароль"
+            placeholder={t("password_current_placeholder")}
             className="h-[50px] px-4 rounded-[20px] border-2 border-brand-red outline-none text-body-m bg-white"
           />
 
@@ -107,7 +111,7 @@ export default function ChangePassword() {
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="Новий пароль"
+            placeholder={t("password_new_placeholder")}
             className="h-[50px] px-4 rounded-[20px] border-2 border-brand-red outline-none text-body-m bg-white"
           />
 
@@ -115,7 +119,7 @@ export default function ChangePassword() {
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Повторіть новий пароль"
+            placeholder={t("password_confirm_placeholder")}
             className="h-[50px] px-4 rounded-[20px] border-2 border-brand-red outline-none text-body-m bg-white"
           />
 
@@ -131,7 +135,7 @@ export default function ChangePassword() {
             disabled={isPending}
             className="h-[50px] bg-brand-red text-white rounded-[12px] font-semibold hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isPending ? "Збереження..." : "Зберегти пароль"}
+            {isPending ? t("saving") : t("save_password")}
           </button>
         </div>
       </section>

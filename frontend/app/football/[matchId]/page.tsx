@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import { useT } from "@/services/i18n/context";
 import { SportContainer } from "../../_components/_shared/SportContainer";
 import ScheduleColumn, {
     type ScheduleGroup,
@@ -85,6 +86,7 @@ function formatDateLabel(iso: string): string {
 }
 
 export default function FootballMatchPage() {
+    const { t } = useT();
     const params = useParams();
     const searchParams = useSearchParams();
     const matchId = params.matchId as string;
@@ -206,8 +208,8 @@ export default function FootballMatchPage() {
     const actualLineup = lineupData?.lineup ?? lineupData?.lookup ?? null;
     const formation = lineupsToFormation(
         actualLineup,
-        event?.strHomeTeam ?? "Команда 1",
-        event?.strAwayTeam ?? "Команда 2",
+        event?.strHomeTeam ?? t("team_one"),
+        event?.strAwayTeam ?? t("team_two"),
         event?.strHomeTeamBadge ?? undefined,
         event?.strAwayTeamBadge ?? undefined,
         homeCoachName,
@@ -288,8 +290,8 @@ export default function FootballMatchPage() {
               awayPrevLineup as Parameters<typeof predictedFormationFromPrevLineups>[1],
               event?.idHomeTeam,
               event?.idAwayTeam,
-              event?.strHomeTeam ?? "Команда 1",
-              event?.strAwayTeam ?? "Команда 2",
+              event?.strHomeTeam ?? t("team_one"),
+              event?.strAwayTeam ?? t("team_two"),
               event?.strHomeTeamBadge ?? undefined,
               event?.strAwayTeamBadge ?? undefined,
               homeCoachName,
@@ -436,13 +438,13 @@ export default function FootballMatchPage() {
                 <div className="flex-1 min-w-0 flex flex-col gap-4">
                     {eventLoading && (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Завантаження матчу...
+                            {t("loading_match")}
                         </div>
                     )}
 
                     {!eventLoading && !event && (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Матч не знайдено
+                            {t("match_not_found")}
                         </div>
                     )}
 
@@ -486,7 +488,7 @@ export default function FootballMatchPage() {
                                         ? "text-[#af292a]"
                                         : "text-gray-400 hover:text-[#af292a]"
                                 }`}
-                                title="Додати команду в улюблені"
+                                title={t("favourite_team")}
                             >
                                 <span>{isTeamFav(event.idHomeTeam ?? undefined) ? "★" : "☆"}</span>
                                 <span className="truncate max-w-[160px]">{event.strHomeTeam}</span>
@@ -498,10 +500,10 @@ export default function FootballMatchPage() {
                                 className={`text-[13px] font-bold flex items-center gap-1 cursor-pointer transition-colors ${
                                     isMatchFav(matchId) ? "text-[#af292a]" : "text-gray-400 hover:text-[#af292a]"
                                 }`}
-                                title="Додати матч в улюблені"
+                                title={t("favourite_match")}
                             >
                                 <span className="text-lg">{isMatchFav(matchId) ? "★" : "☆"}</span>
-                                <span className="text-[11px] uppercase tracking-wider">Матч</span>
+                                <span className="text-[11px] uppercase tracking-wider">{t("match_details")}</span>
                             </button>
 
                             <button
@@ -512,7 +514,7 @@ export default function FootballMatchPage() {
                                         ? "text-[#af292a]"
                                         : "text-gray-400 hover:text-[#af292a]"
                                 }`}
-                                title="Додати команду в улюблені"
+                                title={t("favourite_team")}
                             >
                                 <span className="truncate max-w-[160px]">{event.strAwayTeam}</span>
                                 <span>{isTeamFav(event.idAwayTeam ?? undefined) ? "★" : "☆"}</span>
@@ -567,7 +569,7 @@ export default function FootballMatchPage() {
                                     isMatchFav(matchId) ? "text-[#af292a]" : "text-white/40 hover:text-[#af292a]"
                                 }`}
                                 aria-label="Favourite match"
-                                title={isMatchFav(matchId) ? "Прибрати з улюблених" : "Додати матч в улюблені"}
+                                title={isMatchFav(matchId) ? t("unfavourite_match") : t("favourite_match")}
                             >
                                 {isMatchFav(matchId) ? "★" : "☆"}
                             </button>
@@ -583,10 +585,10 @@ export default function FootballMatchPage() {
                         <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-2 px-1">
                                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#af292a]">
-                                    Підтверджений склад
+                                    {t("squad_confirmed")}
                                 </span>
                                 <span className="text-[10px] text-gray-500">
-                                    · опубліковано клубами
+                                    · {t("squad_confirmed_desc")}
                                 </span>
                             </div>
                             <FormationPitch top={decoratedFormation.top} bottom={decoratedFormation.bottom} />
@@ -596,11 +598,11 @@ export default function FootballMatchPage() {
                             <div className="flex items-center gap-2 px-1">
                                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#af292a]">
                                     {featured?.status === "finished"
-                                        ? "Орієнтовний склад"
-                                        : "Прогноз складу"}
+                                        ? t("squad_predicted")
+                                        : t("squad_predicted_title")}
                                 </span>
                                 <span className="text-[10px] text-gray-500">
-                                    · на основі попереднього матчу
+                                    · {t("squad_predicted_desc")}
                                 </span>
                             </div>
                             <FormationPitch
@@ -611,20 +613,20 @@ export default function FootballMatchPage() {
                     ) : event ? (
                         <div className="text-center text-gray-400 text-xs py-6 bg-white rounded-[20px]">
                             {featured?.status === "finished"
-                                ? "Склад для цього матчу недоступний"
-                                : "Склад буде опубліковано ближче до матчу"}
+                                ? t("squad_unavailable_title")
+                                : t("squad_unavailable_desc")}
                         </div>
                     ) : null}
                     {stats.length > 0 && <StatsTable rows={stats} />}
                     {event && (homeLastFive.length > 0 || awayLastFive.length > 0) && (
                         <LastFiveMatches
                             home={{
-                                teamName: event.strHomeTeam ?? "Команда 1",
+                                teamName: event.strHomeTeam ?? t("team_one"),
                                 teamLogo: event.strHomeTeamBadge ?? undefined,
                                 rows: homeLastFive,
                             }}
                             away={{
-                                teamName: event.strAwayTeam ?? "Команда 2",
+                                teamName: event.strAwayTeam ?? t("team_two"),
                                 teamLogo: event.strAwayTeamBadge ?? undefined,
                                 rows: awayLastFive,
                             }}

@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+import { useT } from "@/services/i18n/context";
 import { SportContainer } from "../../_components/_shared/SportContainer";
 import ScheduleColumn, {
     type ScheduleGroup,
@@ -144,6 +145,7 @@ function formatDateLabel(iso: string): string {
 }
 
 export default function TennisMatchPage() {
+    const { t } = useT();
     const params = useParams();
     const searchParams = useSearchParams();
     const matchId = params.matchId as string;
@@ -262,7 +264,7 @@ export default function TennisMatchPage() {
     const liveElapsed = formatElapsed(liveForMatch?.strProgress, liveForMatch?.strStatus);
     const featured = event ? eventToFeatured(event) : null;
     if (featured) {
-        featured.stage = "Теніс";
+        featured.stage = t("sport_tennis");
         if (homePhoto && !featured.home.logoUrl) featured.home.logoUrl = homePhoto;
         if (awayPhoto && !featured.away.logoUrl) featured.away.logoUrl = awayPhoto;
     }
@@ -325,13 +327,13 @@ export default function TennisMatchPage() {
                 <div className="flex-1 min-w-0 flex flex-col gap-4">
                     {eventLoading && (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Завантаження матчу...
+                            {t("loading_match")}
                         </div>
                     )}
 
                     {!eventLoading && !event && (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Матч не знайдено
+                            {t("match_not_found")}
                         </div>
                     )}
 
@@ -395,7 +397,7 @@ export default function TennisMatchPage() {
                                     isMatchFav(matchId) ? "text-[#af292a]" : "text-white/40 hover:text-[#af292a]"
                                 }`}
                                 aria-label="Favourite match"
-                                title={isMatchFav(matchId) ? "Прибрати з улюблених" : "Додати матч в улюблені"}
+                                title={isMatchFav(matchId) ? t("unfavourite_match") : t("favourite_match")}
                             >
                                 {isMatchFav(matchId) ? "★" : "☆"}
                             </button>
@@ -404,21 +406,21 @@ export default function TennisMatchPage() {
 
                     {event && (
                         <>
-                            <StatsTable rows={serveStats} labels={TENNIS_SERVE_LABELS} title="Подача" />
-                            <StatsTable rows={pointsStats} labels={TENNIS_POINTS_LABELS} title="Очки" />
-                            <StatsTable rows={gamesStats} labels={TENNIS_GAMES_LABELS} title="Ігри" />
+                            <StatsTable rows={serveStats} labels={TENNIS_SERVE_LABELS} title={t("serve")} />
+                            <StatsTable rows={pointsStats} labels={TENNIS_POINTS_LABELS} title={t("scoring")} />
+                            <StatsTable rows={gamesStats} labels={TENNIS_GAMES_LABELS} title={t("games")} />
                         </>
                     )}
 
                     {event && (homeLastFive.length > 0 || awayLastFive.length > 0) && (
                         <LastFiveMatches
                             home={{
-                                teamName: event.strHomeTeam ?? "Гравець 1",
+                                teamName: event.strHomeTeam ?? t("player") + " 1",
                                 teamLogo: event.strHomeTeamBadge ?? undefined,
                                 rows: homeLastFive,
                             }}
                             away={{
-                                teamName: event.strAwayTeam ?? "Гравець 2",
+                                teamName: event.strAwayTeam ?? t("player") + " 2",
                                 teamLogo: event.strAwayTeamBadge ?? undefined,
                                 rows: awayLastFive,
                             }}

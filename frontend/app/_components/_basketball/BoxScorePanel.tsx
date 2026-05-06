@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import { useT } from "@/services/i18n/context";
 
 export interface BoxScorePlayer {
     id: string;
@@ -72,6 +73,7 @@ function PlayerRow({ p, showStats }: { p: BoxScorePlayer; showStats: boolean }) 
 }
 
 export default function BoxScorePanel({ team }: { team: BoxScoreTeam }) {
+    const { t } = useT();
     const showStats = team.players.some(
         p => p.pts != null || p.reb != null || p.ast != null
     );
@@ -99,7 +101,7 @@ export default function BoxScorePanel({ team }: { team: BoxScoreTeam }) {
                 <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3 px-[16px] py-[8px] bg-[#f1f1f1] border-b border-gray-200">
                     <span />
                     <span className="text-[12px] font-bold uppercase tracking-wider text-[#212121]">
-                        Гравець
+                        {t("player")}
                     </span>
                     {showStats && (
                         <div className="flex items-center gap-2">
@@ -113,7 +115,7 @@ export default function BoxScorePanel({ team }: { team: BoxScoreTeam }) {
                 <div className="flex flex-col px-[16px]">
                     {team.players.length === 0 ? (
                         <div className="text-center text-gray-400 text-[12px] py-6">
-                            Склад недоступний
+                            {t("squad_unavailable")}
                         </div>
                     ) : (
                         team.players.map(p => (

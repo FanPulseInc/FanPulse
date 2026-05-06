@@ -20,6 +20,7 @@ import {
     formatElapsed,
 } from "@/services/sportsdb/adapters";
 import type { SDBEvent } from "@/services/sportsdb/types";
+import { useT } from "@/services/i18n/context";
 
 const TOP_LEAGUES: { id: string; name: string }[] = [
     { id: "4391", name: "NFL" },
@@ -61,6 +62,7 @@ function formatDateLabel(iso: string): string {
 }
 
 export default function AmericanFootballPage() {
+    const { t } = useT();
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialDate = searchParams.get("date") || todayIso();
@@ -208,22 +210,22 @@ export default function AmericanFootballPage() {
                             onClick={() => setDateIso(d => shiftSeasonIso(d, -1))}
                             className="h-[30px] px-3 rounded-full bg-[#212121] text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider hover:bg-black transition-colors cursor-pointer whitespace-nowrap"
                         >
-                            ‹ Минулий сезон
+                            {t("prev_season")}
                         </button>
                         <span className="text-[12px] sm:text-[13px] font-bold uppercase tracking-wider text-[#212121]">
-                            Сезон {season}
+                            {t("season")} {season}
                         </span>
                         <button
                             type="button"
                             onClick={() => setDateIso(d => shiftSeasonIso(d, +1))}
                             className="h-[30px] px-3 rounded-full bg-[#212121] text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider hover:bg-black transition-colors cursor-pointer whitespace-nowrap"
                         >
-                            Наступний сезон ›
+                            {t("next_season")}
                         </button>
                     </div>
                     {anyLoading && (
                         <div className="w-full lg:w-[560px] text-center text-gray-500 text-sm py-2">
-                            Завантаження матчів ({season})...
+                            {t("loading_matches")} ({season})...
                         </div>
                     )}
                     <ScheduleColumn
@@ -241,13 +243,13 @@ export default function AmericanFootballPage() {
                 <div className="flex-1 min-w-0">
                     {anyLoading ? (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Завантаження анонсів...
+                            {t("loading_announcements")}
                         </div>
                     ) : carouselMatches.length > 0 ? (
                         <MatchCarousel matches={carouselMatches} />
                     ) : (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
-                            Немає найближчих матчів
+                            {t("no_upcoming_matches")}
                         </div>
                     )}
                 </div>
