@@ -22,7 +22,7 @@ export default function MainProfile({
   const { t } = useT()
   return (
     <>
-      <section className="w-full flex flex-col gap-6">
+      <section className="w-full flex flex-col gap-6 pb-4">
         <h2 className="text-[1.5rem] font-bold uppercase leading-none">
           {t("profile_activity_tab")}
         </h2>
