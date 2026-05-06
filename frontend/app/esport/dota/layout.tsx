@@ -2,24 +2,31 @@
 
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import EsportsScheduleColumn from "../_components/EsportsScheduleColumn";
-import { useT } from "@/services/i18n/context";
 
-type GridSeries = {
+type GridDotaSeries = {
   id: string;
   startTimeScheduled: string;
   liveState?: {
     teams?: {
       score?: number;
+      kills?: number;
+      deaths?: number;
     }[];
   };
   teams: {
     baseInfo: {
+      id?: string;
       name: string;
     };
   }[];
   tournament: {
     id: string;
     name: string;
+  } | null;
+  format?: {
+    id?: string;
+    name?: string;
+    nameShortened?: string;
   } | null;
 };
 
@@ -53,25 +60,10 @@ function shiftDate(dateIso: string, days: number) {
 }
 
 function mapToGroups(
-  series: GridSeries[],
+  series: GridDotaSeries[],
   forcedStatus?: "live" | "past" | "upcoming"
 ) {
-  type TournamentGroup = {
-    tournamentId: string;
-    tournamentName: string;
-    matches: {
-      id: string;
-      time: string;
-      startIso: string;
-      homeTeam: string;
-      awayTeam: string;
-      homeScore: number | undefined;
-      awayScore: number | undefined;
-      status: "live" | "past" | "upcoming";
-      format: string;
-    }[];
-  };
-  const map: Record<string, TournamentGroup> = {};
+  const map: Record<string, any> = {};
 
   for (const s of series) {
     const tournament = s.tournament;
@@ -96,25 +88,24 @@ function mapToGroups(
         status === "live"
           ? "LIVE"
           : date.toLocaleTimeString("uk-UA", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
       startIso: s.startTimeScheduled,
       homeTeam: s.teams?.[0]?.baseInfo?.name ?? "TBD",
       awayTeam: s.teams?.[1]?.baseInfo?.name ?? "TBD",
       homeScore: s.liveState?.teams?.[0]?.score,
       awayScore: s.liveState?.teams?.[1]?.score,
       status,
-      format: "BO3",
+      format: s.format?.nameShortened ?? s.format?.name ?? "BO3",
     });
   }
 
   return Object.values(map);
 }
 
-export default function Cs2Layout({ children }: { children: ReactNode }) {
-  const { t } = useT();
-  const [groups, setGroups] = useState<ReturnType<typeof mapToGroups>>([]);
+export default function DotaLayout({ children }: { children: ReactNode }) {
+  const [groups, setGroups] = useState<any[]>([]);
   const [dateIso, setDateIso] = useState(() => toDateIsoLocal(new Date()));
   const [phase, setPhase] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -128,12 +119,17 @@ export default function Cs2Layout({ children }: { children: ReactNode }) {
       try {
         const endpoint =
           phase === "live"
-            ? "/api/grid/cs2/live"
-            : `/api/grid/cs2/series?date=${dateIso}`;
+            ? "/api/grid/dota/live"
+            : `/api/grid/dota/series?date=${dateIso}`;
 
         const res = await fetch(endpoint, {
           cache: "no-store",
         });
+
+        if (!res.ok) {
+          setGroups([]);
+          return;
+        }
 
         const data = await res.json();
 
@@ -152,11 +148,11 @@ export default function Cs2Layout({ children }: { children: ReactNode }) {
   }, [dateIso, phase]);
 
   return (
-    <div className="flex gap-6 items-start justify-start">
+    <div className="flex items-start justify-start gap-6">
       <div className="p-10">
         {loading ? (
           <div className="w-[560px] rounded-[20px] bg-[#f8f8f8] py-10 text-center text-sm text-gray-400">
-            {t("loading")}
+            Завантаження...
           </div>
         ) : (
           <EsportsScheduleColumn
@@ -164,25 +160,25 @@ export default function Cs2Layout({ children }: { children: ReactNode }) {
             dateIso={dateIso}
             dateLabel={dateLabel}
             onPhaseChange={setPhase}
-            onPrevDay={() => setDateIso((value) => shiftDate(value, -1))}
-            onNextDay={() => setDateIso((value) => shiftDate(value, 1))}
+            onPrevDay={() => setDateIso((v) => shiftDate(v, -1))}
+            onNextDay={() => setDateIso((v) => shiftDate(v, 1))}
             onPickDate={(iso) => setDateIso(iso)}
-            gameSlug="cs2"
+            gameSlug="dota"
           />
         )}
       </div>
 
-      <div className="flex-1 min-w-0 p-5">
-        <div className="w-full min-h-[500px] overflow-hidden rounded-[20px] bg-zinc-200 border border-gray-200 shadow-sm">
+      <div className="min-w-0 flex-1 p-5">
+        <div className="min-h-[500px] w-full overflow-hidden rounded-[20px] border border-gray-200 bg-zinc-200 shadow-sm">
           {children}
         </div>
       </div>
 
-      <div className="shrink-0 m-3 mt-6 max-w-[280px] max-h-[1000px]">
+      <div className="m-3 mt-6 max-h-[1000px] max-w-[280px] shrink-0">
         <img
-          src="/banners/cs2_promo.gif"
-          alt="cs2"
-          className="w-full  rounded-[20px] h-auto"
+          src="/banners/dota_promo.gif"
+          alt="dota"
+          className="h-auto w-full rounded-[20px]"
         />
       </div>
     </div>

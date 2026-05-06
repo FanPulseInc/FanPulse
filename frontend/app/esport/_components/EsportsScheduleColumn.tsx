@@ -38,12 +38,12 @@ function relativeKickoff(startIso: string | undefined, now: number, tFn: (key: s
   const diffMs = ms - now;
   if (diffMs <= 0) return null;
 
-  const min = Math.round(diffMs / 60_000);
+  const minutes = Math.round(diffMs / 60_000);
 
   if (min < 60) return tFn("time_in_min", { min });
 
-  const hr = Math.floor(min / 60);
-  const rem = min % 60;
+  const hours = Math.floor(minutes / 60);
+  const restMinutes = minutes % 60;
 
   if (hr < 24) return rem > 0 ? tFn("time_in_hours_min", { hr, min: rem }) : tFn("time_in_hours", { hr });
 
@@ -74,24 +74,24 @@ function getMatchPhase(match: EsportsMatch, now: number) {
   return "upcoming";
 }
 
-function applyFilter(
+function filterMatches(
   matches: EsportsMatch[],
   topTab: string,
   phaseTab: string | null,
   now: number
 ) {
   return matches.filter((match) => {
-    const realPhase = getMatchPhase(match, now);
+    const phase = getMatchPhase(match, now);
 
     return (
       (topTab !== "fav" || match.favorite) &&
-      (!phaseTab || realPhase === phaseTab)
+      (!phaseTab || phase === phaseTab)
     );
   });
 }
 
 function TeamLine({ name, logo }: { name: string; logo?: string }) {
-  const src = logo && logo !== "" ? logo : "/icons/question_mark.png";
+  const src = logo?.trim() ? logo : "/icons/question_mark.png";
 
   return (
     <div className="flex min-w-0 items-center gap-2">
@@ -135,7 +135,7 @@ function EsportsMatchRow({
       }`}
     >
       <span className="font-data text-[14px] font-bold text-[#af292a]">
-        {realPhase === "live" ? "LIVE" : match.time}
+        {phase === "live" ? "LIVE" : match.time}
       </span>
 
       <div className="flex min-w-0 flex-col gap-[2px]">
@@ -190,6 +190,7 @@ export default function EsportsScheduleColumn({
   onPickDate,
   dateIso,
   onPhaseChange,
+  gameSlug = "cs2",
 }: {
   groups?: EsportsTournamentGroup[];
   dateLabel?: string;
@@ -199,6 +200,7 @@ export default function EsportsScheduleColumn({
   onPickDate?: (iso: string) => void;
   dateIso?: string;
   onPhaseChange?: (phase: string | null) => void;
+  gameSlug?: GameSlug;
 }) {
   const { t } = useT();
   const router = useRouter();
@@ -228,7 +230,7 @@ export default function EsportsScheduleColumn({
   const filteredGroups = groups
     .map((group) => ({
       ...group,
-      matches: applyFilter(group.matches, topTab, phaseTab, now),
+      matches: filterMatches(group.matches, topTab, phaseTab, now),
     }))
     .filter((group) => group.matches.length > 0);
 
@@ -367,7 +369,7 @@ export default function EsportsScheduleColumn({
                     selected={selectedMatchId === match.id}
                     onClick={() => {
                       const suffix = dateIso ? `?date=${dateIso}` : "";
-                      router.push(`/esport/cs2/${match.id}${suffix}`);
+                      router.push(`/esport/${gameSlug}/${match.id}${suffix}`);
                     }}
                   />
                 ))}
