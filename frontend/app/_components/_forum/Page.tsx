@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
-import {ForumContainer} from "../_forum/ForumContainer";
+import { ForumContainer } from "../_forum/ForumContainer";
 import ThreadRow from "../_forum/ThreadRow";
 import { ICONS } from "../../svg";
 import { useQueries } from "@tanstack/react-query";
@@ -13,6 +12,8 @@ import {
 } from "@/services/api/generated";
 import type { PostResponce } from "@/services/api/model";
 import { useT } from "@/services/i18n/context";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/useUserStore";
 
 export default function ForumPage() {
     const { t } = useT();
@@ -26,12 +27,15 @@ export default function ForumPage() {
         { id: "recommended", label: t("forum_recommended") },
     ];
 
+    const router = useRouter();
+    const { user } = useUserStore();
+
     const { data: postsData, isLoading: postsLoading } = useGetApiPost({ page: 0, count: 20 });
     const rawPosts: PostResponce[] = Array.isArray(postsData)
         ? postsData
         : (postsData as unknown as Record<string, PostResponce[]>)?.data
-            ?? (postsData as unknown as Record<string, PostResponce[]>)?.items
-            ?? [];
+        ?? (postsData as unknown as Record<string, PostResponce[]>)?.items
+        ?? [];
     const { data: categories } = useGetApiCategoryRoots();
 
     const filteredPosts = selectedCategory === "__all__"
@@ -76,9 +80,19 @@ export default function ForumPage() {
         <ForumContainer>
             <div className="flex flex-col">
                 <div className="w-[1039px] h-[60px] bg-[#af292a] rounded-[20px] flex items-center justify-center relative z-20">
-                    <Link href="/forum/create" className="absolute left-[16px] top-1/2 -translate-y-1/2 w-[154px] h-[34px] bg-[#212121] rounded-[13px] flex flex-row justify-center items-center gap-[4px] text-white font-bold text-sm hover:bg-black transition-all cursor-pointer">
+                    <button
+                        onClick={() => {
+                            if (!user) {
+                                router.push("?auth=login");
+                                return;
+                            }
+
+                            router.push("/forum/create");
+                        }}
+                        className="absolute left-[16px] top-1/2 -translate-y-1/2 w-[154px] h-[34px] bg-[#212121] rounded-[13px] flex flex-row justify-center items-center gap-[4px] text-white font-bold text-sm hover:bg-black transition-all cursor-pointer"
+                    >
                         {t("forum_create_post_plus")}
-                    </Link>
+                    </button>
 
                     <button
                         onClick={() => setIsCategoryOpen(!isCategoryOpen)}
@@ -97,11 +111,10 @@ export default function ForumPage() {
 
                 <div className="relative">
                     <div
-                        className={`absolute left-1/2 -translate-x-1/2 -top-2 z-30 w-[406px] pt-[18px] pr-[20px] pb-[19px] pl-[20px]  bg-[#ffffff] border-[10px] border-[#af292a] rounded-[11px] flex flex-col justify-start items-start gap-[13px] transition-all duration-300 ease-in-out origin-top ${
-                            isCategoryOpen
-                                ? "opacity-100 scale-y-100 pointer-events-auto"
-                                : "opacity-0 scale-y-0 pointer-events-none"
-                        }`}
+                        className={`absolute left-1/2 -translate-x-1/2 -top-2 z-30 w-[406px] pt-[18px] pr-[20px] pb-[19px] pl-[20px]  bg-[#ffffff] border-[10px] border-[#af292a] rounded-[11px] flex flex-col justify-start items-start gap-[13px] transition-all duration-300 ease-in-out origin-top ${isCategoryOpen
+                            ? "opacity-100 scale-y-100 pointer-events-auto"
+                            : "opacity-0 scale-y-0 pointer-events-none"
+                            }`}
                     >
                         <button
                             key="all"
@@ -109,9 +122,8 @@ export default function ForumPage() {
                                 setSelectedCategory("__all__");
                                 setIsCategoryOpen(false);
                             }}
-                            className={`w-full text-center font-bold text-lg transition-colors cursor-pointer ${
-                                selectedCategory === "__all__" ? "text-[#af292a]" : "hover:text-[#af292a]"
-                            }`}
+                            className={`w-full text-center font-bold text-lg transition-colors cursor-pointer ${selectedCategory === "__all__" ? "text-[#af292a]" : "hover:text-[#af292a]"
+                                }`}
                         >
                             {t("forum_all_categories")}
                         </button>
@@ -122,9 +134,8 @@ export default function ForumPage() {
                                     setSelectedCategory(cat.name ?? "");
                                     setIsCategoryOpen(false);
                                 }}
-                                className={`w-full text-center font-bold text-lg transition-colors cursor-pointer ${
-                                    selectedCategory === cat.name ? "text-[#af292a]" : "hover:text-[#af292a]"
-                                }`}
+                                className={`w-full text-center font-bold text-lg transition-colors cursor-pointer ${selectedCategory === cat.name ? "text-[#af292a]" : "hover:text-[#af292a]"
+                                    }`}
                             >
                                 {cat.name}
                             </button>
@@ -135,40 +146,40 @@ export default function ForumPage() {
                 <div className="w-[1039px] bg-white rounded-[20px] shadow-sm border border-gray-100 -mt-5 pt-8 pb-5 px-5 flex flex-col gap-4;">
                     <div className="flex justify-between items-center mb-4 px-2">
                         <div className="flex gap-2 -mt-1">
-                        {navFilters.map((filter) => {
-                            const isActive = activeFilter === filter.id;
-                            return (
-                                <button
-                                    key={filter.id}
-                                    onClick={() => setActiveFilter(filter.id)}
-                                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase transition-colors cursor-pointer
+                            {navFilters.map((filter) => {
+                                const isActive = activeFilter === filter.id;
+                                return (
+                                    <button
+                                        key={filter.id}
+                                        onClick={() => setActiveFilter(filter.id)}
+                                        className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase transition-colors cursor-pointer
                                             ${isActive
-                                        ? "bg-[#af292a] text-white"
-                                        : "bg-[#212121] text-white hover:bg-black"
-                                    }`}
-                                >
-                                    {filter.label}
-                                </button>
-                            );
-                        })}
+                                                ? "bg-[#af292a] text-white"
+                                                : "bg-[#212121] text-white hover:bg-black"
+                                            }`}
+                                    >
+                                        {filter.label}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
-                        {postsLoading && (
-                            <div className="text-center text-gray-500 py-4">{t("loading")}</div>
-                        )}
-                        {posts?.map((post) => (
-                            <ThreadRow
-                                key={post.id}
-                                id={post.id!}
-                                title={post.title}
-                                author={post.user?.name ?? t("forum_anonymous")}
-                                date={post.createdAt}
-                                likesCount={post.likes?.length ?? 0}
-                            />
-                        ))}
-                        {!postsLoading && (!posts || posts.length === 0) && (
-                            <div className="text-center text-gray-500 py-4">{t("forum_no_posts")}</div>
-                        )}
+                    {postsLoading && (
+                        <div className="text-center text-gray-500 py-4">{t("loading")}</div>
+                    )}
+                    {posts?.map((post) => (
+                        <ThreadRow
+                            key={post.id}
+                            id={post.id!}
+                            title={post.title}
+                            author={post.user?.name ?? t("forum_anonymous")}
+                            date={post.createdAt}
+                            likesCount={post.likes?.length ?? 0}
+                        />
+                    ))}
+                    {!postsLoading && (!posts || posts.length === 0) && (
+                        <div className="text-center text-gray-500 py-4">{t("forum_no_posts")}</div>
+                    )}
                 </div>
             </div>
         </ForumContainer>

@@ -5,6 +5,14 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useT } from "@/services/i18n/context";
 
+type GridPlayer = {
+  id?: string;
+  handle?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  nationality?: string | null;
+};
+
 type GridSeries = {
   id: string;
   startTimeScheduled?: string;
@@ -22,6 +30,7 @@ type GridSeries = {
       id?: string;
       name: string;
     };
+    players?: GridPlayer[];
   }>;
   tournament?: {
     id: string;
@@ -39,13 +48,13 @@ type GridSeries = {
       players?: Array<{
         kills: number;
         deaths: number;
+        assists?: number;
       }>;
     }>;
   } | null;
 };
 
 const mockMaps = ["DUST II", "MIRAGE", "INFERNO", "TBA", "TBA", "TBA", "TBA"];
-const mockPlayers = ["s1mple", "b1t", "iM", "Aleksib", "jL"];
 
 const mockStats = [
   ["WIN", "19%", "14%"],
@@ -56,6 +65,22 @@ const mockStats = [
   ["FIRST KILL", "11%", "11%"],
   ["WIN PISTOL", "17%", "11%"],
 ];
+
+const fallbackPlayers: GridPlayer[] = [
+  { handle: "Player 1", nationality: "—" },
+  { handle: "Player 2", nationality: "—" },
+  { handle: "Player 3", nationality: "—" },
+  { handle: "Player 4", nationality: "—" },
+  { handle: "Player 5", nationality: "—" },
+];
+
+const getPlayerName = (player: GridPlayer) => {
+  return (
+    player.handle ||
+    `${player.firstName ?? ""} ${player.lastName ?? ""}`.trim() ||
+    "Player"
+  );
+};
 
 export default function Cs2MatchPage() {
   const { t } = useT();
@@ -110,8 +135,21 @@ export default function Cs2MatchPage() {
     );
   }
 
-  const teamAName = match.teams?.[0]?.baseInfo?.name ?? "Natus Vincere";
-  const teamBName = match.teams?.[1]?.baseInfo?.name ?? "Team Spirit";
+  const teamA = match.teams?.[0];
+  const teamB = match.teams?.[1];
+
+  const teamAName = teamA?.baseInfo?.name ?? "Team A";
+  const teamBName = teamB?.baseInfo?.name ?? "Team B";
+
+  const teamAPlayers =
+    teamA?.players && teamA.players.length > 0
+      ? teamA.players
+      : fallbackPlayers;
+
+  const teamBPlayers =
+    teamB?.players && teamB.players.length > 0
+      ? teamB.players
+      : fallbackPlayers;
 
   const tournamentName = match.tournament?.name ?? "ProLeague";
   const formatName = match.format?.nameShortened ?? match.format?.name ?? "BO3";
@@ -122,11 +160,11 @@ export default function Cs2MatchPage() {
   const scoreA = teamAState?.score ?? 0;
   const scoreB = teamBState?.score ?? 0;
 
-  const killsA = teamAState?.kills ?? 58;
-  const killsB = teamBState?.kills ?? 51;
+  const killsA = teamAState?.kills ?? 0;
+  const killsB = teamBState?.kills ?? 0;
 
-  const deathsA = teamAState?.deaths ?? 51;
-  const deathsB = teamBState?.deaths ?? 58;
+  const deathsA = teamAState?.deaths ?? 0;
+  const deathsB = teamBState?.deaths ?? 0;
 
   const isLive =
     match.state?.started === true && match.state?.finished === false;
@@ -140,7 +178,7 @@ export default function Cs2MatchPage() {
         hour: "2-digit",
         minute: "2-digit",
       })
-    : "23:14";
+    : "TBA";
 
   return (
     <main className="min-h-[500px] w-full bg-[#e9e9e9] px-4 py-4 text-[#111111]">
@@ -156,7 +194,7 @@ export default function Cs2MatchPage() {
                 <div className="flex h-[88px] w-[108px] items-center justify-center rounded-[18px] bg-white shadow-[0_6px_14px_rgba(0,0,0,0.2)] md:h-[112px] md:w-[136px]">
                   <Image
                     src="/icons/question_mark.png"
-                    alt=""
+                    alt={teamAName}
                     width={54}
                     height={54}
                     unoptimized
@@ -187,7 +225,7 @@ export default function Cs2MatchPage() {
                 <div className="flex h-[88px] w-[108px] items-center justify-center rounded-[18px] bg-white shadow-[0_6px_14px_rgba(0,0,0,0.2)] md:h-[112px] md:w-[136px]">
                   <Image
                     src="/icons/question_mark.png"
-                    alt=""
+                    alt={teamBName}
                     width={54}
                     height={54}
                     unoptimized
@@ -250,53 +288,59 @@ export default function Cs2MatchPage() {
 
             <div className="rounded-[16px] bg-white px-3 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
               <div className="flex items-start justify-between gap-2">
-                {mockPlayers.map((name, index) => (
-                  <div
-                    key={index}
-                    className="flex min-w-0 flex-1 flex-col items-center text-center"
-                  >
-                    <div className="flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-full border-[3px] border-[#bf262b] bg-[#2b3c44] md:h-[56px] md:w-[56px]">
-                      <Image
-                        src="/icons/question_mark.png"
-                        alt=""
-                        width={24}
-                        height={24}
-                        unoptimized
-                      />
-                    </div>
+                {teamAPlayers.map((player, index) => {
+                  const name = getPlayerName(player);
 
-                    <div className="mt-1 max-w-full truncate text-[11px] font-black md:text-[12px]">
-                      {name}
-                    </div>
+                  return (
+                    <div
+                      key={player.id ?? `${name}-${index}`}
+                      className="flex min-w-0 flex-1 flex-col items-center text-center"
+                    >
+                      <div className="flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-full border-[3px] border-[#bf262b] bg-[#2b3c44] md:h-[56px] md:w-[56px]">
+                        <Image
+                          src="/icons/question_mark.png"
+                          alt={name}
+                          width={24}
+                          height={24}
+                          unoptimized
+                        />
+                      </div>
 
-                    <div className="text-[9px] font-bold text-[#888888]">
-                      Україна
+                      <div className="mt-1 max-w-full truncate text-[11px] font-black md:text-[12px]">
+                        {name}
+                      </div>
+
+                      <div className="text-[9px] font-bold text-[#888888]">
+                        {player.nationality ?? "—"}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="mt-4 overflow-hidden rounded-[12px] bg-[#111111] text-white">
                 <div className="flex">
-                  {mockPlayers.map((_, index) => {
-                    const player = teamAState?.players?.[index];
+                  {teamAPlayers.map((player, index) => {
+                    const playerStats = teamAState?.players?.[index];
 
                     const kills =
-                      player?.kills ??
+                      playerStats?.kills ??
                       Math.max(0, Math.round(killsA / 5) + index - 2);
 
+                    const assists = playerStats?.assists ?? 0;
+
                     const deaths =
-                      player?.deaths ??
+                      playerStats?.deaths ??
                       Math.max(0, Math.round(deathsA / 5) + 2 - index);
 
                     return (
                       <div
-                        key={index}
+                        key={player.id ?? `stats-a-${index}`}
                         className="flex flex-1 flex-col border-l border-[#333333] px-1.5 py-2.5 text-center first:border-l-0"
                       >
                         <div className="flex justify-around text-[12px] font-black md:text-[13px]">
                           <span>{kills}</span>
-                          <span>2</span>
+                          <span>{assists}</span>
                           <span>{deaths}</span>
                         </div>
 
@@ -323,53 +367,59 @@ export default function Cs2MatchPage() {
 
             <div className="rounded-[16px] bg-white px-3 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
               <div className="flex items-start justify-between gap-2">
-                {mockPlayers.map((name, index) => (
-                  <div
-                    key={index}
-                    className="flex min-w-0 flex-1 flex-col items-center text-center"
-                  >
-                    <div className="flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-full border-[3px] border-[#bf262b] bg-[#2b3c44] md:h-[56px] md:w-[56px]">
-                      <Image
-                        src="/icons/question_mark.png"
-                        alt=""
-                        width={24}
-                        height={24}
-                        unoptimized
-                      />
-                    </div>
+                {teamBPlayers.map((player, index) => {
+                  const name = getPlayerName(player);
 
-                    <div className="mt-1 max-w-full truncate text-[11px] font-black md:text-[12px]">
-                      {name}
-                    </div>
+                  return (
+                    <div
+                      key={player.id ?? `${name}-${index}`}
+                      className="flex min-w-0 flex-1 flex-col items-center text-center"
+                    >
+                      <div className="flex h-[48px] w-[48px] items-center justify-center overflow-hidden rounded-full border-[3px] border-[#bf262b] bg-[#2b3c44] md:h-[56px] md:w-[56px]">
+                        <Image
+                          src="/icons/question_mark.png"
+                          alt={name}
+                          width={24}
+                          height={24}
+                          unoptimized
+                        />
+                      </div>
 
-                    <div className="text-[9px] font-bold text-[#888888]">
-                      Україна
+                      <div className="mt-1 max-w-full truncate text-[11px] font-black md:text-[12px]">
+                        {name}
+                      </div>
+
+                      <div className="text-[9px] font-bold text-[#888888]">
+                        {player.nationality ?? "—"}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="mt-4 overflow-hidden rounded-[12px] bg-[#111111] text-white">
                 <div className="flex">
-                  {mockPlayers.map((_, index) => {
-                    const player = teamBState?.players?.[index];
+                  {teamBPlayers.map((player, index) => {
+                    const playerStats = teamBState?.players?.[index];
 
                     const kills =
-                      player?.kills ??
+                      playerStats?.kills ??
                       Math.max(0, Math.round(killsB / 5) + index - 2);
 
+                    const assists = playerStats?.assists ?? 0;
+
                     const deaths =
-                      player?.deaths ??
+                      playerStats?.deaths ??
                       Math.max(0, Math.round(deathsB / 5) + 2 - index);
 
                     return (
                       <div
-                        key={index}
+                        key={player.id ?? `stats-b-${index}`}
                         className="flex flex-1 flex-col border-l border-[#333333] px-1.5 py-2.5 text-center first:border-l-0"
                       >
                         <div className="flex justify-around text-[12px] font-black md:text-[13px]">
                           <span>{kills}</span>
-                          <span>2</span>
+                          <span>{assists}</span>
                           <span>{deaths}</span>
                         </div>
 
@@ -397,7 +447,7 @@ export default function Cs2MatchPage() {
               <div className="flex h-[110px] w-[68px] items-center justify-center overflow-hidden rounded-[12px] bg-[#111111] md:h-[130px] md:w-[80px]">
                 <Image
                   src="/icons/question_mark.png"
-                  alt=""
+                  alt={teamAName}
                   width={34}
                   height={34}
                   unoptimized
@@ -434,7 +484,7 @@ export default function Cs2MatchPage() {
               <div className="flex h-[110px] w-[68px] items-center justify-center overflow-hidden rounded-[12px] bg-[#111111] md:h-[130px] md:w-[80px]">
                 <Image
                   src="/icons/question_mark.png"
-                  alt=""
+                  alt={teamBName}
                   width={34}
                   height={34}
                   unoptimized
@@ -463,15 +513,17 @@ export default function Cs2MatchPage() {
               <div className="flex flex-col gap-2">
                 {Array.from({ length: 6 }).map((_, index) => (
                   <div
-                    key={index}
+                    key={`team-a-match-${index}`}
                     className="flex items-center gap-2 text-[12px] font-bold"
                   >
                     <span className="min-w-0 flex-1 truncate text-[#666666]">
                       {t("team")} {index + 1}
                     </span>
+
                     <span className="shrink-0 font-black text-[#111111]">
                       8:0
                     </span>
+
                     <span className="shrink-0 rounded-full bg-[#bf262b] px-2.5 py-1 text-[9px] font-black text-white">
                       BO3
                     </span>
@@ -489,15 +541,17 @@ export default function Cs2MatchPage() {
               <div className="flex flex-col gap-2">
                 {Array.from({ length: 6 }).map((_, index) => (
                   <div
-                    key={index}
+                    key={`team-b-match-${index}`}
                     className="flex items-center gap-2 text-[12px] font-bold"
                   >
                     <span className="min-w-0 flex-1 truncate text-[#666666]">
                       {t("team")} {index + 1}
                     </span>
+
                     <span className="shrink-0 font-black text-[#111111]">
                       8:0
                     </span>
+
                     <span className="shrink-0 rounded-full bg-[#bf262b] px-2.5 py-1 text-[9px] font-black text-white">
                       BO3
                     </span>

@@ -12,6 +12,7 @@ import ChangePassword from "./_components/ChangePassword"
 import DeleteAccountModal from "./_components/DeleteAccountModal"
 import { useT } from "@/services/i18n/context"
 import { useFavoriteTeamsResolved } from "@/services/useFavoriteTeams"
+import { useRouter } from "next/navigation"
 
 const Profile = () => {
     const { t } = useT()
@@ -22,6 +23,8 @@ const Profile = () => {
         user?.avatarUrl ?? null
     )
     const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+
+    const router = useRouter()
 
     const { mutateAsync: deleteUser } = useDeleteApiUserId()
     const { teams: favTeams, competitions: favCompetitions } = useFavoriteTeamsResolved()
@@ -34,9 +37,46 @@ const Profile = () => {
     } | null>(null)
 
 
+    const handleShareProfile = async () => {
+        if (!user) return
+
+        const profileUrl = `${window.location.origin}/profile/${user.id}`
+
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: user.name || "FanPulse profile",
+                    text: "Подивись мій профіль на FanPulse",
+                    url: profileUrl,
+                })
+                return
+            }
+
+            await navigator.clipboard.writeText(profileUrl)
+
+            setToast({
+                message: "Посилання на профіль скопійовано",
+                type: "success",
+            })
+        } catch (error) {
+            console.error(error)
+
+            setToast({
+                message: "Не вдалося поділитися профілем",
+                type: "error",
+            })
+        }
+    }
+
+
     const { mutateAsync: rename } = usePutApiUserId()
 
     if (isLoading) return <div className="p-10 text-brand-red">{t("loading")}</div>
+
+    if (!user) {
+        router.push("/?auth=login")
+        return null
+    }
 
     const uploadAvatar = async (file: File) => {
         const res = await fetch("/api/upload/avatar", {
@@ -197,7 +237,7 @@ const Profile = () => {
                                 />
                             </label>
 
-                          
+
 
                             <label className="text-sm text-brand-red cursor-pointer hover:underline">
                                 {t("profile_change_photo")}
@@ -278,7 +318,10 @@ const Profile = () => {
                                                 {ICONS.Edit}
                                             </span>
                                         )}
-                                        <span className="cursor-pointer hover:opacity-70 transition-opacity">
+                                        <span
+                                            onClick={handleShareProfile}
+                                            className="cursor-pointer hover:opacity-70 transition-opacity"
+                                        >
                                             {ICONS.Share}
                                         </span>
                                     </div>
@@ -310,8 +353,8 @@ const Profile = () => {
                                     type="button"
                                     onClick={() => setActiveTab("main")}
                                     className={`h-[52px] rounded-2xl border-2 border-brand-red transition-all font-semibold text-left px-5 cursor-pointer ${activeTab === "main"
-                                            ? "bg-brand-red text-white"
-                                            : "bg-white text-brand-red hover:bg-brand-red hover:text-white"
+                                        ? "bg-brand-red text-white"
+                                        : "bg-white text-brand-red hover:bg-brand-red hover:text-white"
                                         }`}
                                 >
                                     {t("profile_favourite_tab")}
@@ -321,8 +364,8 @@ const Profile = () => {
                                     type="button"
                                     onClick={() => setActiveTab("activity")}
                                     className={`h-[52px] rounded-2xl border-2 border-brand-red transition-all font-semibold text-left px-5 cursor-pointer ${activeTab === "activity"
-                                            ? "bg-brand-red text-white"
-                                            : "bg-white text-brand-red hover:bg-brand-red hover:text-white"
+                                        ? "bg-brand-red text-white"
+                                        : "bg-white text-brand-red hover:bg-brand-red hover:text-white"
                                         }`}
                                 >
                                     {t("profile_activity_tab")}
@@ -332,8 +375,8 @@ const Profile = () => {
                                     type="button"
                                     onClick={() => setActiveTab("password")}
                                     className={`h-[52px] rounded-2xl border-2 border-brand-red transition-all font-semibold text-left px-5 cursor-pointer ${activeTab === "password"
-                                            ? "bg-brand-red text-white"
-                                            : "bg-white text-brand-red hover:bg-brand-red hover:text-white"
+                                        ? "bg-brand-red text-white"
+                                        : "bg-white text-brand-red hover:bg-brand-red hover:text-white"
                                         }`}
                                 >
                                     {t("profile_change_password")}
@@ -379,7 +422,7 @@ const Profile = () => {
                         <ChangePassword />
                     )}
                 </main>
-            
+
 
                 {/* BANNER */}
                 <div className="hidden 2xl:block shrink-0 px-6">
@@ -389,11 +432,11 @@ const Profile = () => {
                         className="w-[220px] h-[700px] rounded-[28px] border-2 border-brand-red object-cover"
                     />
                 </div>
-            
+
             </div>
 
 
-            
+
 
             {/* TOAST */}
             {toast && (
