@@ -166,7 +166,7 @@ export default function Page() {
                 <img src="/banners/beton.png" className="h-24 rounded-xl shrink-0" />
                 <img src="/banners/vbet.png" className="h-24 rounded-xl shrink-0" />
                 <img src="/banners/sportshop.png" className="h-24 rounded-xl shrink-0" />
-                <img src="/banners/fit.png" className="h-24 rounded-xl shrink-0" />
+                <img src="/banners/Fit.png" className="h-24 rounded-xl shrink-0" />
                 <img src="/banners/roullete.png" className="h-24 rounded-xl shrink-0" />
               </div>
             ))}

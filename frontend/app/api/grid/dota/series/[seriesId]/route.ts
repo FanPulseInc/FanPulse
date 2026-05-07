@@ -9,6 +9,9 @@ export async function GET(
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("date") ?? undefined;
 
+
+  console.log("DOTA GRID series details request:", { seriesId, date });
+
   try {
     const data = await getDotaSeriesDetails(seriesId, date);
 
