@@ -1,39 +1,48 @@
 "use client";
+
+import Link from "next/link";
 import { useT } from "@/services/i18n/context";
 
 const Footer = () => {
   const { t } = useT();
 
   const sportItems = [
-    t("sport_football"),
-    t("sport_basketball"),
-    t("sport_american_football"),
-    t("sport_tennis"),
-    t("sport_motorsport"),
+    { label: t("sport_football"), href: "/football" },
+    { label: t("sport_basketball"), href: "/basketball" },
+    { label: t("sport_american_football"), href: "/american-football" },
+    { label: t("sport_tennis"), href: "/tennis" },
+    { label: t("sport_motorsport"), href: "/motorsport" },
   ];
-  const esportItems = ["League of Legends", "Counter Strike", "Dota 2"];
-  const forumItems = [
-    t("contacts"),
-    t("privacy"),
-    t("cookies"),
-    t("accessibility"),
-    t("ads"),
+
+  const esportItems = [
+    { label: "Counter Strike", href: "esport/cs2" },
+    { label: "Dota 2", href: "esport/dota" },
   ];
+
+  const anotherItems = [
+    { label: t("contacts"), href: "/contacts" },
+    { label: t("privacy"), href: "/privacy" },
+    { label: t("cookies"), href: "/cookies" },
+    { label: t("accessibility"), href: "/accessibility" },
+    { label: t("ads"), href: "/ads" },
+  ];
+
+  const linkClass =
+    "text-[#212121] hover:text-brand-red hover:underline transition-colors cursor-pointer";
 
   return (
     <div className="w-full max-w-[1440px] mx-auto flex flex-col lg:flex-row gap-6 lg:gap-11 bg-[color:var(--variable-collection-4-white)] px-4 sm:px-6 lg:px-[45px] py-6">
       <div className="w-full lg:w-[653px] flex-col items-start gap-2.5 p-4 sm:p-2.5 bg-variable-collection-4-white-duplicate rounded-[20px] lg:rounded-[30px] opacity-80 flex">
-        <div className="flex-col w-full items-start justify-center gap-1 flex">
-          <div className="text-[length:var(--l-interface-font-size)] flex items-center w-fit font-l-interface font-[number:var(--l-interface-font-weight)] text-[#212121] tracking-[var(--l-interface-letter-spacing)] leading-[var(--l-interface-line-height)] [font-style:var(--l-interface-font-style)]">
-            {t("info_title")}
-          </div>
+        <div className="text-[length:var(--l-interface-font-size)] flex items-center w-fit font-l-interface font-[number:var(--l-interface-font-weight)] text-[#212121] tracking-[var(--l-interface-letter-spacing)] leading-[var(--l-interface-line-height)] [font-style:var(--l-interface-font-style)]">
+          {t("info_title")}
         </div>
 
-        <div className="flex-col w-full items-start gap-1 flex">
-          <p className="self-stretch [font-family:'Inter-Medium',Helvetica] font-medium text-[#212121] text-xs tracking-[0] leading-5">
-            FanPulse.com
-          </p>
-        </div>
+        <Link
+          href="/"
+          className="self-stretch [font-family:'Inter-Medium',Helvetica] font-medium text-[#212121] text-xs tracking-[0] leading-5 hover:text-brand-red hover:underline transition-colors"
+        >
+          FanPulse.com
+        </Link>
       </div>
 
       <div className="w-full lg:w-[653px] grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-2 items-start p-4 sm:p-2.5 bg-variable-collection-4-white-duplicate rounded-[20px] lg:rounded-[30px] opacity-80">
@@ -41,13 +50,15 @@ const Footer = () => {
           <div className="font-l-interface font-[number:var(--l-interface-font-weight)] text-[#212121] text-[length:var(--l-interface-font-size)] tracking-[var(--l-interface-letter-spacing)] leading-[var(--l-interface-line-height)] [font-style:var(--l-interface-font-style)]">
             {t("sport_section")}
           </div>
+
           {sportItems.map((item) => (
-            <div
-              key={item}
-              className="text-[length:var(--s-interface-font-size)] font-s-interface font-[number:var(--s-interface-font-weight)] text-[#212121] tracking-[var(--s-interface-letter-spacing)] leading-[var(--s-interface-line-height)] [font-style:var(--s-interface-font-style)]"
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${linkClass} text-[length:var(--s-interface-font-size)] font-s-interface font-[number:var(--s-interface-font-weight)] tracking-[var(--s-interface-letter-spacing)] leading-[var(--s-interface-line-height)] [font-style:var(--s-interface-font-style)]`}
             >
-              {item}
-            </div>
+              {item.label}
+            </Link>
           ))}
         </div>
 
@@ -55,13 +66,15 @@ const Footer = () => {
           <div className="font-l-interface font-[number:var(--l-interface-font-weight)] text-[#212121] text-[length:var(--l-interface-font-size)] tracking-[var(--l-interface-letter-spacing)] leading-[var(--l-interface-line-height)] [font-style:var(--l-interface-font-style)]">
             {t("esport_section")}
           </div>
+
           {esportItems.map((item) => (
-            <div
-              key={item}
-              className="font-s-interface font-[number:var(--s-interface-font-weight)] text-[#212121] text-[length:var(--s-interface-font-size)] tracking-[var(--s-interface-letter-spacing)] leading-[var(--s-interface-line-height)] [font-style:var(--s-interface-font-style)]"
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${linkClass} font-s-interface font-[number:var(--s-interface-font-weight)] text-[length:var(--s-interface-font-size)] tracking-[var(--s-interface-letter-spacing)] leading-[var(--s-interface-line-height)] [font-style:var(--s-interface-font-style)]`}
             >
-              {item}
-            </div>
+              {item.label}
+            </Link>
           ))}
         </div>
 
@@ -69,17 +82,20 @@ const Footer = () => {
           <div className="font-l-interface font-[number:var(--l-interface-font-weight)] text-[#212121] text-[length:var(--l-interface-font-size)] tracking-[var(--l-interface-letter-spacing)] leading-[var(--l-interface-line-height)] [font-style:var(--l-interface-font-style)]">
             {t("forum_section")}
           </div>
-          {forumItems.map((item) => (
-            <div
-              key={item}
-              className="font-l-interface font-[number:var(--l-interface-font-weight)] text-[#212121] text-[length:var(--l-interface-font-size)] tracking-[var(--l-interface-letter-spacing)] leading-[var(--l-interface-line-height)] [font-style:var(--l-interface-font-style)]"
+
+          {anotherItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${linkClass} font-l-interface font-[number:var(--l-interface-font-weight)] text-[length:var(--l-interface-font-size)] tracking-[var(--l-interface-letter-spacing)] leading-[var(--l-interface-line-height)] [font-style:var(--l-interface-font-style)]`}
             >
-              {item}
-            </div>
+              {item.label}
+            </Link>
           ))}
         </div>
       </div>
     </div>
   );
 };
+
 export default Footer;

@@ -90,6 +90,8 @@ const Profile = () => {
             }),
         })
 
+        console.log("Upload response:", res)
+
         if (!res.ok) {
             throw new Error("Upload failed")
         }
@@ -334,17 +336,7 @@ const Profile = () => {
 
 
                         <section className="flex flex-col gap-4">
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-[12px] text-brand-red font-medium ml-4 uppercase">{t("profile_birthday")}</label>
-                                <div className="w-full h-[50px] rounded-[20px] bg-gray-50 border-2 border-brand-red flex items-center px-6">
-                                    <input
-                                        className="w-full bg-transparent outline-none font-bold text-brand-red opacity-50 cursor-not-allowed"
-                                        value={t("birthday_placeholder")}
-                                        disabled
-                                        type="text"
-                                    />
-                                </div>
-                            </div>
+                          
 
 
                             {/* MENU */}
