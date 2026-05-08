@@ -317,9 +317,9 @@ export default function AmericanFootballMatchPage() {
 
     return (
         <SportContainer>
-            <div className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-start justify-start">
-                <div className="flex flex-col gap-2 w-full lg:w-auto">
-                    <div className="w-full lg:w-[560px] flex items-center justify-between gap-2 px-1">
+            <div className="flex gap-6 items-start justify-start">
+                <div className="p-10">
+                    <div className="w-[560px] flex items-center justify-between gap-2 px-1 mb-2">
                         <button
                             type="button"
                             onClick={() => setDateIso(d => shiftSeasonIso(d, -1))}
@@ -351,7 +351,7 @@ export default function AmericanFootballMatchPage() {
                     />
                 </div>
 
-                <div className="flex-1 min-w-0 flex flex-col gap-4">
+                <div className="flex-1 min-w-0 p-5 flex flex-col gap-4">
                     {eventLoading && (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
                             {t("loading_match")}
@@ -508,7 +508,13 @@ export default function AmericanFootballMatchPage() {
                     )}
                 </div>
 
-                <div className="hidden lg:block w-[220px] h-[500px] bg-white rounded-[20px] border border-gray-200 shadow-sm shrink-0" />
+                <div className="shrink-0 m-3 mt-6 max-w-[280px] max-h-[1000px]">
+                    <img
+                        src="/banners/banner.png"
+                        alt="banner"
+                        className="w-full h-auto rounded-[20px]"
+                    />
+                </div>
             </div>
         </SportContainer>
     );

@@ -37,12 +37,9 @@ const Footer = () => {
           {t("info_title")}
         </div>
 
-        <Link
-          href="/"
-          className="self-stretch [font-family:'Inter-Medium',Helvetica] font-medium text-[#212121] text-xs tracking-[0] leading-5 hover:text-brand-red hover:underline transition-colors"
-        >
-          FanPulse.com
-        </Link>
+        <p className="self-stretch [font-family:'Inter-Medium',Helvetica] font-medium text-[#212121] text-xs tracking-[0] leading-5">
+          {t("footer_description")}
+        </p>
       </div>
 
       <div className="w-full lg:w-[653px] grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-2 items-start p-4 sm:p-2.5 bg-variable-collection-4-white-duplicate rounded-[20px] lg:rounded-[30px] opacity-80">

@@ -420,22 +420,24 @@ export default function FootballMatchPage() {
 
     return (
         <SportContainer>
-            <div className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-start justify-start">
+            <div className="flex gap-6 items-start justify-start">
                 {/* Left — grouped schedule with day nav */}
-                <ScheduleColumn
-                    groups={annotatedGroups}
-                    selectedMatchId={matchId}
-                    dateLabel={formatDateLabel(dateIso)}
-                    dateIso={dateIso}
-                    onPrevDayAction={() => setDateIso(d => shiftIso(d, -1))}
-                    onNextDayAction={() => setDateIso(d => shiftIso(d, +1))}
-                    onPickDateAction={(iso) => setDateIso(iso)}
-                    competitions={competitions}
-                    onPickCompetitionAction={onPickCompetitionAction}
-                />
+                <div className="p-10">
+                    <ScheduleColumn
+                        groups={annotatedGroups}
+                        selectedMatchId={matchId}
+                        dateLabel={formatDateLabel(dateIso)}
+                        dateIso={dateIso}
+                        onPrevDayAction={() => setDateIso(d => shiftIso(d, -1))}
+                        onNextDayAction={() => setDateIso(d => shiftIso(d, +1))}
+                        onPickDateAction={(iso) => setDateIso(iso)}
+                        competitions={competitions}
+                        onPickCompetitionAction={onPickCompetitionAction}
+                    />
+                </div>
 
                 {/* Middle — match detail */}
-                <div className="flex-1 min-w-0 flex flex-col gap-4">
+                <div className="flex-1 min-w-0 p-5 flex flex-col gap-4">
                     {eventLoading && (
                         <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
                             {t("loading_match")}
@@ -634,8 +636,14 @@ export default function FootballMatchPage() {
                     )}
                 </div>
 
-                {/* Right — blank banner placeholder */}
-                <div className="hidden lg:block w-[220px] h-[500px] bg-white rounded-[20px] border border-gray-200 shadow-sm shrink-0" />
+                {/* Right — banner */}
+                <div className="shrink-0 m-3 mt-6 max-w-[280px] max-h-[1000px]">
+                    <img
+                        src="/banners/banner.png"
+                        alt="banner"
+                        className="w-full h-auto rounded-[20px]"
+                    />
+                </div>
             </div>
         </SportContainer>
     );

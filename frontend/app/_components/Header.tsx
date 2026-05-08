@@ -7,6 +7,7 @@ import { useUserStore } from "@/store/useUserStore";
 import { useRouter } from "next/navigation";
 import { useLeagueLookups } from "@/services/sportsdb/hooks";
 import { useT } from "@/services/i18n/context";
+import Toast from "./Toast";
 
 const navItems = [
     { icon: ICONS.HOME, labelKey: "nav_home", href: "/" },
@@ -92,6 +93,7 @@ const Header = () => {
     const { lang, setLang, t } = useT();
     const [isSportOpen, setIsSportOpen] = useState(false);
     const [isEsportOpen, setIsEsportOpen] = useState(false);
+    const [searchToast, setSearchToast] = useState(false);
     const [hoveredSport, setHoveredSport] = useState<string>(SPORT_MENU[0].key);
     const activeSport = SPORT_MENU.find(s => s.key === hoveredSport) ?? SPORT_MENU[0];
     const sportMenuRef = useRef<HTMLDivElement | null>(null);
@@ -147,6 +149,13 @@ const Header = () => {
 
     return (
         <div className="w-full bg-[#ffffff] px-4 sm:px-6 lg:px-10 py-4 flex flex-col gap-4">
+            {searchToast && (
+                <Toast
+                    message={t("maintenance_message")}
+                    type="error"
+                    onClose={() => setSearchToast(false)}
+                />
+            )}
 
 
             <div className="flex h-auto lg:h-[70px] items-center justify-between gap-3 w-full flex-wrap lg:flex-nowrap">
@@ -155,15 +164,16 @@ const Header = () => {
                 </Link>
 
 
-                <div className="order-3 lg:order-none w-full lg:w-[600px] h-[44px] lg:h-[50px] flex items-center justify-between pl-4 pr-1 bg-white rounded-[50px] border-2 border-brand-red">
-                    <input
-                        type="text"
-                        placeholder={t("header_search_placeholder")}
-                        className="flex-1 min-w-0 bg-transparent outline-none text-body-l text-brand-black placeholder:text-brand-black/40"
-                    />
-                    <button className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center bg-brand-red rounded-full cursor-pointer hover:opacity-90 transition-opacity shrink-0 [&_svg]:w-5 [&_svg]:h-5 lg:[&_svg]:w-6 lg:[&_svg]:h-6">
+                <div
+                    onClick={() => setSearchToast(true)}
+                    className="order-3 lg:order-none w-full lg:w-[600px] h-[44px] lg:h-[50px] flex items-center justify-between pl-4 pr-1 bg-white rounded-[50px] border-2 border-brand-red cursor-pointer opacity-60"
+                >
+                    <span className="flex-1 min-w-0 text-body-l text-brand-black/40 select-none">
+                        {t("header_search_placeholder")}
+                    </span>
+                    <div className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center bg-brand-red rounded-full shrink-0 [&_svg]:w-5 [&_svg]:h-5 lg:[&_svg]:w-6 lg:[&_svg]:h-6">
                         {ICONS.SEARCH}
-                    </button>
+                    </div>
                 </div>
 
 
@@ -391,9 +401,6 @@ const Header = () => {
                 </nav>
 
                 <div className="flex items-center gap-3 sm:gap-5 lg:gap-8 px-2 lg:px-4 shrink-0">
-                    <button className="cursor-pointer hover:opacity-70 transition-opacity">{ICONS.NOTIFY}</button>
-                    <button className="cursor-pointer hover:opacity-70 transition-opacity">{ICONS.STAR}</button>
-                    <button className="hidden sm:inline-flex cursor-pointer hover:opacity-70 transition-opacity">{ICONS.TV}</button>
                     <button className="hidden sm:inline-flex cursor-pointer hover:opacity-70 transition-opacity">{ICONS.ASK}</button>
                     <button className="cursor-pointer hover:opacity-70 transition-opacity">{ICONS.SETTING}</button>
                 </div>

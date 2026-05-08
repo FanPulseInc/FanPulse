@@ -3,6 +3,7 @@
 import { ICONS } from "@/app/svg"
 import { usePostApiUser } from "@/services/api/generated"
 import { useT } from "@/services/i18n/context"
+import { saveFavCategoryIds } from "@/services/useFavCategories"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import CategorySelectModal from "./CategorySelectModal"
@@ -63,6 +64,7 @@ const Register = () => {
 
       await registerUser({ data: payload })
 
+      saveFavCategoryIds(categoryIds)
       setShowCategoryModal(false)
       router.push("?auth=login")
     } catch (err: unknown) {

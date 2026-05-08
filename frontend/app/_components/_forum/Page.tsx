@@ -12,23 +12,31 @@ import {
 } from "@/services/api/generated";
 import type { PostResponce } from "@/services/api/model";
 import { useT } from "@/services/i18n/context";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
+import { useFavCategoryIds } from "@/services/useFavCategories";
+import Toast from "../Toast";
 
 export default function ForumPage() {
     const { t } = useT();
-    const [activeFilter, setActiveFilter] = useState("latest");
-    const [selectedCategory, setSelectedCategory] = useState("__all__");
+    const router = useRouter();
+    const { user } = useUserStore();
+    const searchParams = useSearchParams();
+    const categoryParam = searchParams.get("category");
+    const filterParam = searchParams.get("filter");
+
+    const [activeFilter, setActiveFilter] = useState(filterParam === "favourite" ? "recommended" : "latest");
+    const [selectedCategory, setSelectedCategory] = useState(categoryParam ?? "__all__");
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+    const [authToast, setAuthToast] = useState(!user);
+
+    const { ids: favCategoryIds } = useFavCategoryIds();
 
     const navFilters = [
         { id: "latest", label: t("forum_latest") },
         { id: "popular", label: t("forum_popular") },
         { id: "recommended", label: t("forum_recommended") },
     ];
-
-    const router = useRouter();
-    const { user } = useUserStore();
 
     const { data: postsData, isLoading: postsLoading } = useGetApiPost({ page: 0, count: 20 });
     const rawPosts: PostResponce[] = Array.isArray(postsData)
@@ -38,9 +46,23 @@ export default function ForumPage() {
         ?? [];
     const { data: categories } = useGetApiCategoryRoots();
 
-    const filteredPosts = selectedCategory === "__all__"
-        ? rawPosts
-        : rawPosts.filter(p => p.category?.name === selectedCategory);
+    /* resolve favourite category names for the "recommended" filter */
+    const favCategoryNames = (categories ?? [])
+        .filter((c) => favCategoryIds.includes(c.id ?? ""))
+        .map((c) => c.name ?? "");
+
+    const filteredPosts = (() => {
+        let base = selectedCategory === "__all__"
+            ? rawPosts
+            : rawPosts.filter(p => p.category?.name === selectedCategory);
+
+        /* recommended = only posts from favourite categories */
+        if (activeFilter === "recommended" && favCategoryNames.length > 0) {
+            base = base.filter(p => favCategoryNames.includes(p.category?.name ?? ""));
+        }
+
+        return base;
+    })();
 
     const likeCountQueries = useQueries({
         queries: filteredPosts.map(p => ({
@@ -75,6 +97,25 @@ export default function ForumPage() {
     });
 
     const displayCategory = selectedCategory === "__all__" ? t("forum_all_categories") : selectedCategory;
+
+    /* redirect unregistered users — placed after all hooks */
+    if (!user) {
+        return (
+            <>
+                {authToast && (
+                    <Toast
+                        message={t("forum_auth_required")}
+                        type="error"
+                        onClose={() => {
+                            setAuthToast(false);
+                            router.push("/?auth=register");
+                        }}
+                        duration={2000}
+                    />
+                )}
+            </>
+        );
+    }
 
     return (
         <ForumContainer>
