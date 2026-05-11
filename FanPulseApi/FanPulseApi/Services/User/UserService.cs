@@ -248,4 +248,22 @@ public class UserService: IUserService
         var success = await _repository.DeleteUserAsync(id);
         return success ? user.ToDto() : null;
     }
+
+    public async Task<UserResponse?> UpdateUserCategoriesAsync(
+    Guid id,
+    UserCategoriesUpdateRequest request
+)
+    {
+        var user = await _repository.UpdateUserCategoriesAsync(
+            id,
+            request.FavCategoryIds
+        );
+
+        if (user == null)
+        {
+            return null;
+        }
+
+        return UserMapper.ToDto(user);
+    }
 }

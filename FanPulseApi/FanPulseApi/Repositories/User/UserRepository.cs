@@ -64,14 +64,54 @@ public class UserRepository : IUserRepository
     }
 
     //Update
-    
+
     public async Task<bool> UpdateUserAsync(Models.User user)
     {
         _context.Users.Update(user);
-        
+
         var affectedRows = await _context.SaveChangesAsync();
-        
+
         return affectedRows > 0;
     }
+
+
+
+
+public async Task<Models.User?> UpdateUserCategoriesAsync(Guid id, List<Guid> categoryIds)
+{
+    var uniqueCategoryIds = categoryIds.Distinct().ToList();
+
+    var user = await _context.Users
+        .Include(u => u.FavCategories)
+        .FirstOrDefaultAsync(u => u.Id == id);
+
+    if (user == null)
+    {
+        return null;
+    }
+
+    var categories = await _context.Categories
+        .Where(c => uniqueCategoryIds.Contains(c.Id))
+        .ToListAsync();
+
+    if (categories.Count != uniqueCategoryIds.Count)
+    {
+        throw new ArgumentException("Some categories were not found.");
+    }
+
+    user.FavCategories.Clear();
+
+    foreach (var category in categories)
+    {
+        user.FavCategories.Add(category);
+    }
+
+    user.UpdatedAt = TimeProvider.System.GetUtcNow();
+    user.UpdatedBy = "system";
+
+    await _context.SaveChangesAsync();
+
+    return user;
+}
     
 }

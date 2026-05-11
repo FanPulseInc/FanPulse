@@ -1,4 +1,5 @@
 ﻿using FanPulseApi.DTO.User;
+using FanPulseApi.Services.Category;
 
 namespace FanPulseApi.Services.User;
 
@@ -21,7 +22,9 @@ public static class UserMapper
             CountOfLkes = user.Likes?.Count ?? 0,
             CountOfPosts = user.Posts?.Count ?? 0,
 
-            RecentActivities = recentActivities ?? new List<UserActivityDto>()
+            RecentActivities = recentActivities ?? new List<UserActivityDto>(),
+            FavCategories = CategoryMapper.ToDtoList(user.FavCategories)
+           
         };
     }
 
