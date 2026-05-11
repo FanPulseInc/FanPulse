@@ -6,7 +6,7 @@ interface UserWithActivity {
   recentActivities?: UserActivityDto[] | null;
 }
 
-export default function RecentActivity({ user }: { user?: UserWithActivity | null }) {
+export default function Activity({ user }: { user?: UserWithActivity | null }) {
   const { t } = useT()
 
   const typeMap: Record<string, string> = {
@@ -16,6 +16,7 @@ export default function RecentActivity({ user }: { user?: UserWithActivity | nul
     Пост: t("activity_post"),
     Коментар: t("activity_comment"),
     Лайк: t("activity_like"),
+    
   }
 
   const formatDate = (dateString: string) => {
@@ -57,11 +58,44 @@ export default function RecentActivity({ user }: { user?: UserWithActivity | nul
 
       <div className="flex flex-col gap-3">
         {!user?.recentActivities || user.recentActivities.length === 0 ? (
-          <div className="w-full min-h-[70px] bg-gray-50 border-2 border-brand-red/30 rounded-[20px] flex items-center justify-center px-6">
-            
-            <span className="text-[14px] text-brand-black/50 font-medium">
-              {t("activity_empty")}
-            </span>
+          <div className="relative overflow-hidden rounded-[28px] border-2 border-dashed border-brand-red/20 bg-gradient-to-br from-white via-[#fff7f7] to-[#ffeaea] px-8 py-10">
+
+            {/* bg glow */}
+            <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-brand-red/10 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-12 -left-12 h-52 w-52 rounded-full bg-brand-red/5 blur-3xl" />
+
+            <div className="relative z-10 flex flex-col items-center justify-center text-center">
+
+              {/* fox */}
+              <div className="relative mb-5">
+                <div className="absolute inset-0 rounded-full bg-brand-red/10 blur-2xl" />
+
+                <img
+                  src="/icons/fox_empty.png"
+                  alt="Empty activities"
+                  className="
+          relative
+          w-[160px]
+          object-contain
+
+          transition-transform duration-500
+          hover:scale-105
+          "
+                />
+              </div>
+           
+              <h1 className="text-[1.2rem] font-black uppercase text-brand-red">
+                {t("activity_empty")}
+              </h1>
+       
+              <p className="mt-3 max-w-[420px] text-[14px] leading-relaxed text-brand-black/55 font-medium">
+                Поки що у вашому профілі немає активності.
+                Створюйте пости, залишайте коментарі та взаємодійте зі спільнотою FanPulse.
+              </p>
+
+             
+              
+            </div>
           </div>
         ) : (
           user.recentActivities.map((item: UserActivityDto, index: number) => (

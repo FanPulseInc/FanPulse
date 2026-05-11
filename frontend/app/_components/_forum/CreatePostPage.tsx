@@ -76,7 +76,7 @@ export default function CreatePostPage() {
             <div className="w-[1039px] flex flex-col gap-4">
                 <div className="w-full h-[60px] bg-[#af292a] rounded-[20px] flex items-center justify-between px-6">
                     <h1 className="text-white font-bold text-xl italic">{t("forum_create_post")}</h1>
-                    <button className="w-[327px] h-[45px] bg-[#212121] rounded-[18px] flex justify-center items-center text-white font-bold text-sm hover:bg-black transition-all cursor-pointer">
+                    <button onClick={() => router.push("/forum/rules")} className="w-[327px] h-[45px] bg-[#212121] rounded-[18px] flex justify-center items-center text-white font-bold text-sm hover:bg-black transition-all cursor-pointer">
                         {t("forum_rules")}
                     </button>
                 </div>
