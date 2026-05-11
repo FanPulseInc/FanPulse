@@ -14,4 +14,6 @@ public interface IUserRepository
     
     Task<Models.User?> GetUserByEmailAsync(string email);
 
+    Task<Models.User?> UpdateUserCategoriesAsync(Guid id,List<Guid> categoryIds);
+
 }

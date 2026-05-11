@@ -1,11 +1,13 @@
+using FanPulseApi.DTO.Auth;
+using FanPulseApi.Models;
+using FanPulseApi.Repositories.User;
+using FanPulseApi.Services.User;
+using Google.Apis.Auth;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using FanPulseApi.DTO.Auth;
-using FanPulseApi.Repositories.User;
-using FanPulseApi.Services.User;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 
 namespace FanPulseApi.Services.Auth;
 
@@ -32,7 +34,49 @@ public class AuthService : IAuthService
         {
             return null; 
         }
-        
+
+        return GenerateAuthResponse(user);
+    }
+    public async Task<AuthResponse?> GoogleLoginAsync(GoogleLoginRequest request)
+    {
+        GoogleJsonWebSignature.Payload payload;
+
+        try
+        {
+            payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken);
+        }
+        catch
+        {
+            return null;
+        }
+
+        var user = await _userRepository.GetUserByEmailAsync(payload.Email);
+
+        if (user == null)
+        {
+            user = new Models.User
+            {
+                Id = Guid.NewGuid(),
+                Email = payload.Email,
+                Name = payload.Name ?? "someName",
+                AvatarUrl = null,
+                PasswordHash = Array.Empty<byte>(),
+                PasswordSalt = Array.Empty<byte>(),
+                CreatedBy = "system",
+                UpdatedBy = "system"
+
+            };
+
+            await _userRepository.CreateUserAsync(user);
+        }
+
+        return GenerateAuthResponse(user);
+    }
+
+    private AuthResponse GenerateAuthResponse(Models.User user)
+    {
+        if (user == null) return null;
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "Temporary_Local_Dev_Key_32_Chars_Long!!!");
 
@@ -48,7 +92,7 @@ public class AuthService : IAuthService
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-            
+
         return new AuthResponse
         {
             Token = tokenHandler.WriteToken(token),
@@ -56,4 +100,6 @@ public class AuthService : IAuthService
             UserId = user.Id
         };
     }
+
+
 }

@@ -36,6 +36,7 @@ import type {
   GetApiLikeCheckParams,
   GetApiPostParams,
   GetApiReportUserReportsParams,
+  GoogleLoginRequest,
   LoginRequest,
   PostAddRequest,
   PostLike,
@@ -43,6 +44,7 @@ import type {
   ReportAddRequest,
   ReportResponse,
   UserAddRequest,
+  UserCategoriesUpdateRequest,
   UserResponse,
   UserUpdateRequest
 } from './model';
@@ -108,6 +110,64 @@ const {mutation: mutationOptions} = options ?
         TContext
       > => {
       return useMutation(getPostApiAuthLoginMutationOptions(options), queryClient);
+    }
+
+export const postApiAuthGoogle = (
+    googleLoginRequest: GoogleLoginRequest,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AuthResponse>(
+      {url: `/api/Auth/google`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: googleLoginRequest, signal
+    },
+      );
+    }
+
+
+
+export const getPostApiAuthGoogleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiAuthGoogle>>, TError,{data: GoogleLoginRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof postApiAuthGoogle>>, TError,{data: GoogleLoginRequest}, TContext> => {
+
+const mutationKey = ['postApiAuthGoogle'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiAuthGoogle>>, {data: GoogleLoginRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postApiAuthGoogle(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiAuthGoogleMutationResult = NonNullable<Awaited<ReturnType<typeof postApiAuthGoogle>>>
+    export type PostApiAuthGoogleMutationBody = GoogleLoginRequest
+    export type PostApiAuthGoogleMutationError = unknown
+
+    export const usePostApiAuthGoogle = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiAuthGoogle>>, TError,{data: GoogleLoginRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiAuthGoogle>>,
+        TError,
+        {data: GoogleLoginRequest},
+        TContext
+      > => {
+      return useMutation(getPostApiAuthGoogleMutationOptions(options), queryClient);
     }
 
 export const getApiCategory = (
@@ -2193,6 +2253,65 @@ const {mutation: mutationOptions} = options ?
         TContext
       > => {
       return useMutation(getPatchApiReportIdCloseMutationOptions(options), queryClient);
+    }
+
+export const patchApiUserIdCategories = (
+    id: string,
+    userCategoriesUpdateRequest: UserCategoriesUpdateRequest,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UserResponse>(
+      {url: `/api/User/${id}/categories`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: userCategoriesUpdateRequest, signal
+    },
+      );
+    }
+
+
+
+export const getPatchApiUserIdCategoriesMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApiUserIdCategories>>, TError,{id: string;data: UserCategoriesUpdateRequest}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof patchApiUserIdCategories>>, TError,{id: string;data: UserCategoriesUpdateRequest}, TContext> => {
+
+const mutationKey = ['patchApiUserIdCategories'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchApiUserIdCategories>>, {id: string;data: UserCategoriesUpdateRequest}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  patchApiUserIdCategories(id,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchApiUserIdCategoriesMutationResult = NonNullable<Awaited<ReturnType<typeof patchApiUserIdCategories>>>
+    export type PatchApiUserIdCategoriesMutationBody = UserCategoriesUpdateRequest
+    export type PatchApiUserIdCategoriesMutationError = unknown
+
+    export const usePatchApiUserIdCategories = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApiUserIdCategories>>, TError,{id: string;data: UserCategoriesUpdateRequest}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof patchApiUserIdCategories>>,
+        TError,
+        {id: string;data: UserCategoriesUpdateRequest},
+        TContext
+      > => {
+      return useMutation(getPatchApiUserIdCategoriesMutationOptions(options), queryClient);
     }
 
 export const getApiUser = (

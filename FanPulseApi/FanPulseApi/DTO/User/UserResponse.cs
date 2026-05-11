@@ -1,4 +1,6 @@
-﻿namespace FanPulseApi.DTO.User;
+﻿using FanPulseApi.DTO.Category;
+
+namespace FanPulseApi.DTO.User;
 
 public class UserResponse
 {
@@ -14,6 +16,9 @@ public class UserResponse
     public int? CountOfLkes { get; set; }
 
     public List<UserActivityDto>? RecentActivities {  get; set; }
+
+    public List<CategoryResponse>? FavCategories { get; set; }
+
 
 }
 

@@ -18,5 +18,7 @@ public interface IUserService
     
     //Delete
     Task<UserResponse?> DeleteUserAsync(Guid id);
-    
+
+    Task<UserResponse?> UpdateUserCategoriesAsync(Guid id,UserCategoriesUpdateRequest request);
+
 }

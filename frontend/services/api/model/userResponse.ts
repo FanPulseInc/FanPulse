@@ -4,6 +4,7 @@
  * FanPulseApi
  * OpenAPI spec version: 1.0
  */
+import type { CategoryResponse } from './categoryResponse';
 import type { UserActivityDto } from './userActivityDto';
 
 export interface UserResponse {
@@ -24,4 +25,6 @@ export interface UserResponse {
   countOfLkes?: number | null;
   /** @nullable */
   recentActivities?: UserActivityDto[] | null;
+  /** @nullable */
+  favCategories?: CategoryResponse[] | null;
 }

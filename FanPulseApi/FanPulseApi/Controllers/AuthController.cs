@@ -23,4 +23,17 @@ public class AuthController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpPost("google")]
+    public async Task<ActionResult<AuthResponse>> GoogleLogin(
+    [FromBody] GoogleLoginRequest request
+)
+    {
+        var result = await _authService.GoogleLoginAsync(request);
+
+        if (result == null)
+            return Unauthorized(new { message = "Invalid Google token" });
+
+        return Ok(result);
+    }
 }

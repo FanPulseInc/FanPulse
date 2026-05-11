@@ -16,7 +16,21 @@ namespace FanPulseApi.Controllers
         {
             _userService = userService;
         }
-        
+
+        [HttpPatch("{id:guid}/categories")]
+        public async Task<ActionResult<UserResponse>> UpdateCategories(Guid id, 
+        [FromBody] UserCategoriesUpdateRequest request)
+        {
+            var updatedUser = await _userService.UpdateUserCategoriesAsync(id, request);
+
+            if (updatedUser == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(updatedUser);
+        }
+
         // GET: api/<UserController>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserResponse>>> GetAll()

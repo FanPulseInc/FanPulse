@@ -8,6 +8,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css"
 import { UserInitializer } from "./_components/UserInitializer";
 import { LangProvider } from "@/services/i18n/context";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -33,7 +34,7 @@ export default function RootGlobalLayout({ children
         <html lang="uk">
             <body>
                 <Suspense fallback={<div>Loading...</div>}>
-
+                    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
                     <QueryProvider>
                         <LangProvider>
                             <UserInitializer>
@@ -44,6 +45,7 @@ export default function RootGlobalLayout({ children
                             </UserInitializer>
                         </LangProvider>
                     </QueryProvider>
+                    </GoogleOAuthProvider>
 
                 </Suspense>
             </body>

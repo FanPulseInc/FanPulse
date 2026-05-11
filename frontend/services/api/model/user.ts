@@ -28,6 +28,10 @@ export interface User {
   isDeleted?: boolean;
   isBanned?: boolean;
   banCount?: number;
+  /** @nullable */
+  emailVerificationTokenHash?: string | null;
+  /** @nullable */
+  emailVerificationTokenExpiresAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
   /** @nullable */

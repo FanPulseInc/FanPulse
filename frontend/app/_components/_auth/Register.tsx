@@ -7,6 +7,8 @@ import { saveFavCategoryIds } from "@/services/useFavCategories"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import CategorySelectModal from "./CategorySelectModal"
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google"
+import { useUserStore } from "@/store/useUserStore"
 
 const Register = () => {
   const router = useRouter()
@@ -17,9 +19,13 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isGoogleFlow, setIsGoogleFlow] = useState(false)
+  const [googleUserId, setGoogleUserId] = useState<string | null>(null)
 
   const [formError, setFormError] = useState("")
   const [showCategoryModal, setShowCategoryModal] = useState(false)
+
+  const { setUser, user } = useUserStore()
 
   const { mutateAsync: registerUser, isPending } = usePostApiUser()
 
@@ -46,8 +52,122 @@ const Register = () => {
     return true
   }
 
+  const onGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    try {
+      setFormError("")
+
+      if (!credentialResponse.credential) {
+        setFormError("Google credential is missing")
+        return
+      }
+
+      const authRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/Auth/google`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            idToken: credentialResponse.credential,
+          }),
+        }
+      )
+
+      if (!authRes.ok) {
+        throw new Error("Google auth failed")
+      }
+
+      const authData = await authRes.json()
+
+      localStorage.setItem("token", authData.token)
+
+      const meRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/me`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData.token}`,
+          },
+        }
+      )
+
+      if (!meRes.ok) {
+        throw new Error("Failed to load user")
+      }
+
+      const fullUser = await meRes.json()
+
+      setUser(fullUser)
+      setGoogleUserId(fullUser.id)
+      setIsGoogleFlow(true)
+
+      const hasCategories = fullUser.favCategories?.length > 0
+
+      if (hasCategories) {
+        router.push("/profile")
+        return
+      }
+
+      setShowCategoryModal(true)
+    } catch (e) {
+      console.error(e)
+      setFormError("Google login failed")
+    }
+  }
+
+  const onSaveGoogleCategories = async (categoryIds: string[]) => {
+    try {
+      const userId = googleUserId || user?.id
+
+      if (!userId) {
+        throw new Error("User id is missing")
+      }
+
+      const token = localStorage.getItem("token")
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/api/User/${userId}/categories`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            favCategoryIds: categoryIds,
+          }),
+        }
+      )
+
+      if (!res.ok) {
+        throw new Error("Failed to save categories")
+      }
+
+      saveFavCategoryIds(categoryIds)
+
+      const meRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (meRes.ok) {
+        const fullUser = await meRes.json()
+        setUser(fullUser)
+      }
+
+      setShowCategoryModal(false)
+      router.push("/profile")
+    } catch (e) {
+      console.error(e)
+      setFormError("Failed to save categories")
+      setShowCategoryModal(false)
+    }
+  }
+
   const onOpenCategoryModal = () => {
     if (!validateForm()) return
+    setIsGoogleFlow(false)
     setShowCategoryModal(true)
   }
 
@@ -172,16 +292,19 @@ const Register = () => {
           <div className="flex-1 h-px bg-brand-red/30" />
         </div>
 
-        <button className="h-[50px] border-2 border-brand-red rounded-[20px] flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer">
-          <img
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="google"
-            className="w-5 h-5"
+        <div className="w-full">
+          <GoogleLogin
+            theme="outline"
+            size="large"
+            shape="pill"
+            width="306"
+            text="continue_with"
+            onSuccess={onGoogleSuccess}
+            onError={() => {
+              setFormError("Google login failed");
+            }}
           />
-          <span className="text-body-m text-brand-black/65">
-            {t("auth_google")}
-          </span>
-        </button>
+        </div>
 
         <span className="mt-6 text-body-s text-brand-black/80 leading-tight">
           {t("auth_consent_text")}{" "}
@@ -199,7 +322,7 @@ const Register = () => {
         <CategorySelectModal
           isPending={isPending}
           onClose={() => setShowCategoryModal(false)}
-          onSubmit={onRegisterWithCategories}
+          onSubmit={isGoogleFlow ? onSaveGoogleCategories : onRegisterWithCategories}
         />
       )}
     </>
