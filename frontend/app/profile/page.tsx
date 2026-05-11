@@ -13,6 +13,7 @@ import DeleteAccountModal from "./_components/DeleteAccountModal"
 import { useT } from "@/services/i18n/context"
 import { useFavoriteTeamsResolved } from "@/services/useFavoriteTeams"
 import { useRouter } from "next/navigation"
+import Activity from "./_components/Activity"
 
 const Profile = () => {
     const { t } = useT()
@@ -407,7 +408,7 @@ const Profile = () => {
                     )}
 
                     {activeTab === "activity" && (
-                        <RecentActivity user={user} />
+                        <Activity user={user} />
                     )}
 
                     {activeTab === "password" && (

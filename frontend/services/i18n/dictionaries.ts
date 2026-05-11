@@ -308,6 +308,94 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         time_in_days: "за {days} дн",
         stage_grand_prix: "Гран-При",
         stage: "Стадія",
+        forum_rules_page_title: "Правила форуму",
+        forum_rules_page_description:
+            "FanPulse — це місце для фанатів, а не для хаосу. Порушення правил може призвести до видалення контенту, обмеження доступу або блокування акаунта.",
+
+        forum_rules_back: "До форуму",
+        forum_rules_create_post: "Створити пост",
+
+        forum_rules_no_insults: "Без образ",
+        forum_rules_no_insults_desc:
+            "Не ображайте інших користувачів, команди, гравців або фанатські спільноти.",
+
+        forum_rules_no_hate: "Заборонена мова ненависті",
+        forum_rules_no_hate_desc:
+            "Расизм, сексизм, ксенофобія, гомофобія та будь-яка дискримінація суворо заборонені.",
+
+        forum_rules_no_spam: "Без спаму",
+        forum_rules_no_spam_desc:
+            "Не публікуйте повторювані повідомлення, беззмістовні теми або спам-коментарі.",
+
+        forum_rules_no_fake_news: "Без фейкових новин",
+        forum_rules_no_fake_news_desc:
+            "Не поширюйте неперевірені чутки, маніпулятивну інформацію або вигадані інсайди.",
+
+        forum_rules_no_politics: "Без політичних конфліктів",
+        forum_rules_no_politics_desc:
+            "Форум створений для обговорення спорту та кіберспорту, а не політичних суперечок.",
+
+        forum_rules_no_adult: "Без 18+ контенту",
+        forum_rules_no_adult_desc:
+            "Сексуальний контент, відверті зображення та неприйнятні матеріали заборонені.",
+
+        forum_rules_no_threats: "Без погроз",
+        forum_rules_no_threats_desc:
+            "Погрози, заклики до насильства або агресивна поведінка призведуть до санкцій.",
+
+        forum_rules_no_doxxing: "Без особистої інформації",
+        forum_rules_no_doxxing_desc:
+            "Поширення адрес, телефонів, приватних фото або особистих акаунтів заборонено.",
+
+        forum_rules_no_flood: "Без флуду",
+        forum_rules_no_flood_desc:
+            "Не засмічуйте обговорення короткими, повторюваними або беззмістовними повідомленнями.",
+
+        forum_rules_no_ads: "Без реклами",
+        forum_rules_no_ads_desc:
+            "Реклама сайтів, ставок, товарів або сторонніх платформ заборонена.",
+
+        forum_rules_no_duplicate_posts: "Без дублікатів",
+        forum_rules_no_duplicate_posts_desc:
+            "Перед створенням теми перевірте, чи вже існує схоже обговорення.",
+
+        forum_rules_no_offtopic: "Дотримуйтесь теми",
+        forum_rules_no_offtopic_desc:
+            "Коментарі повинні відповідати темі обговорення або категорії.",
+
+        forum_rules_no_match_spoilers: "Обережно зі спойлерами",
+        forum_rules_no_match_spoilers_desc:
+            "Не псуйте результати матчів іншим користувачам без попередження.",
+
+        forum_rules_no_caps: "Без надмірного CAPS",
+        forum_rules_no_caps_desc:
+            "Постійне використання CAPS LOCK сприймається як крик і заважає спілкуванню.",
+
+        forum_rules_no_provocation: "Без провокацій",
+        forum_rules_no_provocation_desc:
+            "Не створюйте пости або коментарі лише для провокування конфліктів чи тролінгу.",
+
+        forum_rules_no_discrimination: "Без дискримінації",
+        forum_rules_no_discrimination_desc:
+            "Поважайте всіх користувачів незалежно від клубу, країни, мови чи поглядів.",
+
+        forum_rules_no_illegal_content: "Без незаконного контенту",
+        forum_rules_no_illegal_content_desc:
+            "Піратські трансляції, незаконні матеріали або протиправні інструкції заборонені.",
+
+        forum_rules_no_impersonation: "Без видавання себе за інших",
+        forum_rules_no_impersonation_desc:
+            "Не видавайте себе за іншу людину, гравця чи публічну особу.",
+
+        forum_rules_punishment_title: "Порушення можуть призвести до",
+        forum_rules_punishment_1:
+            "Видалення контенту без попередження.",
+
+        forum_rules_punishment_2:
+            "Тимчасового обмеження акаунта.",
+
+        forum_rules_punishment_3:
+            "Повного блокування акаунта за серйозні порушення.",
     },
     en: {
         nav_home: "HOME",
@@ -616,6 +704,95 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         time_in_days: "in {days} days",
         stage_grand_prix: "Grand Prix",
         stage: "Stage",
+        forum_rules_page_title: "Forum Rules",
+        forum_rules_page_description:
+            "FanPulse is a place for fans, not chaos. Violating the rules may result in content removal, restrictions, or account suspension.",
+
+        forum_rules_back: "Back to forum",
+        forum_rules_create_post: "Create post",
+
+        forum_rules_no_insults: "No insults",
+        forum_rules_no_insults_desc:
+            "Do not insult other users, teams, players, or fan communities.",
+
+        forum_rules_no_hate: "No hate speech",
+        forum_rules_no_hate_desc:
+            "Racism, sexism, xenophobia, homophobia, and any form of discrimination are strictly prohibited.",
+
+        forum_rules_no_spam: "No spam",
+        forum_rules_no_spam_desc:
+            "Do not post repetitive messages, meaningless topics, or spam comments.",
+
+        forum_rules_no_fake_news: "No fake news",
+        forum_rules_no_fake_news_desc:
+            "Do not spread unverified rumors, manipulative information, or fake insider news.",
+
+        forum_rules_no_politics: "No political conflicts",
+        forum_rules_no_politics_desc:
+            "The forum is made for sports and esports discussions, not political arguments.",
+
+        forum_rules_no_adult: "No adult content",
+        forum_rules_no_adult_desc:
+            "Sexual content, explicit images, and inappropriate material are prohibited.",
+
+        forum_rules_no_threats: "No threats",
+        forum_rules_no_threats_desc:
+            "Threats, calls for violence, or aggressive behavior will lead to immediate sanctions.",
+
+        forum_rules_no_doxxing: "No personal information",
+        forum_rules_no_doxxing_desc:
+            "Sharing addresses, phone numbers, private photos, or personal accounts is forbidden.",
+
+        forum_rules_no_flood: "No flooding",
+        forum_rules_no_flood_desc:
+            "Do not spam discussions with short, repetitive, or meaningless messages.",
+
+        forum_rules_no_ads: "No advertising",
+        forum_rules_no_ads_desc:
+            "Advertising websites, betting services, products, or third-party platforms is prohibited.",
+
+        forum_rules_no_duplicate_posts: "No duplicate posts",
+        forum_rules_no_duplicate_posts_desc:
+            "Before creating a topic, check whether a similar discussion already exists.",
+
+        forum_rules_no_offtopic: "Stay on topic",
+        forum_rules_no_offtopic_desc:
+            "Comments should stay relevant to the discussion or category.",
+
+        forum_rules_no_match_spoilers: "Be careful with spoilers",
+        forum_rules_no_match_spoilers_desc:
+            "Do not ruin match results for other users without warning.",
+
+        forum_rules_no_caps: "No excessive CAPS",
+        forum_rules_no_caps_desc:
+            "Constant use of CAPS LOCK is considered shouting and disrupts communication.",
+
+        forum_rules_no_provocation: "No provocations",
+        forum_rules_no_provocation_desc:
+            "Do not create posts or comments solely to provoke conflicts or trolling.",
+
+        forum_rules_no_discrimination: "No discrimination",
+        forum_rules_no_discrimination_desc:
+            "Respect all users regardless of club, country, language, or opinions.",
+
+        forum_rules_no_illegal_content: "No illegal content",
+        forum_rules_no_illegal_content_desc:
+            "Pirated streams, illegal materials, or unlawful instructions are forbidden.",
+
+        forum_rules_no_impersonation: "No impersonation",
+        forum_rules_no_impersonation_desc:
+            "Do not pretend to be another person, player, or public figure.",
+
+        forum_rules_punishment_title: "Violations may result in",
+        forum_rules_punishment_1:
+            "Content removal without warning.",
+
+        forum_rules_punishment_2:
+            "Temporary account restrictions.",
+
+        forum_rules_punishment_3:
+            "Permanent account suspension for severe violations.",
+
     },
 };
 

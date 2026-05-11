@@ -145,7 +145,7 @@ export default function ForumPage() {
                         {isCategoryOpen ? ICONS.ArrowUpWhite : ICONS.ArrowDownWhite}
                     </button>
 
-                    <button className="absolute right-[16px] top-[26px] w-[198px] h-[66px] bg-[#212121] rounded-[20px] flex flex-row justify-center items-center gap-[10px] text-white font-bold text-sm shadow-lg hover:bg-black transition-all">
+                    <button onClick={() => router.push("/forum/rules")} className="absolute right-[16px] top-[26px] w-[198px] h-[66px] bg-[#212121] rounded-[20px] flex flex-row justify-center items-center gap-[10px] text-white font-bold text-sm shadow-lg hover:bg-black transition-all">
                         {t("forum_rules")}
                     </button>
                 </div>
