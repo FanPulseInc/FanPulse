@@ -252,7 +252,7 @@ const Profile = () => {
                             </label>
 
                             <div className="flex flex-col gap-1">
-                                <div className="flex flex-row items-center gap-4">
+                                <div className="flex min-w-0 flex-row items-center gap-4">
                                     {nameEditing ? (
                                         <input
                                             autoFocus
@@ -277,14 +277,14 @@ const Profile = () => {
                                             className="min-w-0 max-w-[240px] text-center text-xl md:text-2xl font-semibold text-brand-red border-b-2 border-brand-red bg-transparent outline-none"
                                         />
                                     ) : (
-                                        <h2 className="min-w-0 truncate text-center text-xl md:text-2xl font-semibold text-brand-red">
+                                        <h2 className="min-w-0 max-w-[220px] truncate text-center text-xl md:text-2xl font-semibold text-brand-red">
                                             {user?.name && user.name !== "someName"
                                                 ? user.name
                                                 : user?.email}
                                         </h2>
                                     )}
 
-                                    <div className="flex flex-row gap-4 items-center">
+                                    <div className="shrink-0 flex flex-row gap-4 items-center">
                                         {nameEditing ? (
                                             <span
                                                 className="cursor-pointer hover:scale-110 transition-transform"
@@ -336,7 +336,7 @@ const Profile = () => {
 
 
                         <section className="flex flex-col gap-4">
-                          
+
 
 
                             {/* MENU */}
