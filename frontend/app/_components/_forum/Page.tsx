@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ForumContainer } from "../_forum/ForumContainer";
 import ThreadRow from "../_forum/ThreadRow";
 import { ICONS } from "../../svg";
@@ -29,6 +29,18 @@ export default function ForumPage() {
     const [selectedCategory, setSelectedCategory] = useState(categoryParam ?? "__all__");
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
     const [authToast, setAuthToast] = useState(!user);
+
+    const [showOnboarding, setShowOnboarding] = useState(false)
+
+    useEffect(() => {
+        const passed = localStorage.getItem("forum_onboarding_passed")
+        setShowOnboarding(passed !== "true")
+    }, [])
+
+    const handleCloseOnboarding = () => {
+        localStorage.setItem("forum_onboarding_passed", "true")
+        setShowOnboarding(false)
+    }
 
     const { ids: favCategoryIds } = useFavCategoryIds();
 
@@ -117,8 +129,166 @@ export default function ForumPage() {
         );
     }
 
+    function ForumOnboarding({
+        onClose,
+    }: {
+        onClose: () => void
+    }) {
+        const [step, setStep] = useState(0)
+
+        const steps = [
+            {
+                title: "Ласкаво просимо до FanPulse Forum",
+                text: "Forum — це простір для спортивної та кіберспортивної спільноти, де фанати можуть обговорювати матчі, ділитись думками та створювати власний контент.",
+            },
+            {
+                title: "Створюйте власні пости",
+                text: "Публікуйте новини, обговорення, аналітику, думки після матчів або цікаві теми для інших учасників спільноти.",
+            },
+            {
+                title: "Сортування та рекомендації",
+                text: "Використовуйте вкладки Latest, Popular та Recommended, щоб знаходити найактуальніші або найпопулярніші обговорення.",
+            },
+            {
+                title: "Категорії форуму",
+                text: "Обирайте спортивні або кіберспортивні категорії, щоб швидше знаходити теми саме для ваших улюблених дисциплін.",
+            },
+            {
+                title: "Взаємодія зі спільнотою",
+                text: "Коментуйте пости, підтримуйте інших фанатів, отримуйте лайки та формуйте власну активність у FanPulse.",
+            },
+            {
+                title: "Правила спільноти",
+                text: "Дотримуйтесь правил форуму та допомагайте підтримувати комфортну атмосферу для всіх учасників.",
+            },
+        ]
+
+        const current = steps[step]
+        const isLast = step === steps.length - 1
+
+        const nextStep = () => {
+            if (isLast) {
+                onClose()
+                return
+            }
+
+            setStep((prev) => prev + 1)
+        }
+
+        const prevStep = () => {
+            setStep((prev) => Math.max(prev - 1, 0))
+        }
+
+        return (
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/45 px-4 backdrop-blur-sm">
+                <div className="relative w-full max-w-[760px] overflow-hidden rounded-[32px] border-2 border-brand-red bg-white p-6 md:p-8 shadow-2xl">
+
+                    {/* close */}
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="absolute right-5 top-5 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-brand-red text-xl font-bold text-white hover:opacity-90"
+                    >
+                        ×
+                    </button>
+
+                    {/* glow */}
+                    <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-brand-red/10" />
+                    <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-brand-red/5" />
+
+                    <div className="grid items-center gap-6 md:grid-cols-[1fr_240px]">
+
+                        {/* content */}
+                        <div className="flex flex-col gap-5">
+
+                            {/* step */}
+                            <div className="flex w-fit items-center gap-2 rounded-full bg-brand-red/10 px-4 py-2 text-sm font-bold text-brand-red">
+                                <span>
+                                    Крок {step + 1} з {steps.length}
+                                </span>
+                            </div>
+
+                            {/* text */}
+                            <div className="flex flex-col gap-3">
+                                <h2 className="text-3xl font-black uppercase leading-tight text-brand-black md:text-4xl">
+                                    {current.title}
+                                </h2>
+
+                                <p className="max-w-[480px] text-base font-medium leading-relaxed text-brand-black/60">
+                                    {current.text}
+                                </p>
+                            </div>
+
+                            {/* progress */}
+                            <div className="flex items-center gap-2">
+                                {steps.map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className={`h-2 rounded-full transition-all ${index === step
+                                            ? "w-10 bg-brand-red"
+                                            : "w-2 bg-brand-red/25"
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+
+                            {/* buttons */}
+                            <div className="flex flex-wrap gap-3 pt-2">
+
+                                <button
+                                    type="button"
+                                    onClick={prevStep}
+                                    disabled={step === 0}
+                                    className="h-[48px] rounded-2xl border-2 border-brand-red px-6 font-bold text-brand-red transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
+                                >
+                                    Назад
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={nextStep}
+                                    className="h-[48px] rounded-2xl bg-brand-red px-6 font-bold text-white hover:opacity-90"
+                                >
+                                    {isLast ? "Завершити" : "Далі"}
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="h-[48px] px-4 text-sm font-bold text-brand-black/40 hover:text-brand-red"
+                                >
+                                    Пропустити
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* fox */}
+                        <div className="relative mx-auto flex justify-center">
+                            <div className="absolute inset-0 rounded-full bg-brand-red/20 blur-3xl" />
+
+                            <img
+                                src="/icons/fox.png"
+                                alt="FanPulse помічник"
+                                className="relative z-10 w-[190px] md:w-[240px] drop-shadow-xl"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+
     return (
         <ForumContainer>
+            {
+                showOnboarding && (
+                    <ForumOnboarding
+                        onClose={handleCloseOnboarding}
+                    />
+                )
+            }
+
             <div className="flex flex-col">
                 <div className="w-[1039px] h-[60px] bg-[#af292a] rounded-[20px] flex items-center justify-center relative z-20">
                     <button
@@ -214,6 +384,7 @@ export default function ForumPage() {
                             id={post.id!}
                             title={post.title}
                             author={post.user?.name ?? t("forum_anonymous")}
+                            authorId={post.user?.id}
                             date={post.createdAt}
                             likesCount={post.likes?.length ?? 0}
                         />

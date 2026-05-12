@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useT } from "@/services/i18n/context";
 import { ForumContainer } from "../../_components/_forum/ForumContainer";
@@ -36,6 +36,19 @@ export default function ThreadDetailPage() {
     const [isCommenting, setIsCommenting] = useState(false);
     const [commentText, setCommentText] = useState("");
     const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+    const router = useRouter();
+
+    const openAuthorProfile = (
+        e: React.MouseEvent,
+        userId?: string | null
+    ) => {
+        e.stopPropagation();
+
+        if (!userId) return;
+
+        router.push(`/profile/${userId}`);
+    };
 
     const onSubmit = async () => {
         if (!commentText.trim()) return;
@@ -142,7 +155,25 @@ export default function ThreadDetailPage() {
                                 {t("comment_reply")}
                             </button>
                             <div className="bg-[#212121] text-white px-8 py-2 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2">
-                                <span>{post.user?.name ?? t("forum_anonymous")}</span>
+                                <button
+                                    type="button"
+                                    onClick={(e) => openAuthorProfile(e, post.user?.id)}
+                                    disabled={!post.user?.id}
+                                    className="
+        max-w-[160px]
+        truncate
+
+        transition-opacity
+
+        hover:underline
+        hover:opacity-80
+
+        disabled:cursor-default
+        disabled:hover:no-underline
+        "
+                                >
+                                    {post.user?.name ?? t("forum_anonymous")}
+                                </button>
                                 {isCurrentUserAuthor && (
                                     <span className="bg-[#af292a] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-[2px] rounded-full">
                                         {t("comment_author")}
