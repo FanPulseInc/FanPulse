@@ -102,7 +102,7 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         esport_section: "Кіберспорт",
         forum_section: "Форум",
         contacts: "Контакти",
-        privacy: "Політика приватності",
+        privacy: "Політика конфіденційності",
         cookies: "Політика Cookies",
         accessibility: "Політика доступності",
         ads: "Реклама",
@@ -396,6 +396,92 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
 
         forum_rules_punishment_3:
             "Повного блокування акаунта за серйозні порушення.",
+
+        cookies_title: "Політика Cookies",
+        cookies_intro:
+            "Ця Політика Cookies пояснює, як FanPulse використовує cookies та схожі технології під час користування платформою.",
+
+        cookies_what_title: "Що таке Cookies",
+        cookies_what_text:
+            "Cookies — це невеликі текстові файли, які зберігаються на вашому пристрої для покращення роботи платформи та користувацького досвіду.",
+
+        cookies_usage_title: "Як ми використовуємо Cookies",
+        cookies_usage_text:
+            "Ми використовуємо cookies для забезпечення роботи платформи, аналітики, персоналізації та безпеки.",
+
+        cookies_required: "Необхідні",
+        cookies_required_1: "Авторизація користувача",
+        cookies_required_2: "Безпека платформи",
+        cookies_required_3: "Основна функціональність",
+
+        cookies_analytics: "Аналітичні",
+        cookies_analytics_1: "Аналіз поведінки користувачів",
+        cookies_analytics_2: "Покращення UX",
+        cookies_analytics_3: "Оптимізація продуктивності платформи",
+
+        cookies_functional: "Функціональні",
+        cookies_functional_1: "Збереження налаштувань",
+        cookies_functional_2: "Персоналізація досвіду",
+        cookies_functional_3: "Запам’ятовування параметрів",
+
+        cookies_third_party_title: "Cookies третіх сторін",
+        cookies_third_party_text:
+            "FanPulse може використовувати сторонні сервіси, які також застосовують cookies.",
+
+        cookies_third_party_1: "Аналітичні сервіси",
+        cookies_third_party_2: "API провайдери",
+        cookies_third_party_3: "Вбудований контент",
+
+        cookies_manage_title: "Керування Cookies",
+        cookies_manage_text:
+            "Ви можете керувати або вимкнути cookies через налаштування браузера.",
+
+        cookies_manage_1: "Змінити налаштування cookies",
+        cookies_manage_2: "Видалити збережені cookies",
+        cookies_manage_3: "Повністю заблокувати cookies",
+
+        cookies_changes_title: "Зміни політики",
+        cookies_changes_text:
+            "FanPulse може оновлювати цю Політику Cookies відповідно до технічних або юридичних змін.",
+
+        contact_title: "Контакт",
+        contact_intro:
+            "Зв’яжіться з підтримкою FanPulse щодо проблем платформи, відгуків, модерації або партнерських запитів.",
+
+        contact_heading:
+            "Ви пишете нам, ми пишемо вам у відповідь.",
+
+        contact_text_1:
+            "Щоб переконатися, що ваш запит або відгук дійде до потрібної людини, будь ласка, скористайтеся цією електронною адресою.",
+
+        contact_text_2:
+            "Електронна пошта підтримки:",
+
+        contact_text_3:
+            "Ми переглядаємо кожен електронний лист і якщо нам потрібно більше інформації — ми зв’яжемося з вами.",
+
+        contact_text_4:
+            "Дякуємо, що знайшли час, щоб надіслати свій відгук.",
+
+        contact_support_title: "Центр підтримки",
+        contact_support_text:
+            "Підтримка FanPulse допомагає користувачам із технічними проблемами, модерацією, доступом до акаунта та питаннями щодо платформи.",
+
+        contact_response: "Зазвичай протягом 24 годин",
+
+        advertising_title: "Реклама",
+        advertising_intro:
+            "Якщо ви хочете розмістити рекламу на нашому сайті, будь ласка, заповніть форму запиту. Команда FanPulse зв’яжеться з вами, щоб обговорити умови.",
+
+        advertising_message_placeholder: "Введіть текст",
+        advertising_name_placeholder: "Введіть ім’я",
+        advertising_email_placeholder: "Електронна пошта",
+        advertising_company_placeholder: "Вебсайт компанії",
+
+        advertising_privacy_agree:
+            "Я погоджуюся з обробкою персональних даних",
+
+        advertising_submit: "Надіслати повідомлення",
     },
     en: {
         nav_home: "HOME",
@@ -792,6 +878,92 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
 
         forum_rules_punishment_3:
             "Permanent account suspension for severe violations.",
+
+        cookies_title: "Cookie Policy",
+        cookies_intro:
+            "This Cookie Policy explains how FanPulse uses cookies and similar technologies while using the platform.",
+
+        cookies_what_title: "What are Cookies",
+        cookies_what_text:
+            "Cookies are small text files stored on your device to improve platform functionality and user experience.",
+
+        cookies_usage_title: "How We Use Cookies",
+        cookies_usage_text:
+            "We use cookies to ensure platform functionality, analytics, personalization, and security.",
+
+        cookies_required: "Required",
+        cookies_required_1: "User authorization",
+        cookies_required_2: "Platform security",
+        cookies_required_3: "Core functionality",
+
+        cookies_analytics: "Analytics",
+        cookies_analytics_1: "Analyze user behavior",
+        cookies_analytics_2: "Improve UX",
+        cookies_analytics_3: "Optimize platform performance",
+
+        cookies_functional: "Functional",
+        cookies_functional_1: "Save preferences",
+        cookies_functional_2: "Personalize experience",
+        cookies_functional_3: "Remember selected settings",
+
+        cookies_third_party_title: "Third-party Cookies",
+        cookies_third_party_text:
+            "FanPulse may use third-party services that also use cookies.",
+
+        cookies_third_party_1: "Analytics services",
+        cookies_third_party_2: "API providers",
+        cookies_third_party_3: "Embedded content",
+
+        cookies_manage_title: "Managing Cookies",
+        cookies_manage_text:
+            "You can manage or disable cookies through your browser settings.",
+
+        cookies_manage_1: "Change cookie settings",
+        cookies_manage_2: "Delete stored cookies",
+        cookies_manage_3: "Block cookies entirely",
+
+        cookies_changes_title: "Policy Changes",
+        cookies_changes_text:
+            "FanPulse may update this Cookie Policy according to technical or legal changes.",
+
+        contact_title: "Contact",
+        contact_intro:
+            "Contact FanPulse support regarding platform issues, feedback, moderation, or partnership inquiries.",
+
+        contact_heading:
+            "You write to us, we reply to you.",
+
+        contact_text_1:
+            "To ensure your request or feedback reaches the correct person, please use the following email address.",
+
+        contact_text_2:
+            "Support email:",
+
+        contact_text_3:
+            "We review every email and may contact you if additional information is required.",
+
+        contact_text_4:
+            "Thank you for taking the time to send your feedback.",
+
+        contact_support_title: "Support Center",
+        contact_support_text:
+            "FanPulse support helps users with technical issues, moderation, account access, and platform-related questions.",
+
+        contact_response: "Usually within 24 hours",
+        advertising_title: "Advertising",
+        advertising_intro:
+            "If you want to place advertising on our site, please fill out the request form. The FanPulse team will contact you to discuss the terms.",
+
+        advertising_message_placeholder: "Enter your message",
+        advertising_name_placeholder: "Enter your name",
+        advertising_email_placeholder: "Email address",
+        advertising_company_placeholder: "Company website",
+
+        advertising_privacy_agree:
+            "I agree to the processing of personal data",
+
+        advertising_submit: "Send message",
+
 
     },
 };
