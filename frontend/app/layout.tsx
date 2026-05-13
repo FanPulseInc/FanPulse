@@ -9,6 +9,7 @@ import "./globals.css"
 import { UserInitializer } from "./_components/UserInitializer";
 import { LangProvider } from "@/services/i18n/context";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import ThemeInit from "./_components/ThemeInit";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -31,8 +32,12 @@ export default function RootGlobalLayout({ children
     children: React.ReactNode
 }) {
     return (
-        <html lang="uk">
-            <body>
+        <html lang="uk" suppressHydrationWarning>
+            <head>
+                <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem("fanpulse:theme");if(t==="dark")document.documentElement.classList.add("dark")}catch(e){}})()` }} />
+            </head>
+            <body className="bg-background text-foreground">
+                <ThemeInit />
                 <Suspense fallback={<div>Loading...</div>}>
                     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
                     <QueryProvider>

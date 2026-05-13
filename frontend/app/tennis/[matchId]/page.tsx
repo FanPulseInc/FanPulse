@@ -328,13 +328,13 @@ export default function TennisMatchPage() {
 
                 <div className="flex-1 min-w-0 p-5 flex flex-col gap-4">
                     {eventLoading && (
-                        <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
+                        <div className="text-center text-text-secondary text-sm py-10 bg-surface rounded-[20px]">
                             {t("loading_match")}
                         </div>
                     )}
 
                     {!eventLoading && !event && (
-                        <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
+                        <div className="text-center text-text-secondary text-sm py-10 bg-surface rounded-[20px]">
                             {t("match_not_found")}
                         </div>
                     )}
@@ -366,7 +366,7 @@ export default function TennisMatchPage() {
 
                     {(featured?.status === "live" || featured?.status === "finished") && (
                         <div className="w-full h-[78px] p-[16px] bg-[#212121] rounded-[20px] flex items-center justify-between">
-                            <span className="w-[65px] h-[35px] pt-[2px] pr-[7px] pb-[2px] pl-[8px] bg-[#f8f8f8] rounded-[8px] flex flex-row justify-center items-center gap-[10px]">
+                            <span className="w-[65px] h-[35px] pt-[2px] pr-[7px] pb-[2px] pl-[8px] bg-surface-secondary rounded-[8px] flex flex-row justify-center items-center gap-[10px]">
                                 <span
                                     className="text-[16px] font-bold leading-[30px] tracking-normal text-center text-[#af292a]"
                                     style={{ fontFamily: "'Space Grotesk', sans-serif" }}

@@ -58,7 +58,7 @@ export default function Activity({ user }: { user?: UserWithActivity | null }) {
 
       <div className="flex flex-col gap-3">
         {!user?.recentActivities || user.recentActivities.length === 0 ? (
-          <div className="relative overflow-hidden rounded-[28px] border-2 border-dashed border-brand-red/20 bg-gradient-to-br from-white via-[#fff7f7] to-[#ffeaea] px-8 py-10">
+          <div className="relative overflow-hidden rounded-[28px] border-2 border-dashed border-brand-red/20 bg-gradient-to-br from-surface via-surface-secondary to-surface-tertiary px-8 py-10">
 
             {/* bg glow */}
             <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-brand-red/10 blur-3xl" />
@@ -101,7 +101,7 @@ export default function Activity({ user }: { user?: UserWithActivity | null }) {
           user.recentActivities.map((item: UserActivityDto, index: number) => (
             <div
               key={index}
-              className="w-full min-h-[70px] bg-gray-50 border-2 border-brand-red rounded-[20px] flex flex-row items-center px-6 gap-4 hover:bg-brand-red/5 transition-colors cursor-pointer group"
+              className="w-full min-h-[70px] bg-surface-secondary border-2 border-brand-red rounded-[20px] flex flex-row items-center px-6 gap-4 hover:bg-brand-red/5 transition-colors cursor-pointer group"
             >
               <div className="flex flex-1 items-center justify-between">
                 <div className="flex flex-row gap-6 items-center">

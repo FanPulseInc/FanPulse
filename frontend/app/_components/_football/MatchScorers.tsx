@@ -16,7 +16,7 @@ function ScorerLine({
     return (
         <div className={`flex items-center gap-2 ${rowJustify}`}>
             <div className={`flex items-baseline gap-[6px] ${orderText}`}>
-                <span className="text-[13px] font-semibold text-[#212121] truncate">
+                <span className="text-[13px] font-semibold text-text-primary truncate">
                     {scorer.name}
                 </span>
                 {tag && (
@@ -51,13 +51,13 @@ export default function MatchScorers({
 }) {
     if (home.length === 0 && away.length === 0) return null;
     return (
-        <div className="w-full bg-white rounded-[20px] shadow-sm border border-gray-100 p-4">
+        <div className="w-full bg-surface rounded-[20px] shadow-sm border border-border-theme p-4">
             
             <div className="flex items-center justify-between mb-3">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#212121] truncate max-w-[48%]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-text-primary truncate max-w-[48%]">
                     {homeLabel ?? ""}
                 </span>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#212121] truncate max-w-[48%] text-right">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-text-primary truncate max-w-[48%] text-right">
                     {awayLabel ?? ""}
                 </span>
             </div>
@@ -67,14 +67,14 @@ export default function MatchScorers({
                 <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-px bg-[#af292a]/30" />
                 <div className="flex flex-col gap-[10px] pr-3">
                     {home.length === 0 ? (
-                        <span className="text-[11px] text-gray-400 text-right">—</span>
+                        <span className="text-[11px] text-text-muted text-right">—</span>
                     ) : (
                         home.map(s => <ScorerLine key={s.id} scorer={s} side="home" />)
                     )}
                 </div>
                 <div className="flex flex-col gap-[10px] pl-3">
                     {away.length === 0 ? (
-                        <span className="text-[11px] text-gray-400 text-left">—</span>
+                        <span className="text-[11px] text-text-muted text-left">—</span>
                     ) : (
                         away.map(s => <ScorerLine key={s.id} scorer={s} side="away" />)
                     )}

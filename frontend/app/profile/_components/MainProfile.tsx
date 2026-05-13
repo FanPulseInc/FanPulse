@@ -2,7 +2,7 @@
 import RecentActivity from "./RecentActivity"
 import { useT } from "@/services/i18n/context"
 import type { UserResponse } from "@/services/api/model/userResponse"
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface StatItem { label: string; value: string | number }
 interface FavoriteItem { icon: string; name: string }
@@ -59,7 +59,7 @@ function ProfileOnboarding({
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/45 px-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-[760px] overflow-hidden rounded-[32px] border-2 border-brand-red bg-white p-6 md:p-8 shadow-2xl">
+      <div className="relative w-full max-w-[760px] overflow-hidden rounded-[32px] border-2 border-brand-red bg-surface p-6 md:p-8 shadow-2xl">
         <button
           type="button"
           onClick={onClose}
@@ -161,12 +161,10 @@ export default function MainProfile({
   players: FavoriteItem[];
 }) {
   const { t } = useT()
-  const [showOnboarding, setShowOnboarding] = useState(false)
-
-  useEffect(() => {
-    const passed = localStorage.getItem("profile_onboarding_passed")
-    setShowOnboarding(passed !== "true")
-  }, [])
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    if (typeof window === "undefined") return false
+    return localStorage.getItem("profile_onboarding_passed") !== "true"
+  })
 
   const handleCloseOnboarding = () => {
     localStorage.setItem("profile_onboarding_passed", "true")
@@ -258,7 +256,7 @@ export default function MainProfile({
 function FavoriteCard({ item, player }: { item: FavoriteItem; player?: boolean }) {
   return (
     <div className="aspect-[4/5] shadow-lg rounded-[20px] bg-brand-red flex flex-col items-center justify-end pb-5 px-2 gap-3 relative transition-transform hover:scale-105 cursor-pointer">
-      <div className="w-16 h-16 absolute top-4 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
+      <div className="w-16 h-16 absolute top-4 bg-surface rounded-full flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
         <img
           src={item.icon}
           alt={item.name}

@@ -53,7 +53,7 @@ export default function ForumRulesPage() {
           "
         >
           {/* glow */}
-          <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+          <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-surface/10 blur-3xl" />
           <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-black/20 blur-3xl" />
 
           {/* pattern */}
@@ -97,7 +97,7 @@ export default function ForumRulesPage() {
                   group inline-flex items-center gap-2
 
                   rounded-[18px]
-                  bg-white
+                  bg-surface
 
                   px-6 py-4
 
@@ -183,8 +183,8 @@ export default function ForumRulesPage() {
 
               rounded-[28px]
 
-              border border-black/5
-              bg-white
+              border border-border-theme
+              bg-surface
 
               p-6
 
@@ -232,7 +232,7 @@ export default function ForumRulesPage() {
                     className="
                     text-[15px]
                     font-black uppercase tracking-wide
-                    text-[#212121]
+                    text-text-primary
                     "
                   >
                     {t(key)}
@@ -245,7 +245,7 @@ export default function ForumRulesPage() {
                     text-[13px]
                     leading-relaxed
 
-                    text-[#212121]/60
+                    text-text-primary/60
                     "
                   >
                     {t(`${key}_desc`)}
@@ -264,7 +264,7 @@ export default function ForumRulesPage() {
           rounded-[34px]
 
           border border-brand-red/15
-          bg-white
+          bg-surface
 
           p-8
 
@@ -294,11 +294,11 @@ export default function ForumRulesPage() {
               </div>
 
               <div>
-                <h3 className="text-2xl font-black uppercase text-[#212121]">
+                <h3 className="text-2xl font-black uppercase text-text-primary">
                   {t("forum_rules_punishment_title")}
                 </h3>
 
-                <p className="mt-1 text-sm text-[#212121]/50">
+                <p className="mt-1 text-sm text-text-primary/50">
                   FanPulse Moderation System
                 </p>
               </div>
@@ -310,15 +310,15 @@ export default function ForumRulesPage() {
                 className="
                 rounded-[24px]
 
-                border border-black/5
-                bg-[#f5f5f5]
+                border border-border-theme
+                bg-surface-secondary
 
                 p-6
 
                 transition-all duration-300
 
                 hover:-translate-y-1
-                hover:bg-white
+                hover:bg-surface
                 hover:shadow-xl
                 "
               >
@@ -326,7 +326,7 @@ export default function ForumRulesPage() {
                   01
                 </div>
 
-                <p className="mt-3 text-[14px] font-semibold leading-relaxed text-[#212121]/70">
+                <p className="mt-3 text-[14px] font-semibold leading-relaxed text-text-primary/70">
                   {t("forum_rules_punishment_1")}
                 </p>
               </div>
@@ -335,15 +335,15 @@ export default function ForumRulesPage() {
                 className="
                 rounded-[24px]
 
-                border border-black/5
-                bg-[#f5f5f5]
+                border border-border-theme
+                bg-surface-secondary
 
                 p-6
 
                 transition-all duration-300
 
                 hover:-translate-y-1
-                hover:bg-white
+                hover:bg-surface
                 hover:shadow-xl
                 "
               >
@@ -351,7 +351,7 @@ export default function ForumRulesPage() {
                   02
                 </div>
 
-                <p className="mt-3 text-[14px] font-semibold leading-relaxed text-[#212121]/70">
+                <p className="mt-3 text-[14px] font-semibold leading-relaxed text-text-primary/70">
                   {t("forum_rules_punishment_2")}
                 </p>
               </div>
@@ -360,15 +360,15 @@ export default function ForumRulesPage() {
                 className="
                 rounded-[24px]
 
-                border border-black/5
-                bg-[#f5f5f5]
+                border border-border-theme
+                bg-surface-secondary
 
                 p-6
 
                 transition-all duration-300
 
                 hover:-translate-y-1
-                hover:bg-white
+                hover:bg-surface
                 hover:shadow-xl
                 "
               >
@@ -376,7 +376,7 @@ export default function ForumRulesPage() {
                   03
                 </div>
 
-                <p className="mt-3 text-[14px] font-semibold leading-relaxed text-[#212121]/70">
+                <p className="mt-3 text-[14px] font-semibold leading-relaxed text-text-primary/70">
                   {t("forum_rules_punishment_3")}
                 </p>
               </div>

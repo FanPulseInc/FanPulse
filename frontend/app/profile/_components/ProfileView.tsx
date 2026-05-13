@@ -215,10 +215,10 @@ export default function ProfileView({
   ]
 
   return (
-    <div className="min-h-screen bg-[#efefef] p-4 md:p-5 font-sans">
+    <div className="min-h-screen bg-surface-tertiary p-4 md:p-5 font-sans">
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-5 xl:flex-row xl:items-start xl:justify-center">
         <aside className="w-full shrink-0 xl:w-[390px]">
-          <div className="bg-white rounded-[24px] md:rounded-[28px] p-5 md:p-8 flex flex-col gap-6 md:gap-8 border-2 border-brand-red shadow-sm xl:sticky xl:top-5">
+          <div className="bg-surface rounded-[24px] md:rounded-[28px] p-5 md:p-8 flex flex-col gap-6 md:gap-8 border-2 border-brand-red shadow-sm xl:sticky xl:top-5">
             <div className="flex flex-col items-center gap-4">
               <label
                 className={`relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-[3px] border-brand-red group ${
@@ -232,7 +232,7 @@ export default function ProfileView({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-[#f5f5f5] text-brand-red text-3xl md:text-4xl font-bold">
+                  <div className="w-full h-full flex items-center justify-center bg-surface-secondary text-brand-red text-3xl md:text-4xl font-bold">
                     {localUser?.name?.[0]?.toUpperCase() ||
                       localUser?.email?.[0]?.toUpperCase() ||
                       "?"}
@@ -329,7 +329,7 @@ export default function ProfileView({
                   className={`h-[52px] rounded-2xl border-2 border-brand-red transition-all font-semibold text-left px-5 cursor-pointer ${
                     activeTab === "main"
                       ? "bg-brand-red text-white"
-                      : "bg-white text-brand-red hover:bg-brand-red hover:text-white"
+                      : "bg-surface text-brand-red hover:bg-brand-red hover:text-white"
                   }`}
                 >
                   {t("profile_favourite_tab")}
@@ -341,7 +341,7 @@ export default function ProfileView({
                   className={`h-[52px] rounded-2xl border-2 border-brand-red transition-all font-semibold text-left px-5 cursor-pointer ${
                     activeTab === "activity"
                       ? "bg-brand-red text-white"
-                      : "bg-white text-brand-red hover:bg-brand-red hover:text-white"
+                      : "bg-surface text-brand-red hover:bg-brand-red hover:text-white"
                   }`}
                 >
                   {t("profile_activity_tab")}
@@ -354,7 +354,7 @@ export default function ProfileView({
                     className={`h-[52px] rounded-2xl border-2 border-brand-red transition-all font-semibold text-left px-5 cursor-pointer ${
                       activeTab === "password"
                         ? "bg-brand-red text-white"
-                        : "bg-white text-brand-red hover:bg-brand-red hover:text-white"
+                        : "bg-surface text-brand-red hover:bg-brand-red hover:text-white"
                     }`}
                   >
                     {t("profile_change_password")}
@@ -384,7 +384,7 @@ export default function ProfileView({
           </div>
         </aside>
 
-        <main className="w-full flex-1 bg-white rounded-[24px] md:rounded-[28px] border-2 border-brand-red p-5 md:p-8 lg:p-10 overflow-y-auto xl:h-[calc(100vh-40px)] xl:sticky xl:top-5 xl:max-w-[920px]">
+        <main className="w-full flex-1 bg-surface rounded-[24px] md:rounded-[28px] border-2 border-brand-red p-5 md:p-8 lg:p-10 overflow-y-auto xl:h-[calc(100vh-40px)] xl:sticky xl:top-5 xl:max-w-[920px]">
           {activeTab === "main" && (
             <MainProfile
               user={localUser}

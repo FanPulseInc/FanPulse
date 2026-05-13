@@ -81,15 +81,15 @@ export default function CreatePostPage() {
                     </button>
                 </div>
 
-                <div className="w-full py-3 bg-[#f8f8f8] rounded-[20px] flex justify-center items-center shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
-                    <span className="font-bold text-base leading-[30px] text-center text-[#212121]">
+                <div className="w-full py-3 bg-surface-secondary rounded-[20px] flex justify-center items-center shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
+                    <span className="font-bold text-base leading-[30px] text-center text-text-primary">
                         {t("forum_rules_notice")}
                     </span>
                 </div>
 
-                <div className="w-full h-[47px] bg-[#f8f8f8] rounded-full flex items-center overflow-visible relative shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
+                <div className="w-full h-[47px] bg-surface-secondary rounded-full flex items-center overflow-visible relative shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
                     <div className="px-10 flex items-center justify-center">
-                        <span className="font-bold text-[20px] text-[#212121] whitespace-nowrap pl-5">
+                        <span className="font-bold text-[20px] text-text-primary whitespace-nowrap pl-5">
                             {t("forum_category")}
                         </span>
                     </div>
@@ -108,7 +108,7 @@ export default function CreatePostPage() {
                         </button>
 
                         <div
-                            className={`absolute right-0 top-[55px] z-30 w-[90%] p-5 bg-white border-[10px] border-[#af292a] rounded-[20px] flex flex-col gap-[13px] shadow-xl transition-all duration-300 ease-in-out origin-top ${
+                            className={`absolute right-0 top-[55px] z-30 w-[90%] p-5 bg-surface border-[10px] border-[#af292a] rounded-[20px] flex flex-col gap-[13px] shadow-xl transition-all duration-300 ease-in-out origin-top ${
                                 isCategoryOpen
                                     ? "opacity-100 scale-y-100 pointer-events-auto"
                                     : "opacity-0 scale-y-0 pointer-events-none"
@@ -137,7 +137,7 @@ export default function CreatePostPage() {
                     <div className="w-full h-[50px] px-5 bg-[#af292a] rounded-[20px] flex items-center relative z-10">
                         <span className="text-white text-sm font-bold">{t("forum_enter_title")}</span>
                     </div>
-                    <div className="w-full bg-white rounded-[20px] -mt-4 pt-8 pb-4 px-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-2 border-[#af292a]">
+                    <div className="w-full bg-surface rounded-[20px] -mt-4 pt-8 pb-4 px-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-2 border-[#af292a]">
                         <input
                             type="text"
                             value={title}
@@ -147,8 +147,8 @@ export default function CreatePostPage() {
                             }}
                             placeholder={t("forum_title_placeholder")}
                             className={`w-full h-[40px] bg-transparent border-b ${
-                                errors.title ? "border-red-500" : "border-gray-200"
-                            } text-[#212121] text-sm font-medium outline-none focus:border-[#af292a] transition-colors`}
+                                errors.title ? "border-red-500" : "border-border-theme"
+                            } text-text-primary text-sm font-medium outline-none focus:border-[#af292a] transition-colors`}
                         />
                     </div>
                     {errors.title && (
@@ -160,7 +160,7 @@ export default function CreatePostPage() {
                     <div className="w-full h-[50px] px-5 bg-[#af292a] rounded-[20px] flex items-center relative z-10">
                         <span className="text-white text-sm font-bold">{t("forum_enter_text")}</span>
                     </div>
-                    <div className={`w-full bg-[#f8f8f8] rounded-[20px] -mt-4 pt-8 pb-5 px-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-2 border-[#af292a]`}>
+                    <div className={`w-full bg-surface-secondary rounded-[20px] -mt-4 pt-8 pb-5 px-5 shadow-[0_4px_20px_rgba(0,0,0,0.1)] border-2 border-[#af292a]`}>
                         <textarea
                             value={text}
                             onChange={(e) => {
@@ -168,7 +168,7 @@ export default function CreatePostPage() {
                                 if (errors.text) setErrors((prev) => ({ ...prev, text: undefined }));
                             }}
                             placeholder={t("forum_text_placeholder")}
-                            className="w-full min-h-[350px] bg-transparent text-[#212121] text-sm font-medium outline-none resize-none"
+                            className="w-full min-h-[350px] bg-transparent text-text-primary text-sm font-medium outline-none resize-none"
                         />
                     </div>
                     {errors.text && (

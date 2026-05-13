@@ -218,7 +218,7 @@ export default function MotorsportPage() {
             <div className="flex gap-6 items-start justify-start">
                 <div className="p-10">
                     {anyLoading && (
-                        <div className="w-[560px] text-center text-gray-500 text-sm py-2">
+                        <div className="w-[560px] text-center text-text-secondary text-sm py-2">
                             {t("loading_races")} ({season})...
                         </div>
                     )}
@@ -237,13 +237,13 @@ export default function MotorsportPage() {
 
                 <div className="flex-1 min-w-0 p-5">
                     {anyLoading ? (
-                        <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
+                        <div className="text-center text-text-secondary text-sm py-10 bg-surface rounded-[20px]">
                             {t("loading_announcements")}
                         </div>
                     ) : carouselItems.length > 0 ? (
                         <MotorsportCarousel items={carouselItems} />
                     ) : (
-                        <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
+                        <div className="text-center text-text-secondary text-sm py-10 bg-surface rounded-[20px]">
                             {t("no_upcoming_races")}
                         </div>
                     )}

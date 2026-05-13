@@ -308,6 +308,7 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         time_in_days: "за {days} дн",
         stage_grand_prix: "Гран-При",
         stage: "Стадія",
+        theme: "Тема",
         forum_rules_page_title: "Правила форуму",
         forum_rules_page_description:
             "FanPulse — це місце для фанатів, а не для хаосу. Порушення правил може призвести до видалення контенту, обмеження доступу або блокування акаунта.",
@@ -790,6 +791,7 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         time_in_days: "in {days} days",
         stage_grand_prix: "Grand Prix",
         stage: "Stage",
+        theme: "Theme",
         forum_rules_page_title: "Forum Rules",
         forum_rules_page_description:
             "FanPulse is a place for fans, not chaos. Violating the rules may result in content removal, restrictions, or account suspension.",

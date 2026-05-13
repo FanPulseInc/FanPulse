@@ -34,8 +34,8 @@ function StatPill({ value }: { value: number | string | undefined }) {
 
 function PlayerRow({ p, showStats }: { p: BoxScorePlayer; showStats: boolean }) {
     return (
-        <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3 py-[10px] border-b border-gray-100 last:border-none">
-            <div className="w-[44px] h-[44px] rounded-full overflow-hidden bg-gray-200 flex items-center justify-center shrink-0">
+        <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3 py-[10px] border-b border-border-theme last:border-none">
+            <div className="w-[44px] h-[44px] rounded-full overflow-hidden bg-surface-tertiary flex items-center justify-center shrink-0">
                 {p.photoUrl ? (
                     <Image
                         src={p.photoUrl}
@@ -46,17 +46,17 @@ function PlayerRow({ p, showStats }: { p: BoxScorePlayer; showStats: boolean }) 
                         className="w-full h-full object-cover"
                     />
                 ) : (
-                    <span className="text-[12px] font-bold text-gray-500">
+                    <span className="text-[12px] font-bold text-text-secondary">
                         {p.name.slice(0, 1).toUpperCase()}
                     </span>
                 )}
             </div>
             <div className="flex flex-col min-w-0">
-                <span className="text-[14px] font-bold text-[#212121] truncate">
+                <span className="text-[14px] font-bold text-text-primary truncate">
                     {p.name}
                 </span>
                 {p.position && (
-                    <span className="text-[11px] uppercase tracking-wider text-gray-500">
+                    <span className="text-[11px] uppercase tracking-wider text-text-secondary">
                         {p.position}
                     </span>
                 )}
@@ -90,31 +90,31 @@ export default function BoxScorePanel({ team }: { team: BoxScoreTeam }) {
                         className="w-12 h-12 object-contain shrink-0"
                     />
                 ) : (
-                    <span className="w-12 h-12 rounded-full bg-white/20 shrink-0" />
+                    <span className="w-12 h-12 rounded-full bg-surface/20 shrink-0" />
                 )}
                 <span className="text-white font-bold text-[16px] uppercase tracking-wider truncate">
                     {team.teamName}
                 </span>
             </div>
 
-            <div className="w-full bg-white rounded-[14px] overflow-hidden shadow-sm border border-gray-100 flex flex-col">
-                <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3 px-[16px] py-[8px] bg-[#f1f1f1] border-b border-gray-200">
+            <div className="w-full bg-surface rounded-[14px] overflow-hidden shadow-sm border border-border-theme flex flex-col">
+                <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3 px-[16px] py-[8px] bg-surface-tertiary border-b border-border-theme">
                     <span />
-                    <span className="text-[12px] font-bold uppercase tracking-wider text-[#212121]">
+                    <span className="text-[12px] font-bold uppercase tracking-wider text-text-primary">
                         {t("player")}
                     </span>
                     {showStats && (
                         <div className="flex items-center gap-2">
-                            <span className="min-w-[36px] text-center text-[11px] font-bold uppercase tracking-wider text-[#212121]">PTS</span>
-                            <span className="min-w-[36px] text-center text-[11px] font-bold uppercase tracking-wider text-[#212121]">REB</span>
-                            <span className="min-w-[36px] text-center text-[11px] font-bold uppercase tracking-wider text-[#212121]">AST</span>
+                            <span className="min-w-[36px] text-center text-[11px] font-bold uppercase tracking-wider text-text-primary">PTS</span>
+                            <span className="min-w-[36px] text-center text-[11px] font-bold uppercase tracking-wider text-text-primary">REB</span>
+                            <span className="min-w-[36px] text-center text-[11px] font-bold uppercase tracking-wider text-text-primary">AST</span>
                         </div>
                     )}
                 </div>
 
                 <div className="flex flex-col px-[16px]">
                     {team.players.length === 0 ? (
-                        <div className="text-center text-gray-400 text-[12px] py-6">
+                        <div className="text-center text-text-muted text-[12px] py-6">
                             {t("squad_unavailable")}
                         </div>
                     ) : (

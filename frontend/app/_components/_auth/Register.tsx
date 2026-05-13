@@ -212,7 +212,7 @@ const Register = () => {
     <>
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-[370px] h-auto bg-white rounded-[20px] py-10 p-8 flex flex-col gap-4 shadow-sm"
+        className="w-[370px] h-auto bg-surface rounded-[20px] py-10 p-8 flex flex-col gap-4 shadow-sm"
       >
         <h1 className="text-h1 text-brand-black text-left">{t("auth_register")}</h1>
 

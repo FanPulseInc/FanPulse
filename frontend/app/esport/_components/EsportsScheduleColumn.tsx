@@ -95,7 +95,7 @@ function TeamLine({ name, logo }: { name: string; logo?: string }) {
 
   return (
     <div className="flex min-w-0 items-center gap-2">
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-300">
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-tertiary">
         <Image
           src={src}
           alt=""
@@ -106,7 +106,7 @@ function TeamLine({ name, logo }: { name: string; logo?: string }) {
         />
       </div>
 
-      <span className="truncate text-[13px] text-[#212121]">{name}</span>
+      <span className="truncate text-[13px] text-text-primary">{name}</span>
     </div>
   );
 }
@@ -130,8 +130,8 @@ function EsportsMatchRow({
   return (
     <div
       onClick={onClick}
-      className={`grid h-[60px] cursor-pointer grid-cols-[54px_1fr_70px_28px] items-center gap-2 rounded-[8px] border-b border-gray-200 px-2 transition-colors last:border-none ${
-        selected ? "bg-[#af292a]/10" : "hover:bg-white"
+      className={`grid h-[60px] cursor-pointer grid-cols-[54px_1fr_70px_28px] items-center gap-2 rounded-[8px] border-b border-border-theme px-2 transition-colors last:border-none ${
+        selected ? "bg-[#af292a]/10" : "hover:bg-surface"
       }`}
     >
       <span className="font-data text-[14px] font-bold text-[#af292a]">
@@ -146,11 +146,11 @@ function EsportsMatchRow({
       <div className="flex min-w-0 flex-col items-end justify-center">
         {isUpcoming ? (
           <>
-            <span className="whitespace-nowrap text-[10px] font-bold text-[#212121]">
+            <span className="whitespace-nowrap text-[10px] font-bold text-text-primary">
               {match.format ?? "BO3"}
             </span>
 
-            <span className="whitespace-nowrap text-[10px] font-semibold text-gray-500">
+            <span className="whitespace-nowrap text-[10px] font-semibold text-text-secondary">
               {countdown ?? "–"}
             </span>
           </>
@@ -171,7 +171,7 @@ function EsportsMatchRow({
         className={`cursor-pointer text-xl leading-none transition-colors ${
           match.favorite
             ? "text-[#af292a]"
-            : "text-gray-300 hover:text-[#af292a]"
+            : "text-text-muted hover:text-[#af292a]"
         }`}
         aria-label="Favorite"
       >
@@ -262,7 +262,7 @@ export default function EsportsScheduleColumn({
           <button
             onClick={onPrevDayAction}
             disabled={!onPrevDayAction}
-            className="flex h-[26px] w-[22px] cursor-pointer items-center justify-center rounded-[6px] border border-white/30 text-xs text-white hover:bg-white/10 disabled:cursor-default disabled:opacity-40"
+            className="flex h-[26px] w-[22px] cursor-pointer items-center justify-center rounded-[6px] border border-white/30 text-xs text-white hover:bg-surface/10 disabled:cursor-default disabled:opacity-40"
             aria-label="Previous day"
           >
             ‹
@@ -270,7 +270,7 @@ export default function EsportsScheduleColumn({
 
           <button
             onClick={() => setPickerOpen((value) => !value)}
-            className="h-[26px] cursor-pointer rounded-[8px] border border-white/30 px-3 text-[11px] font-bold text-white hover:bg-white/10"
+            className="h-[26px] cursor-pointer rounded-[8px] border border-white/30 px-3 text-[11px] font-bold text-white hover:bg-surface/10"
           >
             {dateLabel}
           </button>
@@ -283,14 +283,14 @@ export default function EsportsScheduleColumn({
                 onPickDateAction(event.target.value);
                 setPickerOpen(false);
               }}
-              className="absolute right-0 top-[30px] z-10 rounded-[6px] border border-gray-300 bg-white px-2 py-1 text-[11px] text-[#212121]"
+              className="absolute right-0 top-[30px] z-10 rounded-[6px] border border-border-theme bg-surface px-2 py-1 text-[11px] text-text-primary"
             />
           )}
 
           <button
             onClick={onNextDayAction}
             disabled={!onNextDayAction}
-            className="flex h-[26px] w-[22px] cursor-pointer items-center justify-center rounded-[6px] border border-white/30 text-xs text-white hover:bg-white/10 disabled:cursor-default disabled:opacity-40"
+            className="flex h-[26px] w-[22px] cursor-pointer items-center justify-center rounded-[6px] border border-white/30 text-xs text-white hover:bg-surface/10 disabled:cursor-default disabled:opacity-40"
             aria-label="Next day"
           >
             ›
@@ -298,7 +298,7 @@ export default function EsportsScheduleColumn({
         </div>
       </div>
 
-      <div className="flex w-full flex-col gap-[10px] rounded-[20px] bg-[#f8f8f8] px-[32px] py-[20px] shadow-sm">
+      <div className="flex w-full flex-col gap-[10px] rounded-[20px] bg-surface-secondary px-[32px] py-[20px] shadow-sm">
         <div className="flex w-full items-center gap-2">
           {phaseTabs.map((tab) => {
             const active = phaseTab === tab.id;
@@ -331,14 +331,14 @@ export default function EsportsScheduleColumn({
         </div>
 
         {isEmpty ? (
-          <div className="py-8 text-center text-[12px] text-gray-400">
+          <div className="py-8 text-center text-[12px] text-text-muted">
             {t("no_matches")}
           </div>
         ) : (
           filteredGroups.map((group) => (
             <div key={group.tournamentId} className="flex flex-col">
               <div className="flex items-center gap-2 border-b-2 border-[#af292a]/30 px-2 py-[8px]">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-300">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-surface-tertiary">
                   <Image
                     src={group.tournamentLogo || "/icons/question_mark.png"}
                     alt=""
@@ -349,12 +349,12 @@ export default function EsportsScheduleColumn({
                   />
                 </div>
 
-                <span className="truncate text-[13px] font-bold uppercase tracking-wider text-[#212121]">
+                <span className="truncate text-[13px] font-bold uppercase tracking-wider text-text-primary">
                   {group.tournamentName}
                 </span>
 
                 {group.stage && (
-                  <span className="text-[11px] text-gray-500">
+                  <span className="text-[11px] text-text-secondary">
                     · {group.stage}
                   </span>
                 )}

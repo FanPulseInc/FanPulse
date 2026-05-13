@@ -76,7 +76,7 @@ function Slide({ match }: { match: CarouselMatch }) {
             className="w-full bg-[#af292a] rounded-[20px] p-[20px] flex flex-col gap-4 shadow-lg cursor-pointer hover:brightness-105 transition"
         >
             <div className="relative flex items-center gap-2">
-                <div className="w-[28px] h-[28px] rounded-full bg-white flex items-center justify-center overflow-hidden shrink-0">
+                <div className="w-[28px] h-[28px] rounded-full bg-surface flex items-center justify-center overflow-hidden shrink-0">
                     {match.leagueBadge ? (
                         <Image
                             src={match.leagueBadge}
@@ -96,7 +96,7 @@ function Slide({ match }: { match: CarouselMatch }) {
                     {match.league}
                 </span>
                 {isLive && (
-                    <span className="absolute right-0 top-0 bg-white text-[#af292a] text-[10px] font-bold uppercase px-2 py-[2px] rounded-full">
+                    <span className="absolute right-0 top-0 bg-surface text-[#af292a] text-[10px] font-bold uppercase px-2 py-[2px] rounded-full">
                         Live
                     </span>
                 )}
@@ -196,7 +196,7 @@ export default function MatchCarousel({ matches }: { matches: CarouselMatch[] })
                             type="button"
                             onClick={prev}
                             aria-label="Previous match"
-                            className="absolute left-[-14px] top-1/2 -translate-y-1/2 w-[36px] h-[36px] rounded-full bg-white text-[#af292a] text-[20px] font-bold flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer"
+                            className="absolute left-[-14px] top-1/2 -translate-y-1/2 w-[36px] h-[36px] rounded-full bg-surface text-[#af292a] text-[20px] font-bold flex items-center justify-center shadow-md hover:bg-surface-secondary cursor-pointer"
                         >
                             ‹
                         </button>
@@ -204,7 +204,7 @@ export default function MatchCarousel({ matches }: { matches: CarouselMatch[] })
                             type="button"
                             onClick={next}
                             aria-label="Next match"
-                            className="absolute right-[-14px] top-1/2 -translate-y-1/2 w-[36px] h-[36px] rounded-full bg-white text-[#af292a] text-[20px] font-bold flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer"
+                            className="absolute right-[-14px] top-1/2 -translate-y-1/2 w-[36px] h-[36px] rounded-full bg-surface text-[#af292a] text-[20px] font-bold flex items-center justify-center shadow-md hover:bg-surface-secondary cursor-pointer"
                         >
                             ›
                         </button>
@@ -219,7 +219,7 @@ export default function MatchCarousel({ matches }: { matches: CarouselMatch[] })
                         key={i}
                         onClick={() => setIdx(i)}
                         className={`w-[10px] h-[10px] rounded-full transition-colors cursor-pointer ${
-                            i === safeIdx ? "bg-[#af292a]" : "bg-gray-300 hover:bg-gray-400"
+                            i === safeIdx ? "bg-[#af292a]" : "bg-surface-tertiary hover:bg-text-muted"
                         }`}
                         aria-label={`Slide ${i + 1}`}
                     />

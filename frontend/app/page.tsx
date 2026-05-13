@@ -70,7 +70,7 @@ export default function Page() {
   };
 
   return (
-    <main className="min-h-screen w-full overflow-hidden bg-white">
+    <main className="min-h-screen w-full overflow-hidden">
       {maintenance && (
         <Toast
           message={maintenance}
@@ -269,8 +269,8 @@ export default function Page() {
 
           {/* banners */}
           <div className="relative w-full overflow-hidden rounded-2xl">
-            <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-16 bg-gradient-to-r from-white to-transparent" />
-            <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-16 bg-gradient-to-l from-white to-transparent" />
+            <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-16 bg-gradient-to-r from-background to-transparent" />
+            <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-16 bg-gradient-to-l from-background to-transparent" />
 
             <div className="flex w-max gap-2 marquee">
               {[...Array(3)].map((_, i) => (
@@ -312,7 +312,7 @@ function HomeCard({
 group relative flex h-full cursor-pointer flex-col
 overflow-hidden rounded-[28px]
 border-2 border-brand-red
-bg-[#efefef]
+bg-surface
 p-4 shadow-sm
 
 animate-[cardFade_0.45s_ease-out]

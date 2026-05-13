@@ -141,8 +141,8 @@ function MatchRow({
         return (
             <div
                 onClick={onClick}
-                className={`grid grid-cols-[54px_1fr_auto_28px] items-center gap-2 h-[56px] px-2 rounded-[8px] cursor-pointer transition-colors border-b border-gray-200 last:border-none ${
-                    selected ? "bg-[#af292a]/10" : "hover:bg-white"
+                className={`grid grid-cols-[54px_1fr_auto_28px] items-center gap-2 h-[56px] px-2 rounded-[8px] cursor-pointer transition-colors border-b border-border-theme last:border-none ${
+                    selected ? "bg-[#af292a]/10" : "hover:bg-surface"
                 }`}
             >
                 <div className="flex flex-col items-start leading-tight">
@@ -152,7 +152,7 @@ function MatchRow({
                 </div>
                 <div className="flex items-center gap-3 min-w-0">
                     {m.countryFlag ? (
-                        <div className="w-[36px] h-[36px] rounded-full overflow-hidden shrink-0 ring-1 ring-gray-200">
+                        <div className="w-[36px] h-[36px] rounded-full overflow-hidden shrink-0 ring-1 ring-border-theme">
                             {m.countryFlag.startsWith("http") ? (
                                 <Image
                                     src={m.countryFlag}
@@ -176,9 +176,9 @@ function MatchRow({
                             className="w-[36px] h-[36px] object-contain shrink-0"
                         />
                     ) : (
-                        <span className="block w-[36px] h-[36px] rounded-full bg-gray-300 shrink-0" />
+                        <span className="block w-[36px] h-[36px] rounded-full bg-surface-tertiary shrink-0" />
                     )}
-                    <span className="text-[13px] font-bold text-[#212121] truncate">
+                    <span className="text-[13px] font-bold text-text-primary truncate">
                         {m.trackName ?? m.competitionName}
                     </span>
                 </div>
@@ -191,7 +191,7 @@ function MatchRow({
                 </div>
                 <button
                     onClick={(e) => { e.stopPropagation(); toggleMatch(m.id); }}
-                    className={`text-xl leading-none ${starred ? "text-[#af292a]" : "text-gray-300 hover:text-[#af292a]"} transition-colors cursor-pointer`}
+                    className={`text-xl leading-none ${starred ? "text-[#af292a]" : "text-text-muted hover:text-[#af292a]"} transition-colors cursor-pointer`}
                     aria-label="Favorite match"
                     title={starred ? t("unfavourite_match") : t("favourite_match")}
                 >
@@ -221,8 +221,8 @@ function MatchRow({
     return (
         <div
             onClick={onClick}
-            className={`grid ${gridCols} items-center gap-2 h-[56px] px-2 rounded-[8px] cursor-pointer transition-colors border-b border-gray-200 last:border-none ${
-                selected ? "bg-[#af292a]/10" : "hover:bg-white"
+            className={`grid ${gridCols} items-center gap-2 h-[56px] px-2 rounded-[8px] cursor-pointer transition-colors border-b border-border-theme last:border-none ${
+                selected ? "bg-[#af292a]/10" : "hover:bg-surface"
             }`}
         >
             <div className="flex flex-col items-start leading-tight">
@@ -286,10 +286,10 @@ function MatchRow({
                                 className="w-[18px] h-[18px] object-contain"
                             />
                         ) : (
-                            <span className="block w-5 h-5 rounded-full bg-gray-300" />
+                            <span className="block w-5 h-5 rounded-full bg-surface-tertiary" />
                         )}
                     </button>
-                    <span className="text-[13px] text-[#212121] truncate">{m.homeTeam}</span>
+                    <span className="text-[13px] text-text-primary truncate">{m.homeTeam}</span>
                     {m.homeRedCard && (
                         <span className="shrink-0" title="Red card">
                             <Icon name="REDCARD" size={10} />
@@ -314,10 +314,10 @@ function MatchRow({
                                 className="w-[18px] h-[18px] object-contain"
                             />
                         ) : (
-                            <span className="block w-5 h-5 rounded-full bg-gray-300" />
+                            <span className="block w-5 h-5 rounded-full bg-surface-tertiary" />
                         )}
                     </button>
-                    <span className="text-[13px] text-[#212121] truncate">{m.awayTeam}</span>
+                    <span className="text-[13px] text-text-primary truncate">{m.awayTeam}</span>
                     {m.awayRedCard && (
                         <span className="shrink-0" title="Red card">
                             <Icon name="REDCARD" size={10} />
@@ -328,11 +328,11 @@ function MatchRow({
             <div className="flex flex-col items-end justify-center min-w-0">
                 {isUpcoming ? (
                     countdown ? (
-                        <span className="text-[10px] font-semibold text-gray-500 whitespace-nowrap">
+                        <span className="text-[10px] font-semibold text-text-secondary whitespace-nowrap">
                             {countdown}
                         </span>
                     ) : (
-                        <span className="text-[12px] font-bold text-gray-400 font-data">–</span>
+                        <span className="text-[12px] font-bold text-text-muted font-data">–</span>
                     )
                 ) : hasQuarters ? (
                     <div className="flex flex-col gap-[2px]">
@@ -340,7 +340,7 @@ function MatchRow({
                             {m.quarters!.home.map((q, i) => (
                                 <span
                                     key={`h-${i}`}
-                                    className="font-data tracking-wider text-[11px] text-[#212121]/70 w-[18px] text-right tabular-nums"
+                                    className="font-data tracking-wider text-[11px] text-text-primary/70 w-[18px] text-right tabular-nums"
                                 >
                                     {q}
                                 </span>
@@ -353,7 +353,7 @@ function MatchRow({
                             {m.quarters!.away.map((q, i) => (
                                 <span
                                     key={`a-${i}`}
-                                    className="font-data tracking-wider text-[11px] text-[#212121]/70 w-[18px] text-right tabular-nums"
+                                    className="font-data tracking-wider text-[11px] text-text-primary/70 w-[18px] text-right tabular-nums"
                                 >
                                     {q}
                                 </span>
@@ -376,7 +376,7 @@ function MatchRow({
             </div>
             <button
                 onClick={(e) => { e.stopPropagation(); toggleMatch(m.id); }}
-                className={`text-xl leading-none ${starred ? "text-[#af292a]" : "text-gray-300 hover:text-[#af292a]"} transition-colors cursor-pointer`}
+                className={`text-xl leading-none ${starred ? "text-[#af292a]" : "text-text-muted hover:text-[#af292a]"} transition-colors cursor-pointer`}
                 aria-label="Favorite match"
                 title={starred ? t("unfavourite_match") : t("favourite_match")}
             >
@@ -460,7 +460,7 @@ export default function ScheduleColumn({
                 ))}
                 
                 <div className="ml-auto relative">
-                    <div className="h-[30px] pl-[6px] pr-[6px] bg-white rounded-[10px] flex items-center gap-[4px] shadow-sm">
+                    <div className="h-[30px] pl-[6px] pr-[6px] bg-surface rounded-[10px] flex items-center gap-[4px] shadow-sm">
                         <button
                             onClick={onPrevDayAction}
                             disabled={!onPrevDayAction}
@@ -492,18 +492,18 @@ export default function ScheduleColumn({
                                 onPickDateAction(e.target.value);
                                 setPickerOpen(false);
                             }}
-                            className="absolute right-0 top-[34px] z-10 text-[11px] rounded-[6px] border border-gray-300 bg-white px-2 py-1 text-[#212121]"
+                            className="absolute right-0 top-[34px] z-10 text-[11px] rounded-[6px] border border-border-theme bg-surface px-2 py-1 text-text-primary"
                         />
                     )}
                 </div>
             </div>
 
             
-            <div className="w-full bg-[#f8f8f8] rounded-[20px] py-[20px] px-[16px] sm:px-[24px] lg:px-[32px] flex flex-col gap-[10px] shadow-sm">
+            <div className="w-full bg-surface-secondary rounded-[20px] py-[20px] px-[16px] sm:px-[24px] lg:px-[32px] flex flex-col gap-[10px] shadow-sm">
                 {inCompeteMode && competitions && competitions.length > 0 && (
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-[#212121]">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-text-primary">
                                 {t("choose_competition")}
                             </span>
                             {pickedCompetition && (
@@ -551,7 +551,7 @@ export default function ScheduleColumn({
                                                 className="w-10 h-10 object-contain"
                                             />
                                         ) : (
-                                            <span className="text-[10px] font-bold text-[#212121] text-center leading-tight px-1">
+                                            <span className="text-[10px] font-bold text-text-primary text-center leading-tight px-1">
                                                 {c.name.slice(0, 3).toUpperCase()}
                                             </span>
                                         )}
@@ -587,7 +587,7 @@ export default function ScheduleColumn({
                 </div>
 
                 {isEmpty && (
-                    <div className="text-center text-gray-400 text-[12px] py-8">{t("no_matches")}</div>
+                    <div className="text-center text-text-muted text-[12px] py-8">{t("no_matches")}</div>
                 )}
 
                 
@@ -604,13 +604,13 @@ export default function ScheduleColumn({
                                     className="w-8 h-8 object-contain"
                                 />
                             ) : (
-                                <span className="w-8 h-8 rounded-full bg-gray-300" />
+                                <span className="w-8 h-8 rounded-full bg-surface-tertiary" />
                             )}
-                            <span className="text-[13px] font-bold uppercase tracking-wider text-[#212121]">
+                            <span className="text-[13px] font-bold uppercase tracking-wider text-text-primary">
                                 {g.leagueName}
                             </span>
                             {g.leagueCountry && (
-                                <span className="text-[11px] text-gray-500">
+                                <span className="text-[11px] text-text-secondary">
                                     · {g.leagueCountry}
                                 </span>
                             )}

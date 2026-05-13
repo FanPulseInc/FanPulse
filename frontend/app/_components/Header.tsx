@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useLeagueLookups } from "@/services/sportsdb/hooks";
 import { useT } from "@/services/i18n/context";
 import Toast from "./Toast";
+import { useTheme } from "@/store/useThemeStore";
 
 const navItems = [
   { icon: ICONS.HOME, labelKey: "nav_home", href: "/" },
@@ -89,6 +90,7 @@ const Header = () => {
 
   const [isSportOpen, setIsSportOpen] = useState(false);
   const [isEsportOpen, setIsEsportOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [searchToast, setSearchToast] = useState(false);
   const [hoveredSport, setHoveredSport] = useState<string>(SPORT_MENU[0].key);
 
@@ -97,6 +99,8 @@ const Header = () => {
 
   const sportMenuRef = useRef<HTMLDivElement | null>(null);
   const esportMenuRef = useRef<HTMLDivElement | null>(null);
+  const settingsRef = useRef<HTMLDivElement | null>(null);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     if (!isSportOpen) return;
@@ -154,6 +158,25 @@ const Header = () => {
     };
   }, [isEsportOpen]);
 
+  useEffect(() => {
+    if (!isSettingsOpen) return;
+    const handlePointer = (e: MouseEvent) => {
+      const target = e.target as Node | null;
+      if (settingsRef.current && target && !settingsRef.current.contains(target)) {
+        setIsSettingsOpen(false);
+      }
+    };
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsSettingsOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointer);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handlePointer);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isSettingsOpen]);
+
   const activeBadgeQueries = useLeagueLookups(
     activeSport.leagues.map((l) => l.id)
   );
@@ -169,7 +192,7 @@ const Header = () => {
   };
 
   return (
-    <header className="w-full bg-white px-4 py-4 sm:px-6 lg:px-10">
+    <header className="w-full bg-surface px-4 py-4 sm:px-6 lg:px-10">
       {searchToast && (
         <Toast
           message={t("maintenance_message")}
@@ -194,7 +217,7 @@ const Header = () => {
 
           <div
             onClick={() => setSearchToast(true)}
-            className="group order-3 flex h-[44px] w-full cursor-pointer items-center justify-between rounded-[50px] border-2 border-brand-red bg-white pl-4 pr-1 opacity-60 transition-all duration-300 ease-out hover:scale-[1.01] hover:opacity-100 hover:shadow-[0_8px_30px_rgba(175,41,42,0.12)] lg:order-none lg:h-[50px] lg:w-[600px]"
+            className="group order-3 flex h-[44px] w-full cursor-pointer items-center justify-between rounded-[50px] border-2 border-brand-red bg-surface pl-4 pr-1 opacity-60 transition-all duration-300 ease-out hover:scale-[1.01] hover:opacity-100 hover:shadow-[0_8px_30px_rgba(175,41,42,0.12)] lg:order-none lg:h-[50px] lg:w-[600px]"
           >
             <span className="min-w-0 flex-1 select-none text-body-l text-brand-black/40 transition-colors duration-300 group-hover:text-brand-black/60">
               {t("header_search_placeholder")}
@@ -222,7 +245,7 @@ const Header = () => {
             {user ? (
               <button
                 type="button"
-                className="group flex h-15 w-15 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-brand-red bg-gray-50 transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-[0_8px_26px_rgba(175,41,42,0.18)]"
+                className="group flex h-15 w-15 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-brand-red bg-surface-secondary transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-[0_8px_26px_rgba(175,41,42,0.18)]"
                 onClick={() => router.push("/profile")}
                 aria-label="Open profile"
               >
@@ -281,14 +304,14 @@ const Header = () => {
                       </button>
 
                       <div
-                        className={`absolute left-0 top-[60px] z-50 h-auto w-[min(760px,calc(100vw-2rem))] origin-top overflow-hidden rounded-[20px] border-[2px] border-[#af292a] bg-white shadow-2xl transition-all duration-300 ease-out lg:top-[75px] ${
+                        className={`absolute left-0 top-[60px] z-50 h-auto w-[min(760px,calc(100vw-2rem))] origin-top overflow-hidden rounded-[20px] border-[2px] border-[#af292a] bg-surface shadow-2xl transition-all duration-300 ease-out lg:top-[75px] ${
                           isSportOpen
                             ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
                             : "pointer-events-none -translate-y-2 scale-95 opacity-0"
                         }`}
                       >
                         <div className="grid grid-cols-1 sm:grid-cols-[260px_1fr]">
-                          <div className="flex flex-col gap-1 bg-[#fafafa] p-4 sm:border-r sm:border-gray-200 sm:p-6">
+                          <div className="flex flex-col gap-1 bg-surface-secondary p-4 sm:border-r sm:border-border-theme sm:p-6">
                             {SPORT_MENU.map((s) => (
                               <button
                                 key={s.key}
@@ -310,7 +333,7 @@ const Header = () => {
                                   className={`text-[15px] font-bold leading-tight transition-colors duration-300 ${
                                     hoveredSport === s.key
                                       ? "text-[#af292a]"
-                                      : "text-[#212121]"
+                                      : "text-text-primary"
                                   }`}
                                 >
                                   {t(s.labelKey)}
@@ -320,7 +343,7 @@ const Header = () => {
                           </div>
 
                           <div className="flex flex-col gap-1 p-4 sm:p-6">
-                            <span className="mb-1 text-[11px] font-bold uppercase tracking-wider text-gray-500">
+                            <span className="mb-1 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
                               {t("header_top_leagues")}
                             </span>
 
@@ -332,7 +355,7 @@ const Header = () => {
                                   key={l.id}
                                   type="button"
                                   onClick={() => goToSport(activeSport, l.id)}
-                                  className="flex cursor-pointer items-center gap-3 rounded-[8px] px-3 py-2 text-[14px] font-medium text-[#212121] transition-all duration-300 hover:translate-x-1 hover:bg-[#af292a]/5 hover:text-[#af292a]"
+                                  className="flex cursor-pointer items-center gap-3 rounded-[8px] px-3 py-2 text-[14px] font-medium text-text-primary transition-all duration-300 hover:translate-x-1 hover:bg-[#af292a]/5 hover:text-[#af292a]"
                                 >
                                   {badge ? (
                                     <Image
@@ -344,7 +367,7 @@ const Header = () => {
                                       className="h-7 w-7 shrink-0 object-contain"
                                     />
                                   ) : (
-                                    <span className="h-7 w-7 shrink-0 rounded-full bg-gray-200" />
+                                    <span className="h-7 w-7 shrink-0 rounded-full bg-surface-tertiary" />
                                   )}
 
                                   <span className="truncate">{l.name}</span>
@@ -382,7 +405,7 @@ const Header = () => {
                       </button>
 
                       <div
-                        className={`absolute left-0 top-[75px] z-50 w-[min(760px,calc(100vw-2rem))] origin-top rounded-[20px] border-[2px] border-[#af292a] bg-white px-8 pb-10 pt-8 shadow-2xl transition-all duration-300 ease-out ${
+                        className={`absolute left-0 top-[75px] z-50 w-[min(760px,calc(100vw-2rem))] origin-top rounded-[20px] border-[2px] border-[#af292a] bg-surface px-8 pb-10 pt-8 shadow-2xl transition-all duration-300 ease-out ${
                           isEsportOpen
                             ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
                             : "pointer-events-none -translate-y-2 scale-95 opacity-0"
@@ -435,12 +458,38 @@ const Header = () => {
               {ICONS.ASK}
             </button>
 
-            <button
-              type="button"
-              className="cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:rotate-12 hover:scale-105 hover:opacity-80"
-            >
-              {ICONS.SETTING}
-            </button>
+            <div className="relative" ref={settingsRef}>
+              <button
+                type="button"
+                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                className="cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:rotate-12 hover:scale-105 hover:opacity-80"
+              >
+                {ICONS.SETTING}
+              </button>
+
+              {isSettingsOpen && (
+                <div className="absolute right-0 top-[40px] z-50 w-[200px] rounded-[14px] border-2 border-brand-red bg-surface p-4 shadow-2xl">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold text-text-primary">{t("theme")}</span>
+                    <button
+                      type="button"
+                      onClick={toggleTheme}
+                      className={`relative h-[28px] w-[52px] cursor-pointer rounded-full transition-colors duration-300 ${
+                        theme === "dark" ? "bg-brand-red" : "bg-surface-tertiary"
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-[2px] flex h-[24px] w-[24px] items-center justify-center rounded-full bg-surface text-[14px] shadow-sm transition-all duration-300 ${
+                          theme === "dark" ? "left-[26px]" : "left-[2px]"
+                        }`}
+                      >
+                        {theme === "dark" ? "🌙" : "☀️"}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -503,11 +552,11 @@ function EsportMenuItem({
       onClick={onClick}
       className="group flex w-full cursor-pointer items-center gap-3 transition-all duration-300 hover:translate-x-1"
     >
-      <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gray-100 transition-transform duration-300 group-hover:scale-105">
+      <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-surface-secondary transition-transform duration-300 group-hover:scale-105">
         <img src={src} alt="" className="h-full w-full object-contain" />
       </div>
 
-      <span className="text-[18px] font-bold text-[#212121] transition-colors duration-300 group-hover:text-[#af292a]">
+      <span className="text-[18px] font-bold text-text-primary transition-colors duration-300 group-hover:text-[#af292a]">
         {label}
       </span>
     </button>

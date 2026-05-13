@@ -62,8 +62,8 @@ function TeamHeader({ team }: { team: FormationTeam }) {
                 </span>
             )}
             {team.coachName && (
-                <div className="ml-auto flex items-center gap-2 bg-white/15 rounded-full pl-1 pr-3 py-1">
-                    <div className="w-[34px] h-[34px] rounded-full overflow-hidden bg-white/20 flex items-center justify-center shrink-0">
+                <div className="ml-auto flex items-center gap-2 bg-surface/15 rounded-full pl-1 pr-3 py-1">
+                    <div className="w-[34px] h-[34px] rounded-full overflow-hidden bg-surface/20 flex items-center justify-center shrink-0">
                         {team.coachPhotoUrl ? (
                             <Image
                                 src={team.coachPhotoUrl}
@@ -115,7 +115,7 @@ function PlayerCard({ player, half }: { player: PitchPlayer; half: "top" | "bott
         !!player.redCard;
 
     return (
-        <div className="relative z-10 flex flex-col items-center gap-[1px] w-[60px] sm:w-[72px] min-h-[88px] sm:min-h-[96px] pt-[4px] pr-[3px] pb-[4px] pl-[3px] bg-[#e6e6e6] rounded-[8px] shadow-sm">
+        <div className="relative z-10 flex flex-col items-center gap-[1px] w-[60px] sm:w-[72px] min-h-[88px] sm:min-h-[96px] pt-[4px] pr-[3px] pb-[4px] pl-[3px] bg-background rounded-[8px] shadow-sm">
             {half === "top" && player.role && (
                 <span className="text-[7px] text-[#af292a] font-bold tracking-wider leading-none">{player.role}</span>
             )}
@@ -130,7 +130,7 @@ function PlayerCard({ player, half }: { player: PitchPlayer; half: "top" | "bott
                         />
                     </span>
                 )}
-                <div className="w-[40px] h-[40px] rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm">
+                <div className="w-[40px] h-[40px] rounded-full bg-surface overflow-hidden flex items-center justify-center shadow-sm">
                     {player.photoUrl ? (
                         <Image
                             src={player.photoUrl}
@@ -158,7 +158,7 @@ function PlayerCard({ player, half }: { player: PitchPlayer; half: "top" | "bott
                     </span>
                 )}
             </div>
-            <span className="text-[9px] text-[#212121] font-semibold truncate max-w-full leading-tight">
+            <span className="text-[9px] text-text-primary font-semibold truncate max-w-full leading-tight">
                 {shortName}
             </span>
             {half === "bottom" && player.role && (
@@ -268,7 +268,7 @@ export default function FormationPitch({ top, bottom }: { top: FormationTeam; bo
         <div className="w-full flex flex-col gap-3">
             <TeamHeader team={top} />
             <div className="w-full">
-            <div className="relative bg-white rounded-[20px] shadow-sm border border-gray-100 px-2 sm:px-4 pt-[20px] sm:pt-[28px] pb-[20px] sm:pb-[28px] overflow-hidden w-full">
+            <div className="relative bg-surface rounded-[20px] shadow-sm border border-border-theme px-2 sm:px-4 pt-[20px] sm:pt-[28px] pb-[20px] sm:pb-[28px] overflow-hidden w-full">
                 <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 border-t-[3px] border-[#af292a] z-0" />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[150px] h-[150px] rounded-full border-[3px] border-[#af292a] z-0" />
 
