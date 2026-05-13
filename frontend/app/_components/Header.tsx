@@ -428,6 +428,7 @@ const Header = () => {
 
           <div className="flex shrink-0 items-center gap-3 px-2 sm:gap-5 lg:gap-8 lg:px-4">
             <button
+              onClick={()=>{router.push("/contacts")}}
               type="button"
               className="hidden cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:opacity-80 sm:inline-flex"
             >
