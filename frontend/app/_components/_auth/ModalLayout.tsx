@@ -29,7 +29,7 @@ export const ModalLayout = ({ isOpen, onCloseAction, children }: Props) => {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white rounded-[20px] shadow-xl"
+            className="bg-surface rounded-[20px] shadow-xl"
           >
             {children}
           </motion.div>

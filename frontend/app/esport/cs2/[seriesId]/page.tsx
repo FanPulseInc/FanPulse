@@ -121,7 +121,7 @@ export default function Cs2MatchPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center bg-[#e9e9e9] text-sm font-black text-[#111111]">
+      <div className="flex min-h-[500px] items-center justify-center bg-background text-sm font-black text-text-primary">
         {t("loading")}
       </div>
     );
@@ -129,7 +129,7 @@ export default function Cs2MatchPage() {
 
   if (!match) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center bg-[#e9e9e9] text-sm font-black text-[#111111]">
+      <div className="flex min-h-[500px] items-center justify-center bg-background text-sm font-black text-text-primary">
         {t("match_not_found")}
       </div>
     );
@@ -181,7 +181,7 @@ export default function Cs2MatchPage() {
     : "TBA";
 
   return (
-    <main className="min-h-[500px] w-full bg-[#e9e9e9] px-4 py-4 text-[#111111]">
+    <main className="min-h-[500px] w-full bg-background px-4 py-4 text-text-primary">
       <div className="mx-auto flex w-full max-w-[760px] flex-col gap-3">
         <section className="overflow-hidden rounded-[22px] bg-[#bf262b] text-white shadow-[0_8px_20px_rgba(0,0,0,0.22)]">
           <div className="px-5 pb-5 pt-5 md:px-7 md:pb-6">
@@ -191,7 +191,7 @@ export default function Cs2MatchPage() {
 
             <div className="mt-6 grid grid-cols-[1fr_120px_1fr] items-center gap-3 md:grid-cols-[1fr_170px_1fr] md:gap-5">
               <div className="flex min-w-0 flex-col items-center text-center">
-                <div className="flex h-[88px] w-[108px] items-center justify-center rounded-[18px] bg-white shadow-[0_6px_14px_rgba(0,0,0,0.2)] md:h-[112px] md:w-[136px]">
+                <div className="flex h-[88px] w-[108px] items-center justify-center rounded-[18px] bg-surface shadow-[0_6px_14px_rgba(0,0,0,0.2)] md:h-[112px] md:w-[136px]">
                   <Image
                     src="/icons/question_mark.png"
                     alt={teamAName}
@@ -212,7 +212,7 @@ export default function Cs2MatchPage() {
                   {scoreA}-{scoreB}
                 </div>
 
-                <div className="mt-3 rounded-full bg-white px-5 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-[#bf262b] shadow-md md:text-[13px]">
+                <div className="mt-3 rounded-full bg-surface px-5 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-[#bf262b] shadow-md md:text-[13px]">
                   {statusLabel}
                 </div>
 
@@ -222,7 +222,7 @@ export default function Cs2MatchPage() {
               </div>
 
               <div className="flex min-w-0 flex-col items-center text-center">
-                <div className="flex h-[88px] w-[108px] items-center justify-center rounded-[18px] bg-white shadow-[0_6px_14px_rgba(0,0,0,0.2)] md:h-[112px] md:w-[136px]">
+                <div className="flex h-[88px] w-[108px] items-center justify-center rounded-[18px] bg-surface shadow-[0_6px_14px_rgba(0,0,0,0.2)] md:h-[112px] md:w-[136px]">
                   <Image
                     src="/icons/question_mark.png"
                     alt={teamBName}
@@ -248,7 +248,7 @@ export default function Cs2MatchPage() {
                 MAP 1
               </div>
 
-              <div className="rounded-[8px] bg-white/15 px-3 py-1.5 text-[12px] font-black md:text-[13px]">
+              <div className="rounded-[8px] bg-surface/15 px-3 py-1.5 text-[12px] font-black md:text-[13px]">
                 {formatName}
               </div>
             </div>
@@ -260,7 +260,7 @@ export default function Cs2MatchPage() {
           </div>
         </section>
 
-        <section className="overflow-hidden rounded-[16px] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.13)]">
+        <section className="overflow-hidden rounded-[16px] bg-surface shadow-[0_4px_12px_rgba(0,0,0,0.13)]">
           <div className="bg-[#111111] py-3 text-center text-[14px] font-black uppercase tracking-[0.14em] text-white md:text-[15px]">
             Map pool
           </div>
@@ -280,13 +280,13 @@ export default function Cs2MatchPage() {
         <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
           <section className="flex min-w-0 flex-col gap-2">
             <div className="flex h-[48px] items-center gap-3 rounded-[14px] bg-[#bf262b] px-4 text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
-              <span className="h-8 w-8 shrink-0 rounded-full bg-white" />
+              <span className="h-8 w-8 shrink-0 rounded-full bg-surface" />
               <span className="line-clamp-1 text-[15px] font-black">
                 {teamAName}
               </span>
             </div>
 
-            <div className="rounded-[16px] bg-white px-3 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
+            <div className="rounded-[16px] bg-surface px-3 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
               <div className="flex items-start justify-between gap-2">
                 {teamAPlayers.map((player, index) => {
                   const name = getPlayerName(player);
@@ -359,13 +359,13 @@ export default function Cs2MatchPage() {
 
           <section className="flex min-w-0 flex-col gap-2">
             <div className="flex h-[48px] items-center gap-3 rounded-[14px] bg-[#bf262b] px-4 text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
-              <span className="h-8 w-8 shrink-0 rounded-full bg-white" />
+              <span className="h-8 w-8 shrink-0 rounded-full bg-surface" />
               <span className="line-clamp-1 text-[15px] font-black">
                 {teamBName}
               </span>
             </div>
 
-            <div className="rounded-[16px] bg-white px-3 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
+            <div className="rounded-[16px] bg-surface px-3 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
               <div className="flex items-start justify-between gap-2">
                 {teamBPlayers.map((player, index) => {
                   const name = getPlayerName(player);
@@ -437,7 +437,7 @@ export default function Cs2MatchPage() {
           </section>
         </div>
 
-        <section className="overflow-hidden rounded-[16px] bg-white px-4 pb-5 pt-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)] md:px-5">
+        <section className="overflow-hidden rounded-[16px] bg-surface px-4 pb-5 pt-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)] md:px-5">
           <div className="mb-4 text-center text-[15px] font-black uppercase tracking-[0.14em] md:text-[17px]">
             {t("statistics")}
           </div>
@@ -469,7 +469,7 @@ export default function Cs2MatchPage() {
                     {index === 0 ? scoreA : left}
                   </div>
 
-                  <div className="min-w-0 text-[10px] font-black uppercase leading-tight text-[#111111] md:text-[12px]">
+                  <div className="min-w-0 text-[10px] font-black uppercase leading-tight text-text-primary md:text-[12px]">
                     {label}
                   </div>
 
@@ -498,7 +498,7 @@ export default function Cs2MatchPage() {
           </div>
         </section>
 
-        <section className="rounded-[16px] bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)] md:p-5">
+        <section className="rounded-[16px] bg-surface p-4 shadow-[0_4px_12px_rgba(0,0,0,0.12)] md:p-5">
           <div className="mb-4 text-center text-[15px] font-black text-[#bf262b] md:text-[17px]">
             Matches, past 3 months
           </div>
@@ -520,7 +520,7 @@ export default function Cs2MatchPage() {
                       {t("team")} {index + 1}
                     </span>
 
-                    <span className="shrink-0 font-black text-[#111111]">
+                    <span className="shrink-0 font-black text-text-primary">
                       8:0
                     </span>
 
@@ -548,7 +548,7 @@ export default function Cs2MatchPage() {
                       {t("team")} {index + 1}
                     </span>
 
-                    <span className="shrink-0 font-black text-[#111111]">
+                    <span className="shrink-0 font-black text-text-primary">
                       8:0
                     </span>
 

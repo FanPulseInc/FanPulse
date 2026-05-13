@@ -8,7 +8,7 @@ export default function ForumLayout({ children }: { children: React.ReactNode })
                     {children}
                 </div>
 
-                <aside className="hidden lg:block w-[300px] bg-white rounded-[20px] shadow-sm h-fit p-4">
+                <aside className="hidden lg:block w-[300px] bg-surface rounded-[20px] shadow-sm h-fit p-4">
                     <h2 className="font-bold mb-4">Top Match Discussions</h2>
                 </aside>
             </div>

@@ -88,7 +88,7 @@ export default function ThreadDetailPage() {
     if (isLoading) {
         return (
             <ForumContainer>
-                <div className="text-center text-gray-500 py-10">{t("loading")}</div>
+                <div className="text-center text-text-secondary py-10">{t("loading")}</div>
             </ForumContainer>
         );
     }
@@ -96,7 +96,7 @@ export default function ThreadDetailPage() {
     if (!post) {
         return (
             <ForumContainer>
-                <div className="text-center text-gray-500 py-10">{t("post_not_found")}</div>
+                <div className="text-center text-text-secondary py-10">{t("post_not_found")}</div>
             </ForumContainer>
         );
     }
@@ -119,7 +119,7 @@ export default function ThreadDetailPage() {
                 />
             )}
             <div className="flex flex-col gap-6">
-                <div className="w-full bg-white rounded-[20px] shadow-sm border border-gray-100 flex flex-col relative overflow-visible">
+                <div className="w-full bg-surface rounded-[20px] shadow-sm border border-border-theme flex flex-col relative overflow-visible">
                     <div className="w-full h-[60px] bg-[#af292a] rounded-[20px] flex items-center justify-center px-6 relative z-10">
                         <div className="flex items-center gap-3">
                             <div className="absolute left-[24px] w-[45px] h-[45px] flex items-center justify-center">
@@ -144,7 +144,7 @@ export default function ThreadDetailPage() {
                         </div>
                     </div>
                     <div className="p-8 pt-10 relative">
-                        <div className="text-[#212121] text-sm leading-relaxed whitespace-pre-wrap">
+                        <div className="text-text-primary text-sm leading-relaxed whitespace-pre-wrap">
                             {post.description}
                         </div>
                         <div className="flex justify-between items-center mt-6">
@@ -194,7 +194,7 @@ export default function ThreadDetailPage() {
                                 <div className="flex justify-end gap-2">
                                     <button
                                         onClick={() => { setIsCommenting(false); setCommentText(""); }}
-                                        className="h-[36px] px-5 rounded-full text-[12px] font-bold border border-gray-300 hover:bg-gray-100 transition cursor-pointer"
+                                        className="h-[36px] px-5 rounded-full text-[12px] font-bold border border-border-theme hover:bg-surface-secondary transition cursor-pointer"
                                     >
                                         {t("cancel")}
                                     </button>

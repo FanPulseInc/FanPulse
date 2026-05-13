@@ -64,16 +64,16 @@ export default function ThreadRow({
                 className="
                 group mb-2 flex h-[52px] w-full cursor-pointer
                 items-center justify-between rounded-[16px]
-                bg-[#e6e6e6] px-2
+                bg-background px-2
 
                 transition-all duration-200 ease-in-out
                 hover:scale-[1.01]
-                hover:bg-gray-300
+                hover:bg-surface-tertiary
                 hover:shadow-md
                 active:scale-[0.99]
                 "
             >
-                <span className="min-w-0 flex-1 truncate pl-2 text-sm font-medium text-[#212121]">
+                <span className="min-w-0 flex-1 truncate pl-2 text-sm font-medium text-text-primary">
                     {title}
                 </span>
 

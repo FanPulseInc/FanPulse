@@ -181,7 +181,7 @@ export default function ForumPage() {
 
         return (
             <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/45 px-4 backdrop-blur-sm">
-                <div className="relative w-full max-w-[760px] overflow-hidden rounded-[32px] border-2 border-brand-red bg-white p-6 md:p-8 shadow-2xl">
+                <div className="relative w-full max-w-[760px] overflow-hidden rounded-[32px] border-2 border-brand-red bg-surface p-6 md:p-8 shadow-2xl">
 
                     {/* close */}
                     <button
@@ -322,7 +322,7 @@ export default function ForumPage() {
 
                 <div className="relative">
                     <div
-                        className={`absolute left-1/2 -translate-x-1/2 -top-2 z-30 w-[406px] pt-[18px] pr-[20px] pb-[19px] pl-[20px]  bg-[#ffffff] border-[10px] border-[#af292a] rounded-[11px] flex flex-col justify-start items-start gap-[13px] transition-all duration-300 ease-in-out origin-top ${isCategoryOpen
+                        className={`absolute left-1/2 -translate-x-1/2 -top-2 z-30 w-[406px] pt-[18px] pr-[20px] pb-[19px] pl-[20px]  bg-surface border-[10px] border-[#af292a] rounded-[11px] flex flex-col justify-start items-start gap-[13px] transition-all duration-300 ease-in-out origin-top ${isCategoryOpen
                             ? "opacity-100 scale-y-100 pointer-events-auto"
                             : "opacity-0 scale-y-0 pointer-events-none"
                             }`}
@@ -354,7 +354,7 @@ export default function ForumPage() {
                     </div>
                 </div>
 
-                <div className="w-[1039px] bg-white rounded-[20px] shadow-sm border border-gray-100 -mt-5 pt-8 pb-5 px-5 flex flex-col gap-4;">
+                <div className="w-[1039px] bg-surface rounded-[20px] shadow-sm border border-border-theme -mt-5 pt-8 pb-5 px-5 flex flex-col gap-4;">
                     <div className="flex justify-between items-center mb-4 px-2">
                         <div className="flex gap-2 -mt-1">
                             {navFilters.map((filter) => {
@@ -376,7 +376,7 @@ export default function ForumPage() {
                         </div>
                     </div>
                     {postsLoading && (
-                        <div className="text-center text-gray-500 py-4">{t("loading")}</div>
+                        <div className="text-center text-text-secondary py-4">{t("loading")}</div>
                     )}
                     {posts?.map((post) => (
                         <ThreadRow
@@ -390,7 +390,7 @@ export default function ForumPage() {
                         />
                     ))}
                     {!postsLoading && (!posts || posts.length === 0) && (
-                        <div className="text-center text-gray-500 py-4">{t("forum_no_posts")}</div>
+                        <div className="text-center text-text-secondary py-4">{t("forum_no_posts")}</div>
                     )}
                 </div>
             </div>

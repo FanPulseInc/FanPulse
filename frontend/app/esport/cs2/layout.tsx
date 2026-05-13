@@ -155,7 +155,7 @@ export default function Cs2Layout({ children }: { children: ReactNode }) {
     <div className="flex gap-6 items-start justify-start">
       <div className="p-10">
         {loading ? (
-          <div className="w-[560px] rounded-[20px] bg-[#f8f8f8] py-10 text-center text-sm text-gray-400">
+          <div className="w-[560px] rounded-[20px] bg-surface-secondary py-10 text-center text-sm text-text-muted">
             {t("loading")}
           </div>
         ) : (
@@ -173,7 +173,7 @@ export default function Cs2Layout({ children }: { children: ReactNode }) {
       </div>
 
       <div className="flex-1 min-w-0 p-5">
-        <div className="w-full min-h-[500px] overflow-hidden rounded-[20px] bg-zinc-200 border border-gray-200 shadow-sm">
+        <div className="w-full min-h-[500px] overflow-hidden rounded-[20px] bg-zinc-200 border border-border-theme shadow-sm">
           {children}
         </div>
       </div>

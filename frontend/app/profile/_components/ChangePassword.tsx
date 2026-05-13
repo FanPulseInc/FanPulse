@@ -104,7 +104,7 @@ export default function ChangePassword() {
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             placeholder={t("password_current_placeholder")}
-            className="h-[50px] px-4 rounded-[20px] border-2 border-brand-red outline-none text-body-m bg-white"
+            className="h-[50px] px-4 rounded-[20px] border-2 border-brand-red outline-none text-body-m bg-surface"
           />
 
           <input
@@ -112,7 +112,7 @@ export default function ChangePassword() {
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             placeholder={t("password_new_placeholder")}
-            className="h-[50px] px-4 rounded-[20px] border-2 border-brand-red outline-none text-body-m bg-white"
+            className="h-[50px] px-4 rounded-[20px] border-2 border-brand-red outline-none text-body-m bg-surface"
           />
 
           <input
@@ -120,7 +120,7 @@ export default function ChangePassword() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder={t("password_confirm_placeholder")}
-            className="h-[50px] px-4 rounded-[20px] border-2 border-brand-red outline-none text-body-m bg-white"
+            className="h-[50px] px-4 rounded-[20px] border-2 border-brand-red outline-none text-body-m bg-surface"
           />
 
           {error && (

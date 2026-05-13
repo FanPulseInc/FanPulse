@@ -129,7 +129,7 @@ export default function FeaturedMatch({
 
                 <div className="w-full flex-1 flex items-center justify-center px-2">
                     <div className="relative w-full max-w-[420px] mx-auto bg-[#212121] rounded-[24px] pl-[80px] pr-5 py-4 flex flex-col items-center gap-1 shadow-md">
-                        <div className="absolute left-[-12px] top-1/2 -translate-y-1/2 w-[88px] h-[88px] rounded-full bg-white flex items-center justify-center overflow-hidden shadow-md ring-2 ring-[#af292a]">
+                        <div className="absolute left-[-12px] top-1/2 -translate-y-1/2 w-[88px] h-[88px] rounded-full bg-surface flex items-center justify-center overflow-hidden shadow-md ring-2 ring-[#af292a]">
                             {motorsportHero.countryFlag ? (
                                 isFlagUrl ? (
                                     <Image
@@ -210,7 +210,7 @@ export default function FeaturedMatch({
                     {match.tournament}
                 </span>
                 {match.status === "live" && (
-                    <span className="absolute right-[30px] top-[22px] bg-white text-[#af292a] text-[10px] font-bold uppercase px-2 py-[2px] rounded-full">
+                    <span className="absolute right-[30px] top-[22px] bg-surface text-[#af292a] text-[10px] font-bold uppercase px-2 py-[2px] rounded-full">
                         Live
                     </span>
                 )}
@@ -246,7 +246,7 @@ export default function FeaturedMatch({
             
             {hasScorers && (
                 <div className="relative w-full grid grid-cols-2 gap-3 mt-1">
-                    <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-px bg-white/40" />
+                    <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-px bg-surface/40" />
                     <div className="flex flex-col gap-[6px] pr-3">
                         {homeScorers.length === 0 ? (
                             <span className="text-[11px] text-white/60 text-right">—</span>

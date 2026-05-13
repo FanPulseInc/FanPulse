@@ -10,17 +10,17 @@ export default function AdvertisingPage() {
 
     return (
         <main className="min-h-screen px-4 py-10">
-            <div className="mx-auto max-w-[1000px] rounded-[32px] border-2 border-brand-red bg-white p-8 shadow-[0_20px_60px_rgba(0,0,0,0.05)] md:p-12">
+            <div className="mx-auto max-w-[1000px] rounded-[32px] border-2 border-brand-red bg-surface p-8 shadow-[0_20px_60px_rgba(0,0,0,0.05)] md:p-12">
                 <div className="mb-8">
                     <div className="mb-4 w-fit rounded-full bg-brand-red/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-brand-red">
                         FanPulse Partners
                     </div>
 
-                    <h1 className="text-3xl font-black uppercase text-[#212121] md:text-5xl">
+                    <h1 className="text-3xl font-black uppercase text-text-primary md:text-5xl">
                         {t("advertising_title")}
                     </h1>
 
-                    <p className="mt-5 max-w-[760px] text-sm font-semibold leading-relaxed text-[#212121]/70">
+                    <p className="mt-5 max-w-[760px] text-sm font-semibold leading-relaxed text-text-primary/70">
                         {t("advertising_intro")}
                     </p>
                 </div>
@@ -29,26 +29,26 @@ export default function AdvertisingPage() {
                     <textarea
                         placeholder={t("advertising_message_placeholder")}
                         rows={7}
-                        className="w-full resize-none rounded-[22px] border-2 border-brand-red bg-white p-5 text-sm font-medium text-[#212121] outline-none transition-all placeholder:text-[#212121]/35 focus:shadow-[0_0_0_4px_rgba(175,41,42,0.08)]"
+                        className="w-full resize-none rounded-[22px] border-2 border-brand-red bg-surface p-5 text-sm font-medium text-text-primary outline-none transition-all placeholder:text-text-primary/35 focus:shadow-[0_0_0_4px_rgba(175,41,42,0.08)]"
                     />
 
                     <input
                         placeholder={t("advertising_name_placeholder")}
-                        className="h-[52px] rounded-[18px] border-2 border-brand-red bg-white px-5 text-sm font-medium text-[#212121] outline-none transition-all placeholder:text-[#212121]/35 focus:shadow-[0_0_0_4px_rgba(175,41,42,0.08)]"
+                        className="h-[52px] rounded-[18px] border-2 border-brand-red bg-surface px-5 text-sm font-medium text-text-primary outline-none transition-all placeholder:text-text-primary/35 focus:shadow-[0_0_0_4px_rgba(175,41,42,0.08)]"
                     />
 
                     <input
                         type="email"
                         placeholder={t("advertising_email_placeholder")}
-                        className="h-[52px] rounded-[18px] border-2 border-brand-red bg-white px-5 text-sm font-medium text-[#212121] outline-none transition-all placeholder:text-[#212121]/35 focus:shadow-[0_0_0_4px_rgba(175,41,42,0.08)]"
+                        className="h-[52px] rounded-[18px] border-2 border-brand-red bg-surface px-5 text-sm font-medium text-text-primary outline-none transition-all placeholder:text-text-primary/35 focus:shadow-[0_0_0_4px_rgba(175,41,42,0.08)]"
                     />
 
                     <input
                         placeholder={t("advertising_company_placeholder")}
-                        className="h-[52px] rounded-[18px] border-2 border-brand-red bg-white px-5 text-sm font-medium text-[#212121] outline-none transition-all placeholder:text-[#212121]/35 focus:shadow-[0_0_0_4px_rgba(175,41,42,0.08)]"
+                        className="h-[52px] rounded-[18px] border-2 border-brand-red bg-surface px-5 text-sm font-medium text-text-primary outline-none transition-all placeholder:text-text-primary/35 focus:shadow-[0_0_0_4px_rgba(175,41,42,0.08)]"
                     />
 
-                    <label className="flex min-h-[46px] cursor-pointer items-center gap-3 rounded-[18px] border-2 border-brand-red bg-[#f5f5f5] px-5 text-sm font-black text-[#212121]">
+                    <label className="flex min-h-[46px] cursor-pointer items-center gap-3 rounded-[18px] border-2 border-brand-red bg-surface-secondary px-5 text-sm font-black text-text-primary">
                         <input
                             type="checkbox"
                             checked={accepted}

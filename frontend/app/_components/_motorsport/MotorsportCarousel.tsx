@@ -20,7 +20,7 @@ function Slide({ item }: { item: MotorsportCarouselItem }) {
             onClick={() => router.push(`/motorsport/${item.id}`)}
             className="relative w-full bg-[#af292a] rounded-[20px] p-4 shadow-lg cursor-pointer hover:brightness-105 transition group"
         >
-            <div className="absolute top-5 left-5 z-10 flex items-center gap-2 bg-white/95 rounded-full pl-1 pr-3 py-1 shadow-md">
+            <div className="absolute top-5 left-5 z-10 flex items-center gap-2 bg-surface/95 rounded-full pl-1 pr-3 py-1 shadow-md">
                 {item.leagueBadge ? (
                     <Image
                         src={item.leagueBadge}
@@ -28,12 +28,12 @@ function Slide({ item }: { item: MotorsportCarouselItem }) {
                         width={24}
                         height={24}
                         unoptimized
-                        className="w-6 h-6 rounded-full object-contain bg-white"
+                        className="w-6 h-6 rounded-full object-contain bg-surface"
                     />
                 ) : (
-                    <span className="w-6 h-6 rounded-full bg-gray-300" />
+                    <span className="w-6 h-6 rounded-full bg-surface-tertiary" />
                 )}
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#212121]">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-text-primary">
                     {item.league}
                 </span>
             </div>
@@ -95,7 +95,7 @@ export default function MotorsportCarousel({ items }: { items: MotorsportCarouse
                             type="button"
                             onClick={prev}
                             aria-label="Previous"
-                            className="absolute left-[-14px] top-1/2 -translate-y-1/2 w-[36px] h-[36px] rounded-full bg-white text-[#af292a] text-[20px] font-bold flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer z-10"
+                            className="absolute left-[-14px] top-1/2 -translate-y-1/2 w-[36px] h-[36px] rounded-full bg-surface text-[#af292a] text-[20px] font-bold flex items-center justify-center shadow-md hover:bg-surface-secondary cursor-pointer z-10"
                         >
                             ‹
                         </button>
@@ -103,7 +103,7 @@ export default function MotorsportCarousel({ items }: { items: MotorsportCarouse
                             type="button"
                             onClick={next}
                             aria-label="Next"
-                            className="absolute right-[-14px] top-1/2 -translate-y-1/2 w-[36px] h-[36px] rounded-full bg-white text-[#af292a] text-[20px] font-bold flex items-center justify-center shadow-md hover:bg-gray-100 cursor-pointer z-10"
+                            className="absolute right-[-14px] top-1/2 -translate-y-1/2 w-[36px] h-[36px] rounded-full bg-surface text-[#af292a] text-[20px] font-bold flex items-center justify-center shadow-md hover:bg-surface-secondary cursor-pointer z-10"
                         >
                             ›
                         </button>
@@ -117,7 +117,7 @@ export default function MotorsportCarousel({ items }: { items: MotorsportCarouse
                         key={i}
                         onClick={() => setIdx(i)}
                         className={`w-[10px] h-[10px] rounded-full transition-colors cursor-pointer ${
-                            i === safeIdx ? "bg-[#af292a]" : "bg-gray-300 hover:bg-gray-400"
+                            i === safeIdx ? "bg-[#af292a]" : "bg-surface-tertiary hover:bg-text-muted"
                         }`}
                         aria-label={`Slide ${i + 1}`}
                     />
