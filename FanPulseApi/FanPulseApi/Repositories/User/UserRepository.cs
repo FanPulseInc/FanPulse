@@ -74,10 +74,16 @@ public class UserRepository : IUserRepository
         return affectedRows > 0;
     }
 
+    public async Task<Models.User?> GetUserByEmailVerificationTokenHashAsync(string tokenHash)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.EmailVerificationTokenHash == tokenHash);
+    }
 
 
 
-public async Task<Models.User?> UpdateUserCategoriesAsync(Guid id, List<Guid> categoryIds)
+
+    public async Task<Models.User?> UpdateUserCategoriesAsync(Guid id, List<Guid> categoryIds)
 {
     var uniqueCategoryIds = categoryIds.Distinct().ToList();
 
@@ -98,6 +104,8 @@ public async Task<Models.User?> UpdateUserCategoriesAsync(Guid id, List<Guid> ca
     {
         throw new ArgumentException("Some categories were not found.");
     }
+
+
 
     user.FavCategories.Clear();
 

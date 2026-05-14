@@ -12,9 +12,11 @@ namespace FanPulseApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly IConfiguration _configuration;
+        public UserController(IUserService userService, IConfiguration configuration)
         {
             _userService = userService;
+            _configuration = configuration;
         }
 
         [HttpPatch("{id:guid}/categories")]
@@ -68,6 +70,21 @@ namespace FanPulseApi.Controllers
             }
             
             return Ok(user);
+        }
+
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string token)
+        {
+            var confirmed = await _userService.ConfirmEmailAsync(token);
+
+            var frontendBaseUrl = _configuration["FrontendBaseUrl"];
+
+            if (!confirmed)
+            {
+                return Redirect($"{frontendBaseUrl}/email-verification-failed");
+            }
+
+            return Redirect($"{frontendBaseUrl}/?auth=email-confirmed");
         }
 
         // POST api/<UserController>

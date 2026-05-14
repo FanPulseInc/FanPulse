@@ -15,10 +15,12 @@ namespace FanPulseApi.Services.Email
         {
             var message = new EmailMessage
             {
-                From = "FanPulse <onboarding@resend.dev>",
+                From = "FanPulse <no-reply@natsukashi.xyz>",
                 To = [to],
                 Subject = subject,
-                HtmlBody = html
+                HtmlBody = html,
+                
+
             };
 
             await _resend.EmailSendAsync(message);
