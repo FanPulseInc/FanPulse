@@ -40,7 +40,7 @@ export default function LastFiveMatches({ home, away, title }: Props) {
 function TeamCard({ side }: { side: LastFiveSide }) {
     const { t } = useT();
     return (
-        <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 p-[16px] flex flex-col">
+        <div className="bg-surface rounded-[20px] shadow-sm border border-border-theme p-[16px] flex flex-col">
             
             <div className="flex items-center gap-[12px]" style={{ marginBottom: 32 }}>
                 {side.teamLogo ? (
@@ -53,7 +53,7 @@ function TeamCard({ side }: { side: LastFiveSide }) {
                         style={{ width: 44, height: 44, objectFit: "contain", flexShrink: 0 }}
                     />
                 ) : (
-                    <div className="w-[44px] h-[44px] rounded-full bg-gray-200 shrink-0" />
+                    <div className="w-[44px] h-[44px] rounded-full bg-surface-tertiary shrink-0" />
                 )}
                 <span className="text-[#af292a] font-bold text-[16px] uppercase tracking-wider truncate">
                     {side.teamName}
@@ -61,7 +61,7 @@ function TeamCard({ side }: { side: LastFiveSide }) {
             </div>
 
             {side.rows.length === 0 ? (
-                <div className="text-center text-gray-400 text-xs py-4">
+                <div className="text-center text-text-muted text-xs py-4">
                     {t("no_previous_matches")}
                 </div>
             ) : (
@@ -95,10 +95,10 @@ function MatchRow({ row }: { row: LastFiveRow }) {
                     style={{ width: 20, height: 20, objectFit: "contain", flexShrink: 0 }}
                 />
             ) : (
-                <div className="w-[20px] h-[20px] rounded-full bg-gray-200 shrink-0" />
+                <div className="w-[20px] h-[20px] rounded-full bg-surface-tertiary shrink-0" />
             )}
             
-            <span className="flex-1 min-w-0 text-[#212121] text-[13px] font-medium truncate">
+            <span className="flex-1 min-w-0 text-text-primary text-[13px] font-medium truncate">
                 {row.opponentName}
             </span>
             

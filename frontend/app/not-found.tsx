@@ -3,18 +3,18 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-white px-6">
+    <main className="min-h-screen flex items-center justify-center bg-surface px-6">
       <section className="w-full max-w-5xl flex flex-col-reverse md:flex-row items-center justify-between gap-10">
         <div className="text-center md:text-left">
           <h1 className="text-7xl md:text-8xl font-bold text-brand-red">
             404
           </h1>
 
-          <h2 className="mt-4 text-3xl md:text-4xl font-semibold text-gray-900">
+          <h2 className="mt-4 text-3xl md:text-4xl font-semibold text-text-primary">
             Сторінку не знайдено
           </h2>
 
-          <p className="mt-4 max-w-md text-gray-500 text-lg">
+          <p className="mt-4 max-w-md text-text-secondary text-lg">
             Сторінка, яку ви шукаєте, не існує або була переміщена.
           </p>
 

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { ICONS } from "@/app/svg"
 import { usePostApiUser } from "@/services/api/generated"
 import { useT } from "@/services/i18n/context"
@@ -7,6 +8,7 @@ import { saveFavCategoryIds } from "@/services/useFavCategories"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import CategorySelectModal from "./CategorySelectModal"
+import PasswordHelper from "./PasswordHelper"
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google"
 import { useUserStore } from "@/store/useUserStore"
 
@@ -41,6 +43,18 @@ const Register = () => {
 
     if (!password.trim()) {
       setFormError(t("auth_error_password_required"))
+      return false
+    }
+
+    const pwValid =
+      password.length >= 8 &&
+      /[A-Z]/.test(password) &&
+      /[0-9]/.test(password) &&
+      /[^a-zA-Z0-9]/.test(password) &&
+      [...password].every((c) => c.charCodeAt(0) > 32 && c.charCodeAt(0) < 128)
+
+    if (!pwValid) {
+      setFormError(t("auth_error_password_weak"))
       return false
     }
 
@@ -221,7 +235,7 @@ const Register = () => {
     <>
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-[370px] h-auto bg-white rounded-[20px] py-10 p-8 flex flex-col gap-4 shadow-sm"
+        className="w-[370px] h-auto bg-surface rounded-[20px] py-10 p-8 flex flex-col gap-4 shadow-sm"
       >
         <h1 className="text-h1 text-brand-black text-left">{t("auth_register")}</h1>
 
@@ -254,6 +268,7 @@ const Register = () => {
               {ICONS.EYE}
             </button>
           </div>
+          <PasswordHelper password={password} />
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -317,9 +332,9 @@ const Register = () => {
 
         <span className="mt-6 text-body-s text-brand-black/80 leading-tight">
           {t("auth_consent_text")}{" "}
-          <span className="text-brand-red cursor-pointer hover:underline">
+          <Link href="/info/privacy" className="text-brand-red cursor-pointer hover:underline">
             {t("auth_privacy_policy")}
-          </span>{" "}
+          </Link>{" "}
           {t("auth_consent_and")}{" "}
           <span className="text-brand-red cursor-pointer hover:underline">
             {t("auth_terms")}

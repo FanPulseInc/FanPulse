@@ -96,7 +96,7 @@ export default function LikeButton({ targetId, variant, kind, knownLikeId, onErr
 
     const liked = !!hasLiked;
     const icon = variant === "white" ? ICONS.LikeWhite : ICONS.LikeBlack;
-    const textColor = variant === "white" ? "text-white" : "text-[#212121]";
+    const textColor = variant === "white" ? "text-white" : "text-text-primary";
 
     return (
         <button

@@ -20,7 +20,7 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Props
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-[400px] bg-white rounded-[20px] p-6 flex flex-col gap-4 shadow-xl">
+      <div className="w-[400px] bg-surface rounded-[20px] p-6 flex flex-col gap-4 shadow-xl">
         
         <h2 className="text-xl font-bold text-brand-red">
           {t("delete_account_title")}
@@ -44,7 +44,7 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Props
         <div className="flex gap-3 mt-2">
           <button
             onClick={onClose}
-            className="flex-1 h-[45px] rounded-[12px] border border-gray-300 hover:bg-gray-100"
+            className="flex-1 h-[45px] rounded-[12px] border border-border-theme hover:bg-surface-secondary"
           >
             {t("cancel")}
           </button>
@@ -58,7 +58,7 @@ export default function DeleteAccountModal({ isOpen, onClose, onConfirm }: Props
             className={`flex-1 h-[45px] rounded-[12px] text-white transition ${
               isValid
                 ? "bg-red-600 hover:opacity-90"
-                : "bg-gray-300 cursor-not-allowed"
+                : "bg-surface-tertiary cursor-not-allowed"
             }`}
           >
             {t("delete")}

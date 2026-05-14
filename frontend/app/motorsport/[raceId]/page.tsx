@@ -519,13 +519,13 @@ export default function MotorsportRacePage() {
 
                 <div className="flex-1 min-w-0 p-5 flex flex-col gap-4">
                     {eventLoading && (
-                        <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
+                        <div className="text-center text-text-secondary text-sm py-10 bg-surface rounded-[20px]">
                             {t("loading_races")}...
                         </div>
                     )}
 
                     {!eventLoading && !event && (
-                        <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
+                        <div className="text-center text-text-secondary text-sm py-10 bg-surface rounded-[20px]">
                             {t("race_not_found")}
                         </div>
                     )}

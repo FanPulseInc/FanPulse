@@ -24,13 +24,13 @@ function quarterLabel(q: 1 | 2 | 3 | 4 | 5): string {
 function PlayCell({ play }: { play: ScoringPlay }) {
     return (
         <div className="flex items-center gap-2">
-            <span className="text-[13px] font-data text-[#212121]/70 tabular-nums">
+            <span className="text-[13px] font-data text-text-primary/70 tabular-nums">
                 {play.minute}
             </span>
             <span className="bg-[#af292a] text-white px-2 py-[2px] rounded-[6px] text-[12px] font-bold tabular-nums">
                 {play.homeScoreAfter}-{play.awayScoreAfter}
             </span>
-            <span className="text-[13px] font-medium text-[#212121] truncate">
+            <span className="text-[13px] font-medium text-text-primary truncate">
                 {play.playerName}
             </span>
         </div>
@@ -42,7 +42,7 @@ export default function ScoringTimeline({ plays, title }: Props) {
     const displayTitle = title ?? t("attack");
     if (!plays || plays.length === 0) {
         return (
-            <div className="w-full p-[20px] bg-[#f8f8f8] rounded-[20px] flex flex-col gap-[10px]">
+            <div className="w-full p-[20px] bg-surface-secondary rounded-[20px] flex flex-col gap-[10px]">
                 <div className="w-full flex justify-center mb-[4px]">
                     <div className="min-w-[220px] h-[42px] px-8 bg-[#af292a] rounded-[10px] flex items-center justify-center">
                         <span className="text-white font-bold text-[16px] uppercase tracking-wider">
@@ -50,7 +50,7 @@ export default function ScoringTimeline({ plays, title }: Props) {
                         </span>
                     </div>
                 </div>
-                <div className="text-center text-gray-400 text-sm py-6">
+                <div className="text-center text-text-muted text-sm py-6">
                     {t("no_scoring")}
                 </div>
             </div>
@@ -67,7 +67,7 @@ export default function ScoringTimeline({ plays, title }: Props) {
     const orderedQuarters = Array.from(groupsByQ.keys()).sort((a, b) => b - a) as (1 | 2 | 3 | 4 | 5)[];
 
     return (
-        <div className="w-full p-[20px] bg-[#f8f8f8] rounded-[20px] flex flex-col gap-[10px]">
+        <div className="w-full p-[20px] bg-surface-secondary rounded-[20px] flex flex-col gap-[10px]">
             <div className="w-full flex justify-center mb-[4px]">
                 <div className="min-w-[220px] h-[42px] px-8 bg-[#af292a] rounded-[10px] flex items-center justify-center">
                     <span className="text-white font-bold text-[16px] uppercase tracking-wider">

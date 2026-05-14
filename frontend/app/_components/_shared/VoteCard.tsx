@@ -23,13 +23,13 @@ export default function VoteCard({
     ];
 
     return (
-        <div className="w-full bg-[#e6e6e6] rounded-[20px] p-4 flex flex-col gap-3">
+        <div className="w-full bg-background rounded-[20px] p-4 flex flex-col gap-3">
             <div className="flex items-center justify-between">
                 <div>
-                    <div className="text-[14px] font-bold text-[#212121] leading-tight">
+                    <div className="text-[14px] font-bold text-text-primary leading-tight">
                         {current ? t("vote_fan_opinion") : t("vote_who_wins")}
                     </div>
-                    <div className="text-[11px] text-[#212121]/60">
+                    <div className="text-[11px] text-text-primary/60">
                         {current ? t("vote_retract") : t("vote_cast")}
                     </div>
                 </div>
@@ -50,7 +50,7 @@ export default function VoteCard({
                             key={opt.key}
                             type="button"
                             onClick={(e) => { e.stopPropagation(); cast(matchId, opt.key); }}
-                            className="h-[42px] rounded-full text-[14px] font-bold transition-colors cursor-pointer bg-white text-[#212121] hover:bg-white/80"
+                            className="h-[42px] rounded-full text-[14px] font-bold transition-colors cursor-pointer bg-surface text-text-primary hover:bg-surface/80"
                             title={t("vote_cast")}
                         >
                             {opt.label}
@@ -121,9 +121,9 @@ function VoteResults({
                         className="group w-full text-left cursor-pointer"
                         title={active ? t("vote_retract") : ""}
                     >
-                        <div className="flex items-center gap-2 text-[12px] font-bold text-[#212121] mb-[2px]">
+                        <div className="flex items-center gap-2 text-[12px] font-bold text-text-primary mb-[2px]">
                             <span className={`inline-flex items-center justify-center w-[22px] h-[22px] rounded-full text-[11px] ${
-                                active ? "bg-[#af292a] text-white" : "bg-white text-[#212121]"
+                                active ? "bg-[#af292a] text-white" : "bg-surface text-text-primary"
                             }`}>
                                 {opt.label}
                             </span>
@@ -132,7 +132,7 @@ function VoteResults({
                             </span>
                             <span className="font-data">{value}%</span>
                         </div>
-                        <div className="w-full h-[8px] rounded-full bg-white overflow-hidden">
+                        <div className="w-full h-[8px] rounded-full bg-surface overflow-hidden">
                             <div
                                 className={`h-full rounded-full transition-all ${active ? "bg-[#af292a]" : "bg-[#212121]/40"}`}
                                 style={{ width: `${value}%` }}

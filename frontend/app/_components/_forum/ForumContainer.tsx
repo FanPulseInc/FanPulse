@@ -1,6 +1,6 @@
 export const ForumContainer = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div className="w-full min-h-screen bg-[#E6E6E6] py-10">
+        <div className="w-full min-h-screen bg-background py-10">
             <div className="mx-auto grid max-w-[1540px] grid-cols-[220px_1039px_220px] gap-6 px-4 items-start">
 
                 <aside className="hidden 2xl:block sticky top-[120px]">

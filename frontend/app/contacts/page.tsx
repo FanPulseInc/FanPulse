@@ -15,7 +15,7 @@ export default function ContactPage() {
                 rounded-[32px]
                 border-2 border-brand-red
 
-                bg-white
+                bg-surface
 
                 p-8 md:p-12
 
@@ -41,11 +41,11 @@ export default function ContactPage() {
                         FanPulse Support
                     </div>
 
-                    <h1 className="text-3xl font-black uppercase text-[#212121] md:text-5xl">
+                    <h1 className="text-3xl font-black uppercase text-text-primary md:text-5xl">
                         {t("contact_title")}
                     </h1>
 
-                    <p className="mt-4 max-w-[760px] text-sm leading-relaxed text-[#212121]/55 md:text-base">
+                    <p className="mt-4 max-w-[760px] text-sm leading-relaxed text-text-primary/55 md:text-base">
                         {t("contact_intro")}
                     </p>
                 </div>
@@ -57,19 +57,19 @@ export default function ContactPage() {
                     <section
                         className="
                         rounded-[28px]
-                        border border-black/5
-                        bg-[#f7f7f7]
+                        border border-border-theme
+                        bg-surface-secondary
 
                         p-8
 
                         shadow-sm
                         "
                     >
-                        <h2 className="text-2xl font-black leading-tight text-[#212121] md:text-4xl">
+                        <h2 className="text-2xl font-black leading-tight text-text-primary md:text-4xl">
                             {t("contact_heading")}
                         </h2>
 
-                        <div className="mt-8 flex flex-col gap-5 text-[15px] leading-relaxed text-[#212121]/75">
+                        <div className="mt-8 flex flex-col gap-5 text-[15px] leading-relaxed text-text-primary/75">
                             <p>{t("contact_text_1")}</p>
 
                             <p>
@@ -102,7 +102,7 @@ export default function ContactPage() {
                         "
                     >
                         {/* glow */}
-                        <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-3xl" />
+                        <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-surface/10 blur-3xl" />
 
                         <div className="relative z-10 flex h-full flex-col justify-between">
 
@@ -114,7 +114,7 @@ export default function ContactPage() {
 
                                     rounded-full
                                     border border-white/20
-                                    bg-white/10
+                                    bg-surface/10
 
                                     px-4 py-2
 
@@ -140,7 +140,7 @@ export default function ContactPage() {
                                 <div
                                     className="
                                     rounded-[20px]
-                                    bg-white/10
+                                    bg-surface/10
 
                                     px-5 py-4
 

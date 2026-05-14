@@ -15,7 +15,7 @@ export default function CookiesPolicyPage() {
                 rounded-[32px]
                 border-2 border-brand-red
 
-                bg-white
+                bg-surface
 
                 p-8 md:p-12
 
@@ -41,11 +41,11 @@ export default function CookiesPolicyPage() {
                         FanPulse Legal
                     </div>
 
-                    <h1 className="text-3xl font-black text-[#212121] md:text-5xl">
+                    <h1 className="text-3xl font-black text-text-primary md:text-5xl">
                         {t("cookies_title")}
                     </h1>
 
-                    <p className="mt-4 max-w-[760px] text-sm leading-relaxed text-[#212121]/55 md:text-base">
+                    <p className="mt-4 max-w-[760px] text-sm leading-relaxed text-text-primary/55 md:text-base">
                         {t("cookies_intro")}
                     </p>
                 </div>
@@ -55,22 +55,22 @@ export default function CookiesPolicyPage() {
 
                     {/* SECTION */}
                     <section className="flex flex-col gap-4">
-                        <h2 className="text-2xl font-black text-[#212121]">
+                        <h2 className="text-2xl font-black text-text-primary">
                             1. {t("cookies_what_title")}
                         </h2>
 
-                        <p className="text-[15px] leading-relaxed text-[#212121]/70">
+                        <p className="text-[15px] leading-relaxed text-text-primary/70">
                             {t("cookies_what_text")}
                         </p>
                     </section>
 
                     {/* SECTION */}
                     <section className="flex flex-col gap-5">
-                        <h2 className="text-2xl font-black text-[#212121]">
+                        <h2 className="text-2xl font-black text-text-primary">
                             2. {t("cookies_usage_title")}
                         </h2>
 
-                        <p className="text-[15px] leading-relaxed text-[#212121]/70">
+                        <p className="text-[15px] leading-relaxed text-text-primary/70">
                             {t("cookies_usage_text")}
                         </p>
 
@@ -81,8 +81,8 @@ export default function CookiesPolicyPage() {
                             <div
                                 className="
                                 rounded-[24px]
-                                border border-black/5
-                                bg-[#f7f7f7]
+                                border border-border-theme
+                                bg-surface-secondary
 
                                 p-6
 
@@ -106,7 +106,7 @@ export default function CookiesPolicyPage() {
                                     {t("cookies_required")}
                                 </div>
 
-                                <ul className="flex flex-col gap-3 text-sm text-[#212121]/70">
+                                <ul className="flex flex-col gap-3 text-sm text-text-primary/70">
                                     <li>• {t("cookies_required_1")}</li>
                                     <li>• {t("cookies_required_2")}</li>
                                     <li>• {t("cookies_required_3")}</li>
@@ -117,8 +117,8 @@ export default function CookiesPolicyPage() {
                             <div
                                 className="
                                 rounded-[24px]
-                                border border-black/5
-                                bg-[#f7f7f7]
+                                border border-border-theme
+                                bg-surface-secondary
 
                                 p-6
 
@@ -142,7 +142,7 @@ export default function CookiesPolicyPage() {
                                     {t("cookies_analytics")}
                                 </div>
 
-                                <ul className="flex flex-col gap-3 text-sm text-[#212121]/70">
+                                <ul className="flex flex-col gap-3 text-sm text-text-primary/70">
                                     <li>• {t("cookies_analytics_1")}</li>
                                     <li>• {t("cookies_analytics_2")}</li>
                                     <li>• {t("cookies_analytics_3")}</li>
@@ -153,8 +153,8 @@ export default function CookiesPolicyPage() {
                             <div
                                 className="
                                 rounded-[24px]
-                                border border-black/5
-                                bg-[#f7f7f7]
+                                border border-border-theme
+                                bg-surface-secondary
 
                                 p-6
 
@@ -168,7 +168,7 @@ export default function CookiesPolicyPage() {
 
                                     rounded-full
                                     border border-brand-red
-                                    bg-white
+                                    bg-surface
 
                                     px-4 py-2
 
@@ -179,7 +179,7 @@ export default function CookiesPolicyPage() {
                                     {t("cookies_functional")}
                                 </div>
 
-                                <ul className="flex flex-col gap-3 text-sm text-[#212121]/70">
+                                <ul className="flex flex-col gap-3 text-sm text-text-primary/70">
                                     <li>• {t("cookies_functional_1")}</li>
                                     <li>• {t("cookies_functional_2")}</li>
                                     <li>• {t("cookies_functional_3")}</li>
@@ -190,15 +190,15 @@ export default function CookiesPolicyPage() {
 
                     {/* SECTION */}
                     <section className="flex flex-col gap-4">
-                        <h2 className="text-2xl font-black text-[#212121]">
+                        <h2 className="text-2xl font-black text-text-primary">
                             3. {t("cookies_third_party_title")}
                         </h2>
 
-                        <p className="text-[15px] leading-relaxed text-[#212121]/70">
+                        <p className="text-[15px] leading-relaxed text-text-primary/70">
                             {t("cookies_third_party_text")}
                         </p>
 
-                        <ul className="flex flex-col gap-3 text-[15px] text-[#212121]/70">
+                        <ul className="flex flex-col gap-3 text-[15px] text-text-primary/70">
                             <li>• {t("cookies_third_party_1")}</li>
                             <li>• {t("cookies_third_party_2")}</li>
                             <li>• {t("cookies_third_party_3")}</li>
@@ -207,15 +207,15 @@ export default function CookiesPolicyPage() {
 
                     {/* SECTION */}
                     <section className="flex flex-col gap-4">
-                        <h2 className="text-2xl font-black text-[#212121]">
+                        <h2 className="text-2xl font-black text-text-primary">
                             4. {t("cookies_manage_title")}
                         </h2>
 
-                        <p className="text-[15px] leading-relaxed text-[#212121]/70">
+                        <p className="text-[15px] leading-relaxed text-text-primary/70">
                             {t("cookies_manage_text")}
                         </p>
 
-                        <ul className="flex flex-col gap-3 text-[15px] text-[#212121]/70">
+                        <ul className="flex flex-col gap-3 text-[15px] text-text-primary/70">
                             <li>• {t("cookies_manage_1")}</li>
                             <li>• {t("cookies_manage_2")}</li>
                             <li>• {t("cookies_manage_3")}</li>
@@ -224,11 +224,11 @@ export default function CookiesPolicyPage() {
 
                     {/* SECTION */}
                     <section className="flex flex-col gap-4">
-                        <h2 className="text-2xl font-black text-[#212121]">
+                        <h2 className="text-2xl font-black text-text-primary">
                             5. {t("cookies_changes_title")}
                         </h2>
 
-                        <p className="text-[15px] leading-relaxed text-[#212121]/70">
+                        <p className="text-[15px] leading-relaxed text-text-primary/70">
                             {t("cookies_changes_text")}
                         </p>
                     </section>

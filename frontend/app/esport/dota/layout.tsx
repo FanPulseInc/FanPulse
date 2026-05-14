@@ -166,7 +166,7 @@ export default function DotaLayout({ children }: { children: ReactNode }) {
     <div className="flex items-start justify-start gap-6">
       <div className="p-10">
         {loading ? (
-          <div className="w-[560px] rounded-[20px] bg-[#f8f8f8] py-10 text-center text-sm text-gray-400">
+          <div className="w-[560px] rounded-[20px] bg-surface-secondary py-10 text-center text-sm text-text-muted">
             Завантаження...
           </div>
         ) : (
@@ -184,7 +184,7 @@ export default function DotaLayout({ children }: { children: ReactNode }) {
       </div>
 
       <div className="min-w-0 flex-1 p-5">
-        <div className="min-h-[500px] w-full overflow-hidden rounded-[20px] border border-gray-200 bg-zinc-200 shadow-sm">
+        <div className="min-h-[500px] w-full overflow-hidden rounded-[20px] border border-border-theme bg-zinc-200 shadow-sm">
           {children}
         </div>
       </div>
