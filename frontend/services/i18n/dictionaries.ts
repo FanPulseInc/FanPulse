@@ -482,6 +482,13 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
             "Я погоджуюся з обробкою персональних даних",
 
         advertising_submit: "Надіслати повідомлення",
+        email_confirmed_title: "Email підтверджено",
+        email_confirmed_text: "Вашу електронну пошту успішно підтверджено. Тепер ви можете увійти до акаунта FanPulse.",
+        email_confirmed_button: "Продовжити",
+
+        email_confirm_failed_title: "Підтвердження не вдалося",
+        email_confirm_failed_text: "Посилання для підтвердження недійсне або термін його дії минув. Спробуйте зареєструватися ще раз або запросити новий лист.",
+        email_confirm_failed_button: "Закрити",
     },
     en: {
         nav_home: "HOME",
@@ -963,6 +970,14 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
             "I agree to the processing of personal data",
 
         advertising_submit: "Send message",
+
+        email_confirmed_title: "Email confirmed",
+        email_confirmed_text: "Your email has been successfully confirmed. You can now log in to your FanPulse account.",
+        email_confirmed_button: "Continue",
+
+        email_confirm_failed_title: "Confirmation failed",
+        email_confirm_failed_text: "The confirmation link is invalid or has expired. Please try registering again or request a new email.",
+        email_confirm_failed_button: "Close",
 
 
     },

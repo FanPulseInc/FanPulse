@@ -18,26 +18,27 @@ public class UserService: IUserService
     private readonly IValidator<UserAddRequest> _validator;
     private readonly IValidator<UserUpdateRequest> _updateValidator;
     private readonly IEmailSender _emailSender;
+    private readonly IConfiguration _configuration;
 
     public UserService(
-    IUserRepository repository,
-    IPasswordHasher passwordHasher,
-    ICategoryRepository categoryRepository,
-    IValidator<UserAddRequest> validator,
-    IValidator<UserUpdateRequest> updateValidator,
-    IEmailSender emailSender)
+     IUserRepository repository,
+     IValidator<UserAddRequest> validator,
+     IPasswordHasher passwordHasher,
+     ICategoryRepository categoryRepository,
+     IEmailSender emailSender,
+     IConfiguration configuration)
     {
         _repository = repository;
+        _validator = validator;
         _passwordHasher = passwordHasher;
         _categoryRepository = categoryRepository;
-        _validator = validator;
-        _updateValidator = updateValidator;
         _emailSender = emailSender;
+        _configuration = configuration;
     }
 
     //Get
 
-   public async Task<UserResponse?> GetUserByIdAsync(Guid id)
+    public async Task<UserResponse?> GetUserByIdAsync(Guid id)
 {
     var user = await _repository.GetUserByIdAsync(id);
 
@@ -154,19 +155,156 @@ public class UserService: IUserService
 
         var createdUser = await _repository.CreateUserAsync(user);
 
-        //var confirmUrl =
-        //    $"http://localhost:5195/api/User/confirm-email?token={rawEmailVerificationToken}";
+        var appBaseUrl = _configuration["AppBaseUrl"];
 
-        //await _emailSender.SendEmailAsync(
-        //    createdUser.Email,
-        //    "Підтвердження реєстрації FanPulse",
-        //    $@"
-        //    <h2>Підтвердіть вашу електронну пошту</h2>
-        //    <p>Для завершення реєстрації натисніть на посилання нижче:</p>
-        //    <a href=""{confirmUrl}"">Підтвердити email</a>
-        //    <p>Посилання дійсне 24 години.</p>
-        //"
-        //);
+        var confirmUrl =
+            $"{appBaseUrl}/api/User/confirm-email?token={rawEmailVerificationToken}";
+
+        await _emailSender.SendEmailAsync(
+            createdUser.Email,
+            "Підтвердження реєстрації FanPulse",
+            $@"
+<!DOCTYPE html>
+<html lang=""uk"">
+  <body style=""margin:0;padding:0;background:#e6e6e6;font-family:Arial,sans-serif;"">
+    <table width=""100%"" cellpadding=""0"" cellspacing=""0"">
+      <tr>
+        <td align=""center"" style=""padding:40px 16px;"">
+          <table
+            width=""100%""
+            cellpadding=""0""
+            cellspacing=""0""
+            style=""
+              max-width:620px;
+              background:#ffffff;
+              border-radius:28px;
+              overflow:hidden;
+              border:3px solid #af292a;
+            ""
+          >
+            <tr>
+              <td
+                align=""center""
+                style=""
+                  background:#af292a;
+                  padding:42px 20px;
+                ""
+              >
+                <div
+                  style=""
+                    display:inline-block;
+                    margin-bottom:28px;
+                    font-family:Arial,sans-serif;
+                    font-size:48px;
+                    line-height:1;
+                    font-weight:900;
+                    font-style:italic;
+                    letter-spacing:-2px;
+                    color:#212121;
+                  ""
+                >
+                  FP
+                  <span style=""margin-left:10px;""> FanPulse </span>
+                </div>
+
+                <img
+                  src=""https://main.d2pc57axofhk5v.amplifyapp.com/icons/fox.png""
+                  alt=""FanPulse Fox""
+                  width=""180""
+                  style=""
+                    display:block;
+                    filter:drop-shadow(0 10px 24px rgba(0,0,0,0.25));
+                  ""
+                />
+              </td>
+            </tr>
+
+            <tr>
+              <td style=""padding:40px 36px;"">
+                <h1
+                  style=""
+                    margin:0 0 18px;
+                    color:#212121;
+                    font-size:34px;
+                    line-height:1.1;
+                    font-weight:900;
+                    text-transform:uppercase;
+                  ""
+                >
+                  Підтвердіть вашу пошту
+                </h1>
+
+                <p
+                  style=""
+                    margin:0 0 28px;
+                    color:#212121cc;
+                    font-size:16px;
+                    line-height:1.7;
+                  ""
+                >
+                  Дякуємо за реєстрацію у FanPulse.
+                  Для завершення створення акаунта підтвердіть вашу електронну адресу.
+                </p>
+
+                <a
+                  href=""{confirmUrl}""
+                  style=""
+                    display:inline-block;
+                    background:#af292a;
+                    color:#ffffff;
+                    padding:16px 34px;
+                    border-radius:999px;
+                    font-size:14px;
+                    font-weight:800;
+                    text-decoration:none;
+                    text-transform:uppercase;
+                    letter-spacing:0.06em;
+                  ""
+                >
+                  Підтвердити Email
+                </a>
+
+                <p
+                  style=""
+                    margin:32px 0 0;
+                    color:#21212188;
+                    font-size:13px;
+                    line-height:1.7;
+                  ""
+                >
+                  Посилання дійсне протягом 24 годин.
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style=""
+                  padding:24px 36px;
+                  background:#212121;
+                ""
+              >
+                <p
+                  style=""
+                    margin:0;
+                    color:#ffffff99;
+                    font-size:12px;
+                    line-height:1.6;
+                    text-align:center;
+                  ""
+                >
+                  FanPulse © 2026 · Sports & Esports Community Platform
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+"
+        );
 
         return createdUser.ToDto();
     }
@@ -237,7 +375,47 @@ public class UserService: IUserService
     }
 
     //Delete
-    
+
+    public async Task<bool> ConfirmEmailAsync(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            return false;
+        }
+
+        var tokenHash = Convert.ToBase64String(
+            SHA256.HashData(Encoding.UTF8.GetBytes(token))
+        );
+
+        var user = await _repository.GetUserByEmailVerificationTokenHashAsync(tokenHash);
+
+        if (user == null)
+        {
+            return false;
+        }
+
+        if (user.EmailVerificationTokenExpiresAt == null ||
+            user.EmailVerificationTokenExpiresAt < DateTimeOffset.UtcNow)
+        {
+            return false;
+        }
+
+        if (user.IsVerifiedUser)
+        {
+            return true;
+        }
+
+        user.IsVerifiedUser = true;
+        user.EmailVerificationTokenHash = null;
+        user.EmailVerificationTokenExpiresAt = null;
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+        user.UpdatedBy = "email-confirmation";
+
+        await _repository.UpdateUserAsync(user);
+
+        return true;
+    }
+
     public async Task<UserResponse?> DeleteUserAsync(Guid id)
     {
         var user = await _repository.GetUserByIdAsync(id);

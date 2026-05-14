@@ -21,4 +21,6 @@ public interface IUserService
 
     Task<UserResponse?> UpdateUserCategoriesAsync(Guid id,UserCategoriesUpdateRequest request);
 
+    Task<bool> ConfirmEmailAsync(string token);
+
 }
