@@ -21,9 +21,9 @@ const Footer = () => {
 
   const anotherItems = [
     { label: t("contacts"), href: "/contacts" },
-    { label: t("privacy"), href: "/privacy" },
+    { label: t("privacy"), href: "/info/privacy" },
     { label: t("cookies"), href: "/info/cookies" },
-    { label: t("accessibility"), href: "/accessibility" },
+    { label: t("accessibility"), href: "/info/accessibility" },
     { label: t("ads"), href: "/ads" },
   ];
 
