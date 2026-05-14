@@ -271,13 +271,13 @@ export default function BasketballMatchPage() {
 
                 <div className="flex-1 min-w-0 p-5 flex flex-col gap-4">
                     {eventLoading && (
-                        <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
+                        <div className="text-center text-text-secondary text-sm py-10 bg-surface rounded-[20px]">
                             {t("loading_match")}
                         </div>
                     )}
 
                     {!eventLoading && !event && (
-                        <div className="text-center text-gray-500 text-sm py-10 bg-white rounded-[20px]">
+                        <div className="text-center text-text-secondary text-sm py-10 bg-surface rounded-[20px]">
                             {t("match_not_found")}
                         </div>
                     )}
@@ -300,14 +300,14 @@ export default function BasketballMatchPage() {
                     )}
 
                     {event && (
-                        <div className="w-full h-[42px] px-4 bg-white rounded-[14px] border border-gray-200 flex items-center justify-between shadow-sm">
+                        <div className="w-full h-[42px] px-4 bg-surface rounded-[14px] border border-border-theme flex items-center justify-between shadow-sm">
                             <button
                                 type="button"
                                 onClick={() => toggleTeam(event.idHomeTeam ?? undefined)}
                                 className={`text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors ${
                                     isTeamFav(event.idHomeTeam ?? undefined)
                                         ? "text-[#af292a]"
-                                        : "text-gray-400 hover:text-[#af292a]"
+                                        : "text-text-muted hover:text-[#af292a]"
                                 }`}
                                 title={t("favourite_team")}
                             >
@@ -319,7 +319,7 @@ export default function BasketballMatchPage() {
                                 type="button"
                                 onClick={() => toggleMatch(matchId)}
                                 className={`text-[13px] font-bold flex items-center gap-1 cursor-pointer transition-colors ${
-                                    isMatchFav(matchId) ? "text-[#af292a]" : "text-gray-400 hover:text-[#af292a]"
+                                    isMatchFav(matchId) ? "text-[#af292a]" : "text-text-muted hover:text-[#af292a]"
                                 }`}
                                 title={t("favourite_match")}
                             >
@@ -333,7 +333,7 @@ export default function BasketballMatchPage() {
                                 className={`text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors ${
                                     isTeamFav(event.idAwayTeam ?? undefined)
                                         ? "text-[#af292a]"
-                                        : "text-gray-400 hover:text-[#af292a]"
+                                        : "text-text-muted hover:text-[#af292a]"
                                 }`}
                                 title={t("favourite_team")}
                             >
@@ -353,7 +353,7 @@ export default function BasketballMatchPage() {
 
                     {(featured?.status === "live" || featured?.status === "finished") && (
                         <div className="w-full h-[78px] p-[16px] bg-[#212121] rounded-[20px] flex items-center justify-between">
-                            <span className="w-[65px] h-[35px] pt-[2px] pr-[7px] pb-[2px] pl-[8px] bg-[#f8f8f8] rounded-[8px] flex flex-row justify-center items-center gap-[10px]">
+                            <span className="w-[65px] h-[35px] pt-[2px] pr-[7px] pb-[2px] pl-[8px] bg-surface-secondary rounded-[8px] flex flex-row justify-center items-center gap-[10px]">
                                 <span
                                     className="text-[16px] font-bold leading-[30px] tracking-normal text-center text-[#af292a]"
                                     style={{ fontFamily: "'Space Grotesk', sans-serif" }}

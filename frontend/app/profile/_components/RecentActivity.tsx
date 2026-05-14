@@ -57,7 +57,7 @@ export default function RecentActivity({ user }: { user?: UserWithActivity | nul
 
       <div className="flex flex-col gap-3">
         {!user?.recentActivities || user.recentActivities.length === 0 ? (
-          <div className="w-full min-h-[70px] bg-gray-50 border-2 border-brand-red/30 rounded-[20px] flex items-center justify-center px-6">
+          <div className="w-full min-h-[70px] bg-surface-secondary border-2 border-brand-red/30 rounded-[20px] flex items-center justify-center px-6">
             
             <span className="text-[14px] text-brand-black/50 font-medium">
               {t("activity_empty")}
@@ -67,7 +67,7 @@ export default function RecentActivity({ user }: { user?: UserWithActivity | nul
           user.recentActivities.map((item: UserActivityDto, index: number) => (
             <div
               key={index}
-              className="w-full min-h-[70px] bg-gray-50 border-2 border-brand-red rounded-[20px] flex flex-row items-center px-6 gap-4 hover:bg-brand-red/5 transition-colors cursor-pointer group"
+              className="w-full min-h-[70px] bg-surface-secondary border-2 border-brand-red rounded-[20px] flex flex-row items-center px-6 gap-4 hover:bg-brand-red/5 transition-colors cursor-pointer group"
             >
               <div className="flex flex-1 items-center justify-between">
                 <div className="flex flex-row gap-6 items-center">

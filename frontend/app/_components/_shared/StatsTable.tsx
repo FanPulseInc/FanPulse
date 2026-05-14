@@ -93,17 +93,17 @@ function Row({ row, lang }: { row: StatRow; lang: string }) {
     const label = lang === "en" ? (STAT_LABEL_EN[row.label] ?? row.label) : row.label;
     return (
         <div className="grid grid-cols-3 items-center py-[10px] justify-items-center">
-            <span className="w-[60px] sm:w-[87px] h-[19px] bg-[#d9d9d9] rounded-[6px] flex justify-center items-center text-[#212121] font-data font-bold text-[12px] leading-none"
+            <span className="w-[60px] sm:w-[87px] h-[19px] bg-[#d9d9d9] rounded-[6px] flex justify-center items-center text-text-primary font-data font-bold text-[12px] leading-none"
                   style={{ fontFamily: "'Roboto Mono'", fontSize: "16px", fontWeight: 500, lineHeight: "30px",letterSpacing: "0em", textAlign: "center", color: "#212121" }}>
                 {row.home}
             </span>
             <span
-                className="text-center text-[#212121] font-bold text-[12px] sm:text-[16px] px-1"
+                className="text-center text-text-primary font-bold text-[12px] sm:text-[16px] px-1"
                 style={{ fontFamily: "'Space Grotesk', sans-serif", lineHeight: "1.2", letterSpacing: "0em" }}
             >
                 {label}
             </span>
-            <span className="w-[60px] sm:w-[87px] h-[19px] bg-[#d9d9d9] rounded-[6px] flex justify-center items-center text-[#212121] font-data font-bold text-[12px] leading-none"
+            <span className="w-[60px] sm:w-[87px] h-[19px] bg-[#d9d9d9] rounded-[6px] flex justify-center items-center text-text-primary font-data font-bold text-[12px] leading-none"
                   style={{ fontFamily: "'Roboto Mono'", fontSize: "16px", fontWeight: 500, lineHeight: "30px",letterSpacing: "0em", textAlign: "center", color: "#212121" }}>
                 {row.away}
             </span>
@@ -136,7 +136,7 @@ export default function StatsTable({ rows, labels, title }: { rows: StatRow[]; l
     if (filtered.length === 0) return null;
 
     return (
-        <div className="w-full p-[20px] bg-[#f8f8f8] rounded-[20px] flex flex-col gap-[10px]">
+        <div className="w-full p-[20px] bg-surface-secondary rounded-[20px] flex flex-col gap-[10px]">
             <div className="w-full flex justify-center mb-[4px]">
                 <div className="min-w-[220px] h-[42px] px-8 bg-[#af292a] rounded-[10px] flex items-center justify-center">
                     <span className="text-white font-bold text-[16px] uppercase tracking-wider">

@@ -3,6 +3,6 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 
 cd /home/ubuntu/FanPulse-App
 
-sudo docker-compose pull
-
-sudo docker-compose up -d
+sudo docker-compose down || true 
+sudo docker-compose pull          
+sudo docker-compose up -d         

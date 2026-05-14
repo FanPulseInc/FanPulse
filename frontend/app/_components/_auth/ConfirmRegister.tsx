@@ -5,7 +5,7 @@ import { useT } from "@/services/i18n/context"
 const ConfirmRegister = () => {
     const { t } = useT();
     return (
-        <div className="w-[370px] min-h-[650px] bg-white rounded-[20px] flex flex-col items-center p-10 text-left shadow-sm">
+        <div className="w-[370px] min-h-[650px] bg-surface rounded-[20px] flex flex-col items-center p-10 text-left shadow-sm">
 
 
             <div className="relative mb-10 mt-6">

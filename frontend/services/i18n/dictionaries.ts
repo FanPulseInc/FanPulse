@@ -190,6 +190,15 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         auth_back: "Назад",
         auth_saving: "Збереження...",
         auth_continue: "Продовжити",
+        pw_min_length: "Мінімум 8 символів",
+        pw_uppercase: "Хоча б одна велика літера (A-Z)",
+        pw_number: "Хоча б одна цифра (0-9)",
+        pw_special: "Хоча б один спецсимвол (!@#$...)",
+        pw_ascii_only: "Тільки англійські символи",
+        pw_strength_weak: "Слабкий",
+        pw_strength_medium: "Середній",
+        pw_strength_strong: "Надійний",
+        auth_error_password_weak: "Пароль не відповідає вимогам безпеки",
         forum_create_post: "Створити пост",
         forum_create_post_plus: "Створити пост +",
         forum_rules: "Правила форуму",
@@ -308,6 +317,7 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         time_in_days: "за {days} дн",
         stage_grand_prix: "Гран-При",
         stage: "Стадія",
+        theme: "Тема",
         forum_rules_page_title: "Правила форуму",
         forum_rules_page_description:
             "FanPulse — це місце для фанатів, а не для хаосу. Порушення правил може призвести до видалення контенту, обмеження доступу або блокування акаунта.",
@@ -489,6 +499,135 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         email_confirm_failed_title: "Підтвердження не вдалося",
         email_confirm_failed_text: "Посилання для підтвердження недійсне або термін його дії минув. Спробуйте зареєструватися ще раз або запросити новий лист.",
         email_confirm_failed_button: "Закрити",
+
+        privacy_title: "Політика обробки персональних даних — FanPulse",
+        privacy_intro:
+            "Ця Політика визначає порядок збору, використання, зберігання та захисту персональних даних користувачів платформи FanPulse.",
+
+        privacy_general_title: "Загальні положення",
+        privacy_general_text_1:
+            "Ця Політика обробки персональних даних визначає порядок збору, використання, зберігання та захисту персональних даних користувачів платформи FanPulse.",
+        privacy_general_text_2:
+            "Метою цієї політики є забезпечення прозорості щодо того, як FanPulse працює з персональними даними користувачів відповідно до чинного законодавства та сучасних стандартів захисту інформації.",
+        privacy_general_text_3:
+            "Користуючись платформою FanPulse, ви погоджуєтесь із умовами цієї Політики.",
+
+        privacy_data_title: "Які персональні дані ми можемо обробляти",
+        privacy_data_intro: "FanPulse може обробляти такі персональні дані:",
+        privacy_data_reg: "Реєстраційні дані",
+        privacy_data_reg_1: "ім'я користувача",
+        privacy_data_reg_2: "email адреса",
+        privacy_data_reg_3: "пароль (у зашифрованому вигляді)",
+        privacy_data_reg_4: "фото профілю (за бажанням)",
+        privacy_data_interaction: "Дані взаємодії",
+        privacy_data_interaction_1: "коментарі",
+        privacy_data_interaction_2: "пости на форумі",
+        privacy_data_interaction_3: "вподобання",
+        privacy_data_interaction_4: "обрані команди, турніри або гравці",
+        privacy_data_interaction_5: "історія активності на платформі",
+        privacy_data_tech: "Технічні дані",
+        privacy_data_tech_1: "IP-адреса",
+        privacy_data_tech_2: "тип браузера",
+        privacy_data_tech_3: "тип пристрою",
+        privacy_data_tech_4: "cookies",
+        privacy_data_tech_5: "журнали помилок і системна аналітика",
+
+        privacy_purpose_title: "Мета обробки персональних даних",
+        privacy_purpose_intro: "Ми обробляємо персональні дані для:",
+        privacy_purpose_1: "забезпечення роботи платформи",
+        privacy_purpose_2: "створення та підтримки акаунта",
+        privacy_purpose_3: "персоналізації контенту",
+        privacy_purpose_4: "підтримки функцій форуму",
+        privacy_purpose_5: "покращення UX та функціональності сайту",
+        privacy_purpose_6: "забезпечення безпеки сервісу",
+        privacy_purpose_7: "виявлення шахрайства або порушень правил",
+        privacy_purpose_8: "комунікації з користувачами",
+
+        privacy_legal_title: "Правові підстави обробки даних",
+        privacy_legal_intro: "Обробка персональних даних здійснюється:",
+        privacy_legal_1: "на підставі згоди користувача",
+        privacy_legal_2: "для виконання функцій платформи",
+        privacy_legal_3: "для забезпечення законних інтересів FanPulse",
+        privacy_legal_4: "відповідно до вимог чинного законодавства",
+
+        privacy_storage_title: "Зберігання та захист даних",
+        privacy_storage_intro:
+            "FanPulse вживає технічних та організаційних заходів для захисту персональних даних від:",
+        privacy_storage_1: "несанкціонованого доступу",
+        privacy_storage_2: "втрати",
+        privacy_storage_3: "зміни",
+        privacy_storage_4: "пошкодження або розповсюдження",
+        privacy_storage_note:
+            "Дані зберігаються лише протягом часу, необхідного для роботи сервісу або виконання юридичних зобов'язань.",
+
+        privacy_transfer_title: "Передача персональних даних",
+        privacy_transfer_text:
+            "FanPulse не продає персональні дані користувачів третім сторонам.",
+        privacy_transfer_cases: "У деяких випадках дані можуть передаватися:",
+        privacy_transfer_1: "технічним партнерам",
+        privacy_transfer_2: "хостинг-провайдерам",
+        privacy_transfer_3: "сервісам аналітики",
+        privacy_transfer_4: "державним органам у випадках, передбачених законом",
+
+        privacy_rights_title: "Права користувача",
+        privacy_rights_intro: "Користувач має право:",
+        privacy_rights_1: "отримати інформацію про свої персональні дані",
+        privacy_rights_2: "змінити або оновити дані",
+        privacy_rights_3: "вимагати видалення акаунта",
+        privacy_rights_4: "відкликати згоду на обробку даних",
+        privacy_rights_5: "звернутися щодо питань конфіденційності",
+
+        privacy_deletion_title: "Видалення персональних даних",
+        privacy_deletion_text_1:
+            "Користувач може подати запит на видалення персональних даних через налаштування акаунта або звернувшись до служби підтримки.",
+        privacy_deletion_text_2:
+            "Після обробки запиту дані будуть видалені або анонімізовані, якщо інше не передбачено законодавством.",
+
+        privacy_minors_title: "Дані неповнолітніх",
+        privacy_minors_text:
+            "FanPulse не призначений для осіб, які не досягли віку, дозволеного законодавством для самостійного використання онлайн-сервісів без згоди батьків або законних представників.",
+
+        privacy_changes_title: "Зміни політики",
+        privacy_changes_text:
+            "FanPulse може оновлювати цю Політику обробки персональних даних. Оновлена версія публікується на сайті та набирає чинності з моменту публікації.",
+
+        a11y_title: "Політика доступності — FanPulse",
+        a11y_intro:
+            "FanPulse прагне забезпечити комфортний та рівний доступ до платформи для всіх користувачів.",
+        a11y_general_title: "Загальна інформація",
+        a11y_general_text_1:
+            "FanPulse прагне забезпечити комфортний та рівний доступ до платформи для всіх користувачів, включаючи людей з інвалідністю та користувачів із різними технічними можливостями.",
+        a11y_general_text_2:
+            "Ми працюємо над тим, щоб сайт був зрозумілим, зручним та доступним незалежно від пристрою, способу навігації чи фізичних можливостей користувача.",
+        a11y_approach_title: "Наш підхід до доступності",
+        a11y_approach_text:
+            "Під час розробки FanPulse ми враховуємо сучасні принципи вебдоступності та прагнемо дотримуватись рекомендацій WCAG (Web Content Accessibility Guidelines). Ми приділяємо увагу:",
+        a11y_approach_1: "читабельності тексту",
+        a11y_approach_2: "контрастності кольорів",
+        a11y_approach_3: "логічній структурі сторінок",
+        a11y_approach_4: "адаптивності інтерфейсу",
+        a11y_approach_5: "навігації з клавіатури",
+        a11y_approach_6: "коректному відображенню на різних пристроях",
+        a11y_content_title: "Доступність контенту",
+        a11y_content_intro: "Ми намагаємось:",
+        a11y_content_1: "використовувати зрозумілі формулювання",
+        a11y_content_2: "створювати структурований контент",
+        a11y_content_3: "уникати перевантаження інтерфейсу",
+        a11y_content_4: "забезпечувати передбачувану навігацію",
+        a11y_adaptive_title: "Адаптивність платформи",
+        a11y_adaptive_intro: "FanPulse оптимізований для:",
+        a11y_adaptive_1: "комп'ютерів",
+        a11y_adaptive_2: "планшетів",
+        a11y_adaptive_3: "мобільних пристроїв",
+        a11y_adaptive_note:
+            "Інтерфейс автоматично адаптується до розміру екрана користувача.",
+        a11y_feedback_title: "Зворотний зв'язок",
+        a11y_feedback_text:
+            "Ми постійно працюємо над покращенням доступності платформи. Якщо ви зіткнулися з проблемою доступності або маєте пропозиції щодо покращення, будь ласка, зв'яжіться з нами.",
+        a11y_feedback_contact: "Email:",
+        a11y_updates_title: "Оновлення політики",
+        a11y_updates_text:
+            "FanPulse може періодично оновлювати цю Політику доступності відповідно до розвитку платформи та сучасних стандартів вебдоступності.",
     },
     en: {
         nav_home: "HOME",
@@ -679,6 +818,15 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         auth_back: "Back",
         auth_saving: "Saving...",
         auth_continue: "Continue",
+        pw_min_length: "At least 8 characters",
+        pw_uppercase: "At least one uppercase letter (A-Z)",
+        pw_number: "At least one number (0-9)",
+        pw_special: "At least one special character (!@#$...)",
+        pw_ascii_only: "English characters only",
+        pw_strength_weak: "Weak",
+        pw_strength_medium: "Medium",
+        pw_strength_strong: "Strong",
+        auth_error_password_weak: "Password does not meet security requirements",
         forum_create_post: "Create post",
         forum_create_post_plus: "Create post +",
         forum_rules: "Forum rules",
@@ -797,6 +945,7 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         time_in_days: "in {days} days",
         stage_grand_prix: "Grand Prix",
         stage: "Stage",
+        theme: "Theme",
         forum_rules_page_title: "Forum Rules",
         forum_rules_page_description:
             "FanPulse is a place for fans, not chaos. Violating the rules may result in content removal, restrictions, or account suspension.",
@@ -979,6 +1128,134 @@ export const dictionaries: Record<Lang, Record<string, string>> = {
         email_confirm_failed_text: "The confirmation link is invalid or has expired. Please try registering again or request a new email.",
         email_confirm_failed_button: "Close",
 
+        privacy_title: "Personal Data Processing Policy — FanPulse",
+        privacy_intro:
+            "This Policy defines the procedures for collecting, using, storing, and protecting personal data of FanPulse platform users.",
+
+        privacy_general_title: "General Provisions",
+        privacy_general_text_1:
+            "This Personal Data Processing Policy defines the procedures for collecting, using, storing, and protecting personal data of FanPulse platform users.",
+        privacy_general_text_2:
+            "The purpose of this policy is to ensure transparency regarding how FanPulse handles user personal data in accordance with applicable legislation and modern information protection standards.",
+        privacy_general_text_3:
+            "By using the FanPulse platform, you agree to the terms of this Policy.",
+
+        privacy_data_title: "What Personal Data We May Process",
+        privacy_data_intro: "FanPulse may process the following personal data:",
+        privacy_data_reg: "Registration Data",
+        privacy_data_reg_1: "username",
+        privacy_data_reg_2: "email address",
+        privacy_data_reg_3: "password (encrypted)",
+        privacy_data_reg_4: "profile photo (optional)",
+        privacy_data_interaction: "Interaction Data",
+        privacy_data_interaction_1: "comments",
+        privacy_data_interaction_2: "forum posts",
+        privacy_data_interaction_3: "likes",
+        privacy_data_interaction_4: "favourite teams, tournaments, or players",
+        privacy_data_interaction_5: "activity history on the platform",
+        privacy_data_tech: "Technical Data",
+        privacy_data_tech_1: "IP address",
+        privacy_data_tech_2: "browser type",
+        privacy_data_tech_3: "device type",
+        privacy_data_tech_4: "cookies",
+        privacy_data_tech_5: "error logs and system analytics",
+
+        privacy_purpose_title: "Purpose of Personal Data Processing",
+        privacy_purpose_intro: "We process personal data to:",
+        privacy_purpose_1: "ensure platform functionality",
+        privacy_purpose_2: "create and maintain accounts",
+        privacy_purpose_3: "personalize content",
+        privacy_purpose_4: "support forum features",
+        privacy_purpose_5: "improve UX and site functionality",
+        privacy_purpose_6: "ensure service security",
+        privacy_purpose_7: "detect fraud or rule violations",
+        privacy_purpose_8: "communicate with users",
+
+        privacy_legal_title: "Legal Basis for Data Processing",
+        privacy_legal_intro: "Personal data processing is carried out:",
+        privacy_legal_1: "based on user consent",
+        privacy_legal_2: "to perform platform functions",
+        privacy_legal_3: "to ensure legitimate interests of FanPulse",
+        privacy_legal_4: "in accordance with applicable legislation",
+
+        privacy_storage_title: "Data Storage and Protection",
+        privacy_storage_intro:
+            "FanPulse takes technical and organizational measures to protect personal data from:",
+        privacy_storage_1: "unauthorized access",
+        privacy_storage_2: "loss",
+        privacy_storage_3: "alteration",
+        privacy_storage_4: "damage or distribution",
+        privacy_storage_note:
+            "Data is stored only for the time necessary for the service to function or to fulfill legal obligations.",
+
+        privacy_transfer_title: "Transfer of Personal Data",
+        privacy_transfer_text:
+            "FanPulse does not sell user personal data to third parties.",
+        privacy_transfer_cases: "In some cases, data may be transferred to:",
+        privacy_transfer_1: "technical partners",
+        privacy_transfer_2: "hosting providers",
+        privacy_transfer_3: "analytics services",
+        privacy_transfer_4: "government authorities in cases provided by law",
+
+        privacy_rights_title: "User Rights",
+        privacy_rights_intro: "The user has the right to:",
+        privacy_rights_1: "obtain information about their personal data",
+        privacy_rights_2: "change or update data",
+        privacy_rights_3: "request account deletion",
+        privacy_rights_4: "withdraw consent for data processing",
+        privacy_rights_5: "contact us regarding privacy matters",
+
+        privacy_deletion_title: "Deletion of Personal Data",
+        privacy_deletion_text_1:
+            "The user may submit a request to delete personal data through account settings or by contacting support.",
+        privacy_deletion_text_2:
+            "After processing the request, data will be deleted or anonymized, unless otherwise required by law.",
+
+        privacy_minors_title: "Data of Minors",
+        privacy_minors_text:
+            "FanPulse is not intended for individuals who have not reached the age permitted by law for independent use of online services without the consent of parents or legal guardians.",
+
+        privacy_changes_title: "Policy Changes",
+        privacy_changes_text:
+            "FanPulse may update this Personal Data Processing Policy. The updated version is published on the website and takes effect from the moment of publication.",
+
+        a11y_title: "Accessibility Policy — FanPulse",
+        a11y_intro:
+            "FanPulse strives to provide comfortable and equal access to the platform for all users.",
+        a11y_general_title: "General Information",
+        a11y_general_text_1:
+            "FanPulse strives to provide comfortable and equal access to the platform for all users, including people with disabilities and users with varying technical capabilities.",
+        a11y_general_text_2:
+            "We work to ensure the site is clear, convenient, and accessible regardless of device, navigation method, or physical abilities.",
+        a11y_approach_title: "Our Approach to Accessibility",
+        a11y_approach_text:
+            "During the development of FanPulse, we follow modern web accessibility principles and strive to comply with WCAG (Web Content Accessibility Guidelines). We pay attention to:",
+        a11y_approach_1: "text readability",
+        a11y_approach_2: "color contrast",
+        a11y_approach_3: "logical page structure",
+        a11y_approach_4: "interface adaptability",
+        a11y_approach_5: "keyboard navigation",
+        a11y_approach_6: "correct display on various devices",
+        a11y_content_title: "Content Accessibility",
+        a11y_content_intro: "We strive to:",
+        a11y_content_1: "use clear wording",
+        a11y_content_2: "create structured content",
+        a11y_content_3: "avoid interface overload",
+        a11y_content_4: "provide predictable navigation",
+        a11y_adaptive_title: "Platform Adaptability",
+        a11y_adaptive_intro: "FanPulse is optimized for:",
+        a11y_adaptive_1: "desktop computers",
+        a11y_adaptive_2: "tablets",
+        a11y_adaptive_3: "mobile devices",
+        a11y_adaptive_note:
+            "The interface automatically adapts to the user's screen size.",
+        a11y_feedback_title: "Feedback",
+        a11y_feedback_text:
+            "We are constantly working to improve platform accessibility. If you encounter an accessibility issue or have suggestions for improvement, please contact us.",
+        a11y_feedback_contact: "Email:",
+        a11y_updates_title: "Policy Updates",
+        a11y_updates_text:
+            "FanPulse may periodically update this Accessibility Policy in accordance with platform development and modern web accessibility standards.",
 
     },
 };
