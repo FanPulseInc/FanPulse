@@ -64,7 +64,7 @@ namespace FanPulseApi
 
             builder.Services.Configure<ResendClientOptions>(options =>
             {
-                options.ApiToken = builder.Configuration["Resend:ApiKey"]!;
+                options.ApiToken = builder.Configuration["ResendApiKey"]!;
             });
 
             builder.Services.AddTransient<IResend, ResendClient>();
