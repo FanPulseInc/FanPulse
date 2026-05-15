@@ -198,9 +198,18 @@ const Register = () => {
 
       await registerUser({ data: payload })
 
+      localStorage.setItem(
+        "pending_verification_email",
+        email
+      )
+
+      saveFavCategoryIds(categoryIds)
+
+      setShowCategoryModal(false)
+
+      router.push("?auth=confirm")
       saveFavCategoryIds(categoryIds)
       setShowCategoryModal(false)
-      router.push("?auth=login")
     } catch (err: unknown) {
       console.error(err)
 

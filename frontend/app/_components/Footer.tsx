@@ -15,8 +15,8 @@ const Footer = () => {
   ];
 
   const esportItems = [
-    { label: "Counter Strike", href: "esport/cs2" },
-    { label: "Dota 2", href: "esport/dota" },
+    { label: "Counter Strike", href: "/esport/cs2" },
+    { label: "Dota 2", href: "/esport/dota" },
   ];
 
   const anotherItems = [

@@ -10,4 +10,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__PostgresConnection=${DB_CONNECTION}
       - Jwt__Key=${JWT_SECRET}
+      - ResendApiKey=${ResendApiKey}
+      - AppBaseUrl=${AppBaseUrl}
+      - FrontendBaseUrl=${FrontendBaseUrl}
     restart: always

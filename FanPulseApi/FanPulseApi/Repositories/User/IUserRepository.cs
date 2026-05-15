@@ -16,4 +16,6 @@ public interface IUserRepository
 
     Task<Models.User?> UpdateUserCategoriesAsync(Guid id,List<Guid> categoryIds);
 
+    Task<Models.User?> GetUserByEmailVerificationTokenHashAsync(string tokenHash);
+
 }
