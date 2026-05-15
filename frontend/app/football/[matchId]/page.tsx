@@ -420,9 +420,9 @@ export default function FootballMatchPage() {
 
     return (
         <SportContainer>
-            <div className="flex gap-6 items-start justify-start">
+            <div className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-start justify-start">
                 {/* Left — grouped schedule with day nav */}
-                <div className="p-10">
+                <div className="w-full lg:w-auto p-4 sm:p-6 lg:p-10">
                     <ScheduleColumn
                         groups={annotatedGroups}
                         selectedMatchId={matchId}
@@ -437,7 +437,7 @@ export default function FootballMatchPage() {
                 </div>
 
                 {/* Middle — match detail */}
-                <div className="flex-1 min-w-0 p-5 flex flex-col gap-4">
+                <div className="flex-1 min-w-0 px-4 pb-4 lg:p-5 flex flex-col gap-4">
                     {eventLoading && (
                         <div className="text-center text-text-secondary text-sm py-10 bg-surface rounded-[20px]">
                             {t("loading_match")}
@@ -637,7 +637,7 @@ export default function FootballMatchPage() {
                 </div>
 
                 {/* Right — banner */}
-                <div className="shrink-0 m-3 mt-6 max-w-[280px] max-h-[1000px]">
+                <div className="hidden xl:block shrink-0 m-3 mt-6 max-w-[280px] max-h-[1000px]">
                     <img
                         src="/banners/banner.png"
                         alt="banner"

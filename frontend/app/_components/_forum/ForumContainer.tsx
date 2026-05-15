@@ -1,7 +1,7 @@
 export const ForumContainer = ({ children }: { children: React.ReactNode }) => {
     return (
         <div className="w-full min-h-screen bg-background py-10">
-            <div className="mx-auto grid max-w-[1540px] grid-cols-[220px_1039px_220px] gap-6 px-4 items-start">
+            <div className="mx-auto grid max-w-[1540px] grid-cols-1 2xl:grid-cols-[220px_1fr_220px] gap-6 px-4 items-start">
 
                 <aside className="hidden 2xl:block sticky top-[120px]">
                     <img
@@ -11,7 +11,7 @@ export const ForumContainer = ({ children }: { children: React.ReactNode }) => {
                     />
                 </aside>
 
-                <main className="w-full max-w-[1039px]">
+                <main className="w-full max-w-full 2xl:max-w-[1039px]">
                     {children}
                 </main>
 

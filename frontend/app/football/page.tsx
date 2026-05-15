@@ -252,11 +252,11 @@ export default function FootballPage() {
 
     return (
         <SportContainer>
-            <div className="flex gap-6 items-start justify-start">
+            <div className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-start justify-start">
                 {/* Left — schedule grouped by league, navigable by day */}
-                <div className="p-10">
+                <div className="w-full lg:w-auto p-4 sm:p-6 lg:p-10">
                     {anyLoading && (
-                        <div className="w-[560px] text-center text-text-secondary text-sm py-2">
+                        <div className="w-full lg:w-[560px] text-center text-text-secondary text-sm py-2">
                             {t("loading_matches")} ({season})...
                         </div>
                     )}
@@ -273,7 +273,7 @@ export default function FootballPage() {
                 </div>
 
                 {/* Middle — carousel of upcoming matches */}
-                <div className="flex-1 min-w-0 p-5">
+                <div className="flex-1 min-w-0 px-4 pb-4 lg:p-5">
                     {anyLoading ? (
                         <div className="text-center text-text-secondary text-sm py-10 bg-surface rounded-[20px]">
                             {t("loading_announcements")}
@@ -288,7 +288,7 @@ export default function FootballPage() {
                 </div>
 
                 {/* Right — banner */}
-                <div className="shrink-0 m-3 mt-6 max-w-[280px] max-h-[1000px]">
+                <div className="hidden xl:block shrink-0 m-3 mt-6 max-w-[280px] max-h-[1000px]">
                     <img
                         src="/banners/banner.png"
                         alt="banner"

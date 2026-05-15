@@ -242,7 +242,7 @@ export default function EsportsScheduleColumn({
   }
 
   return (
-    <div className="flex w-[560px] flex-col gap-[10px]">
+    <div className="flex w-full lg:w-[560px] flex-col gap-[10px]">
       <div className="flex h-[40px] w-full flex-row items-center justify-center gap-[10px] rounded-[14px] bg-[#212121] px-3">
         {topTabs.map((tab) => (
           <button

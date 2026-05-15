@@ -152,10 +152,10 @@ export default function Cs2Layout({ children }: { children: ReactNode }) {
   }, [dateIso, phase]);
 
   return (
-    <div className="flex gap-6 items-start justify-start">
-      <div className="p-10">
+    <div className="flex flex-col lg:flex-row gap-6 items-stretch lg:items-start justify-start">
+      <div className="w-full lg:w-auto p-4 sm:p-6 lg:p-10">
         {loading ? (
-          <div className="w-[560px] rounded-[20px] bg-surface-secondary py-10 text-center text-sm text-text-muted">
+          <div className="w-full lg:w-[560px] rounded-[20px] bg-surface-secondary py-10 text-center text-sm text-text-muted">
             {t("loading")}
           </div>
         ) : (
@@ -172,13 +172,13 @@ export default function Cs2Layout({ children }: { children: ReactNode }) {
         )}
       </div>
 
-      <div className="flex-1 min-w-0 p-5">
+      <div className="flex-1 min-w-0 px-4 pb-4 lg:p-5">
         <div className="w-full min-h-[500px] overflow-hidden rounded-[20px] bg-zinc-200 border border-border-theme shadow-sm">
           {children}
         </div>
       </div>
 
-      <div className="shrink-0 m-3 mt-6 max-w-[280px] max-h-[1000px]">
+      <div className="hidden xl:block shrink-0 m-3 mt-6 max-w-[280px] max-h-[1000px]">
         <img
           src="/banners/cs2_promo.gif"
           alt="cs2"

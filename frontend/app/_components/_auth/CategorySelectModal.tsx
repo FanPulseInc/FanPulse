@@ -55,7 +55,7 @@ export default function CategorySelectModal({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-[370px] bg-surface rounded-[20px] p-8 flex flex-col gap-5 shadow-xl"
+        className="w-full max-w-[370px] bg-surface rounded-[20px] p-6 sm:p-8 flex flex-col gap-5 shadow-xl"
       >
         <div className="flex flex-col gap-1">
           <h2 className="text-h1 text-brand-black">{t("auth_choose_categories")}</h2>

@@ -12,7 +12,7 @@ export const ModalLayout = ({ isOpen, onCloseAction, children }: Props) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 flex items-center justify-center z-50"
+          className="fixed inset-0 flex items-center justify-center z-50 px-4"
           style={{
             backdropFilter: 'blur(5px)',
           

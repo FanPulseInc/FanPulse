@@ -290,7 +290,7 @@ export default function ForumPage() {
             }
 
             <div className="flex flex-col">
-                <div className="w-[1039px] h-[60px] bg-[#af292a] rounded-[20px] flex items-center justify-center relative z-20">
+                <div className="w-full h-auto min-h-[60px] bg-[#af292a] rounded-[20px] flex flex-wrap items-center justify-center gap-2 px-4 py-3 sm:px-4 relative z-20">
                     <button
                         onClick={() => {
                             if (!user) {
@@ -300,7 +300,7 @@ export default function ForumPage() {
 
                             router.push("/forum/create");
                         }}
-                        className="absolute left-[16px] top-1/2 -translate-y-1/2 w-[154px] h-[34px] bg-[#212121] rounded-[13px] flex flex-row justify-center items-center gap-[4px] text-white font-bold text-sm hover:bg-black transition-all cursor-pointer"
+                        className="order-1 w-full sm:w-auto sm:absolute sm:left-[16px] sm:top-1/2 sm:-translate-y-1/2 h-[34px] bg-[#212121] rounded-[13px] flex flex-row justify-center items-center gap-[4px] text-white font-bold text-sm hover:bg-black transition-all cursor-pointer px-4"
                     >
                         {t("forum_create_post_plus")}
                     </button>
@@ -315,14 +315,14 @@ export default function ForumPage() {
                         {isCategoryOpen ? ICONS.ArrowUpWhite : ICONS.ArrowDownWhite}
                     </button>
 
-                    <button onClick={() => router.push("/forum/rules")} className="absolute right-[16px] top-[26px] w-[198px] h-[66px] bg-[#212121] rounded-[20px] flex flex-row justify-center items-center gap-[10px] text-white font-bold text-sm shadow-lg hover:bg-black transition-all">
+                    <button onClick={() => router.push("/forum/rules")} className="order-3 w-full sm:w-auto sm:absolute sm:right-[16px] sm:top-[26px] h-[34px] sm:h-[66px] bg-[#212121] rounded-[13px] sm:rounded-[20px] flex flex-row justify-center items-center gap-[10px] text-white font-bold text-sm shadow-lg hover:bg-black transition-all px-4 sm:px-6 sm:w-[198px]">
                         {t("forum_rules")}
                     </button>
                 </div>
 
                 <div className="relative">
                     <div
-                        className={`absolute left-1/2 -translate-x-1/2 -top-2 z-30 w-[406px] pt-[18px] pr-[20px] pb-[19px] pl-[20px]  bg-surface border-[10px] border-[#af292a] rounded-[11px] flex flex-col justify-start items-start gap-[13px] transition-all duration-300 ease-in-out origin-top ${isCategoryOpen
+                        className={`absolute left-1/2 -translate-x-1/2 -top-2 z-30 w-[calc(100%-2rem)] sm:w-[406px] pt-[18px] pr-[20px] pb-[19px] pl-[20px]  bg-surface border-[10px] border-[#af292a] rounded-[11px] flex flex-col justify-start items-start gap-[13px] transition-all duration-300 ease-in-out origin-top ${isCategoryOpen
                             ? "opacity-100 scale-y-100 pointer-events-auto"
                             : "opacity-0 scale-y-0 pointer-events-none"
                             }`}
@@ -354,7 +354,7 @@ export default function ForumPage() {
                     </div>
                 </div>
 
-                <div className="w-[1039px] bg-surface rounded-[20px] shadow-sm border border-border-theme -mt-5 pt-8 pb-5 px-5 flex flex-col gap-4;">
+                <div className="w-full bg-surface rounded-[20px] shadow-sm border border-border-theme -mt-5 pt-8 pb-5 px-5 flex flex-col gap-4;">
                     <div className="flex justify-between items-center mb-4 px-2">
                         <div className="flex gap-2 -mt-1">
                             {navFilters.map((filter) => {

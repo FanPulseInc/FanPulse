@@ -210,7 +210,7 @@ const Header = () => {
           >
             <div className="absolute inset-0 rounded-full bg-brand-red/5 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
 
-            <div className="relative transition-transform duration-300 group-hover:-translate-y-0.5">
+            <div className="relative transition-transform duration-300 group-hover:-translate-y-0.5 [&_svg]:w-[200px] [&_svg]:h-auto sm:[&_svg]:w-[260px] lg:[&_svg]:w-[347px]">
               {ICONS.ICON}
             </div>
           </Link>
@@ -232,12 +232,12 @@ const Header = () => {
             <button
               type="button"
               onClick={() => setLang(lang === "uk" ? "en" : "uk")}
-              className="group hidden h-[44px] min-w-[80px] cursor-pointer items-center justify-center gap-2 rounded-[50px] border-2 border-brand-red px-4 text-body-l font-medium text-brand-red transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-red/5 hover:shadow-[0_8px_24px_rgba(175,41,42,0.10)] sm:flex lg:h-[50px] lg:min-w-[100px] lg:px-6"
+              className="group flex h-[36px] w-[36px] cursor-pointer items-center justify-center rounded-full border-2 border-brand-red text-xs font-bold text-brand-red transition-all duration-300 hover:bg-brand-red/5 sm:h-[44px] sm:w-auto sm:min-w-[80px] sm:gap-2 sm:rounded-[50px] sm:px-4 sm:text-body-l sm:font-medium sm:hover:-translate-y-0.5 sm:hover:shadow-[0_8px_24px_rgba(175,41,42,0.10)] lg:h-[50px] lg:min-w-[100px] lg:px-6"
               aria-label="Switch language"
             >
               {lang === "uk" ? "UA" : "EN"}
 
-              <span className="transition-transform duration-300 group-hover:rotate-180">
+              <span className="hidden transition-transform duration-300 group-hover:rotate-180 sm:inline">
                 {ICONS.ArrowDown}
               </span>
             </button>
@@ -245,7 +245,7 @@ const Header = () => {
             {user ? (
               <button
                 type="button"
-                className="group flex h-15 w-15 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-brand-red bg-surface-secondary transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-[0_8px_26px_rgba(175,41,42,0.18)]"
+                className="group flex h-10 w-10 sm:h-15 sm:w-15 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-brand-red bg-surface-secondary transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-[0_8px_26px_rgba(175,41,42,0.18)]"
                 onClick={() => router.push("/profile")}
                 aria-label="Open profile"
               >
@@ -393,7 +393,7 @@ const Header = () => {
                         className="group flex cursor-pointer items-center justify-center gap-2 rounded-[12px] p-2.5 transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-red/5"
                       >
                         <NavIcon simple>{item.icon}</NavIcon>
-                        <NavLabel force>{t(item.labelKey)}</NavLabel>
+                        <NavLabel>{t(item.labelKey)}</NavLabel>
 
                         <span
                           className={`transition-transform duration-300 ${
@@ -506,7 +506,7 @@ function NavIcon({
 }) {
   if (simple) {
     return (
-      <div className="flex h-[18px] w-[18px] items-center justify-center transition-transform duration-300 group-hover:scale-110">
+      <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-brand-red transition-transform duration-300 group-hover:scale-110 lg:h-[18px] lg:w-[18px] lg:border-0 [&_svg]:h-4 [&_svg]:w-4 lg:[&_svg]:h-full lg:[&_svg]:w-full">
         {children}
       </div>
     );

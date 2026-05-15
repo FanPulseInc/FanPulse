@@ -163,10 +163,10 @@ export default function DotaLayout({ children }: { children: ReactNode }) {
   }, [dateIso, phase]);
 
   return (
-    <div className="flex items-start justify-start gap-6">
-      <div className="p-10">
+    <div className="flex flex-col lg:flex-row items-stretch lg:items-start justify-start gap-6">
+      <div className="w-full lg:w-auto p-4 sm:p-6 lg:p-10">
         {loading ? (
-          <div className="w-[560px] rounded-[20px] bg-surface-secondary py-10 text-center text-sm text-text-muted">
+          <div className="w-full lg:w-[560px] rounded-[20px] bg-surface-secondary py-10 text-center text-sm text-text-muted">
             Завантаження...
           </div>
         ) : (
@@ -183,13 +183,13 @@ export default function DotaLayout({ children }: { children: ReactNode }) {
         )}
       </div>
 
-      <div className="min-w-0 flex-1 p-5">
+      <div className="min-w-0 flex-1 px-4 pb-4 lg:p-5">
         <div className="min-h-[500px] w-full overflow-hidden rounded-[20px] border border-border-theme bg-zinc-200 shadow-sm">
           {children}
         </div>
       </div>
 
-      <div className="m-3 mt-6 max-h-[1000px] max-w-[280px] shrink-0">
+      <div className="hidden xl:block m-3 mt-6 max-h-[1000px] max-w-[280px] shrink-0">
         <img
           src="/banners/dota_promo.gif"
           alt="dota"

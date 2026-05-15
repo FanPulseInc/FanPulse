@@ -11,7 +11,7 @@ const ResetPassword = () => {
     }
 
     return (
-        <div className="bg-surface overflow-hidden rounded-[20px] w-[370px] min-h-[650px] flex flex-col gap-8 p-8 items-center justify-center shadow-sm">
+        <div className="bg-surface overflow-hidden rounded-[20px] w-full max-w-[370px] min-h-[650px] flex flex-col gap-8 p-6 sm:p-8 items-center justify-center shadow-sm">
 
             <div className="w-full max-w-[340px] flex flex-col justify-center gap-6 relative">
                 <h1 className="text-h1 text-brand-black leading-tight">

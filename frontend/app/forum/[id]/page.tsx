@@ -120,9 +120,9 @@ export default function ThreadDetailPage() {
             )}
             <div className="flex flex-col gap-6">
                 <div className="w-full bg-surface rounded-[20px] shadow-sm border border-border-theme flex flex-col relative overflow-visible">
-                    <div className="w-full h-[60px] bg-[#af292a] rounded-[20px] flex items-center justify-center px-6 relative z-10">
+                    <div className="w-full min-h-[60px] bg-[#af292a] rounded-[20px] flex flex-wrap items-center justify-center gap-2 px-4 sm:px-6 py-2 relative z-10">
                         <div className="flex items-center gap-3">
-                            <div className="absolute left-[24px] w-[45px] h-[45px] flex items-center justify-center">
+                            <div className="hidden sm:flex absolute left-[24px] w-[45px] h-[45px] items-center justify-center">
                                 <div className="scale-135">
                                     <LikeButton
                                         targetId={postId}
@@ -133,21 +133,21 @@ export default function ThreadDetailPage() {
                                     />
                                 </div>
                             </div>
-                            <h1 className="text-white font-bold text-lg tracking-tight">
+                            <h1 className="text-white font-bold text-base sm:text-lg tracking-tight text-center">
                                 {post.title}
                             </h1>
                         </div>
-                        <div className="absolute right-[10px] top-[12px] w-[202px] h-[37px] bg-[#212121] rounded-full flex items-center justify-center shadow-md">
-                            <span className="text-white text-sm font-bold tracking-wide">
+                        <div className="sm:absolute sm:right-[10px] sm:top-[12px] w-auto sm:w-[202px] h-[37px] bg-[#212121] rounded-full flex items-center justify-center shadow-md px-4">
+                            <span className="text-white text-xs sm:text-sm font-bold tracking-wide">
                                 {formatDate(post.createdAt)}
                             </span>
                         </div>
                     </div>
-                    <div className="p-8 pt-10 relative">
+                    <div className="p-4 sm:p-8 pt-10 relative">
                         <div className="text-text-primary text-sm leading-relaxed whitespace-pre-wrap">
                             {post.description}
                         </div>
-                        <div className="flex justify-between items-center mt-6">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mt-6">
                             <button
                                 onClick={() => setIsCommenting(v => !v)}
                                 className="w-[165px] h-[31px] bg-[#212121] text-white rounded-[20px] text-[13px] font-bold hover:opacity-90 active:scale-95 transition-all cursor-pointer"
